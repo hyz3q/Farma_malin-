@@ -1,0 +1,485 @@
+<title>Malinowy Wąż AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Nunito+Sans:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  :root {
+    --bg: #F1F4EC;
+    --surface: #FFFFFF;
+    --ink: #1B281D;
+    --muted: #5B685C;
+    --line: #D5DCCD;
+    --rasp: #C21E56;
+    --rasp-soft: #F7DCE5;
+    --leaf: #2E7D46;
+    --leaf-soft: #DCEEDF;
+    --board: #1C2E20;
+    --board-alt: #213626;
+    --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+    --body: "Nunito Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #111713;
+      --surface: #19211B;
+      --ink: #E4ECE2;
+      --muted: #97A597;
+      --line: #2B372D;
+      --rasp: #F0527F;
+      --rasp-soft: #3A1B26;
+      --leaf: #5CC07A;
+      --leaf-soft: #1D3324;
+      --board: #0E1A11;
+      --board-alt: #122016;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #111713;
+    --surface: #19211B;
+    --ink: #E4ECE2;
+    --muted: #97A597;
+    --line: #2B372D;
+    --rasp: #F0527F;
+    --rasp-soft: #3A1B26;
+    --leaf: #5CC07A;
+    --leaf-soft: #1D3324;
+    --board: #0E1A11;
+    --board-alt: #122016;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.5;
+    padding: 0 16px;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding-block: 28px 48px; display: grid; gap: 28px; }
+
+  header { display: grid; gap: 6px; }
+  .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--rasp); font-weight: 700; }
+  h1 { font-family: var(--display); font-weight: 800; font-size: clamp(30px, 6vw, 52px); line-height: 1.02; margin: 0; letter-spacing: -.02em; text-wrap: balance; }
+  h1 em { font-style: normal; color: var(--rasp); }
+  .lede { margin: 4px 0 0; color: var(--muted); max-width: 62ch; }
+
+  .main { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+  @media (max-width: 780px) { .main { grid-template-columns: 1fr; } }
+
+  .board-box { position: relative; width: 100%; max-width: 520px; aspect-ratio: 1; border-radius: 14px; overflow: hidden; background: var(--board); box-shadow: 0 1px 0 var(--line), 0 12px 30px -18px rgba(0,0,0,.45); justify-self: center; }
+  #board { width: 100%; height: 100%; display: block; }
+  .board-tag { position: absolute; left: 12px; top: 10px; font-family: var(--mono); font-size: 12px; color: #CFE3D2; background: rgba(0,0,0,.35); padding: 3px 8px; border-radius: 6px; font-variant-numeric: tabular-nums; }
+
+  .panel { display: grid; gap: 18px; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+  .seg button { border: 0; background: transparent; color: var(--ink); font: 600 14px var(--body); padding: 8px 12px; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button[aria-pressed="true"] { background: var(--leaf); color: #fff; }
+  .btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 600 14px var(--body); padding: 8px 14px; border-radius: 10px; cursor: pointer; }
+  .btn.danger { color: var(--rasp); }
+  button:focus-visible { outline: 3px solid var(--rasp); outline-offset: 2px; }
+  .seg button:hover:not([aria-pressed="true"]), .btn:hover { background: var(--leaf-soft); }
+
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  @media (max-width: 420px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .stat { background: var(--surface); padding: 10px 12px; display: grid; gap: 2px; }
+  .stat .k { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  .stat .v { font-family: var(--mono); font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 12px; }
+  .card h2 { font-family: var(--display); font-weight: 600; font-size: 18px; margin: 0; }
+  .card .sub { color: var(--muted); font-size: 13px; margin: -8px 0 0; }
+
+  .senses { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font-size: 12.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+  .chip.on { background: var(--rasp-soft); border-color: transparent; color: var(--rasp); }
+  .chip.food { background: var(--leaf-soft); border-color: transparent; color: var(--leaf); }
+
+  .qrows { display: grid; gap: 8px; }
+  .qrow { display: grid; grid-template-columns: 74px 1fr 64px; gap: 10px; align-items: center; font-size: 14px; }
+  .qrow .lbl { font-weight: 700; }
+  .qrow .val { font-family: var(--mono); font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+  .track { position: relative; height: 14px; background: var(--bg); border-radius: 4px; }
+  .track::before { content: ""; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--line); }
+  .fill { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
+  .qrow.pick .lbl::after { content: " ◀"; color: var(--leaf); font-size: 11px; }
+
+  .chart-card canvas { width: 100%; height: 190px; display: block; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); }
+  .legend i { display: inline-block; width: 12px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+
+  .how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 780px) { .how { grid-template-columns: 1fr; } }
+  .how div { display: grid; gap: 4px; align-content: start; }
+  .how b { font-family: var(--display); font-size: 17px; font-weight: 600; }
+  .how span.n { font-family: var(--mono); color: var(--rasp); font-size: 12px; font-weight: 700; }
+  .how p { margin: 0; color: var(--muted); max-width: 40ch; }
+  code { font-family: var(--mono); font-size: .9em; background: var(--bg); padding: 1px 5px; border-radius: 4px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Uczenie ze wzmocnieniem · Q-learning</div>
+    <h1>Wąż, który sam uczy się <em>zbierać maliny</em></h1>
+    <p class="lede">Nikt nie powiedział mu, jak grać. Na początku rusza się losowo i ciągle ginie. Za każdą malinę dostaje nagrodę, za zderzenie karę, i z każdą grą gra trochę mądrzej. Włącz <b>Turbo</b>, a po kilkuset grach zobaczysz różnicę.</p>
+  </header>
+
+  <section class="main">
+    <div class="board-box">
+      <canvas id="board" width="520" height="520" aria-label="Plansza gry w węża"></canvas>
+      <div class="board-tag" id="boardTag">gra 1 · maliny 0</div>
+    </div>
+
+    <div class="panel">
+      <div class="controls">
+        <div class="seg" role="group" aria-label="Prędkość">
+          <button id="sp-slow" data-sps="7">Wolno</button>
+          <button id="sp-normal" data-sps="25" aria-pressed="true">Normalnie</button>
+          <button id="sp-fast" data-sps="400">Szybko</button>
+          <button id="sp-turbo" data-sps="40000">Turbo</button>
+        </div>
+        <button class="btn" id="pauseBtn">Pauza</button>
+        <button class="btn danger" id="resetBtn">Nowy mózg</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><span class="k">Gry</span><span class="v" id="stGames">0</span></div>
+        <div class="stat"><span class="k">Rekord</span><span class="v" id="stBest">0</span></div>
+        <div class="stat"><span class="k">Średnia</span><span class="v" id="stAvg">0.0</span></div>
+        <div class="stat"><span class="k">Ciekawość</span><span class="v" id="stEps">40%</span></div>
+      </div>
+
+      <div class="card">
+        <h2>Co teraz myśli AI</h2>
+        <p class="sub">Co wąż widzi w tej chwili i ile punktów spodziewa się za każdy ruch.</p>
+        <div class="senses" id="senses"></div>
+        <div class="qrows" id="qrows"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card chart-card">
+    <h2>Postępy nauki</h2>
+    <div class="legend">
+      <span><i style="background: var(--line)"></i>maliny w każdej grze</span>
+      <span><i style="background: var(--rasp)"></i>średnia z ostatnich 50 gier</span>
+    </div>
+    <canvas id="chart" aria-label="Wykres wyników kolejnych gier"></canvas>
+  </section>
+
+  <section class="how">
+    <div><span class="n">1 · PATRZY</span><b>11 pytań tak/nie</b><p>Czy przede mną, z lewej i z prawej jest ściana albo ogon? W którą stronę jadę? Czy malina jest wyżej, niżej, z lewej, z prawej? Daje to 2048 możliwych sytuacji.</p></div>
+    <div><span class="n">2 · WYBIERA</span><b>Tabela doświadczeń</b><p>Dla każdej sytuacji wąż pamięta, ile opłacał się ruch prosto, w lewo i w prawo. Wybiera najlepszy, ale czasem próbuje czegoś losowo. To jego „ciekawość”, która maleje z każdą grą.</p></div>
+    <div><span class="n">3 · UCZY SIĘ</span><b>Nagroda i kara</b><p>Malina to <code>+10</code>, zderzenie to <code>−10</code>. Po każdym kroku poprawia wpis w tabeli: „ten ruch w tej sytuacji był lepszy albo gorszy, niż myślałem”.</p></div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const W = 20, H = 20;
+  const D = [[0, -1], [1, 0], [0, 1], [-1, 0]]; // góra, prawo, dół, lewo
+  const ALPHA = 0.15, GAMMA = 0.9;
+  const STORE = "malinowy-waz-ai-v1";
+
+  let Q = new Float32Array(2048 * 3);
+  let games = 0, best = 0, scores = [];
+  let snake, dir, food, grid, score, sinceFood;
+  let deadPending = false, pauseUntil = 0, paused = false;
+  let sps = 25, acc = 0;
+
+  const $ = id => document.getElementById(id);
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORE);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      if (d.Q && d.Q.length === Q.length) {
+        Q = Float32Array.from(d.Q);
+        games = d.games || 0; best = d.best || 0; scores = d.scores || [];
+      }
+    } catch (e) {}
+  }
+  function save() {
+    try {
+      localStorage.setItem(STORE, JSON.stringify({ Q: Array.from(Q, v => Math.round(v * 1000) / 1000), games, best, scores: scores.slice(-3000) }));
+    } catch (e) {}
+  }
+
+  function reset() {
+    grid = new Uint8Array(W * H);
+    snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
+    for (const p of snake) grid[p.y * W + p.x] = 1;
+    dir = 1; score = 0; sinceFood = 0;
+    placeFood();
+  }
+
+  function placeFood() {
+    for (let i = 0; i < 200; i++) {
+      const x = Math.random() * W | 0, y = Math.random() * H | 0;
+      if (!grid[y * W + x]) { food = { x, y }; return; }
+    }
+    for (let i = 0; i < W * H; i++) if (!grid[i]) { food = { x: i % W, y: i / W | 0 }; return; }
+  }
+
+  const blocked = (x, y) => x < 0 || y < 0 || x >= W || y >= H || grid[y * W + x] === 1;
+
+  function sense() {
+    const h = snake[0];
+    const look = d => blocked(h.x + D[d][0], h.y + D[d][1]) ? 1 : 0;
+    return [
+      look(dir), look((dir + 3) % 4), look((dir + 1) % 4),
+      dir === 0, dir === 1, dir === 2, dir === 3,
+      food.y < h.y, food.y > h.y, food.x < h.x, food.x > h.x
+    ];
+  }
+  const stateOf = bits => bits.reduce((s, b, i) => s | ((b ? 1 : 0) << i), 0);
+
+  const epsilon = () => Math.max(0.002, 0.4 * Math.pow(0.96, games));
+
+  function bestAction(s) {
+    const o = s * 3;
+    let bestA = 0, bestV = -Infinity;
+    for (const a of [0, 1, 2].sort(() => Math.random() - .5)) {
+      if (Q[o + a] > bestV) { bestV = Q[o + a]; bestA = a; }
+    }
+    return bestA;
+  }
+
+  // akcje: 0 prosto, 1 w prawo, 2 w lewo
+  function step() {
+    const s = stateOf(sense());
+    const a = Math.random() < epsilon() ? (Math.random() * 3 | 0) : bestAction(s);
+    if (a === 1) dir = (dir + 1) % 4; else if (a === 2) dir = (dir + 3) % 4;
+
+    const h = snake[0];
+    const nx = h.x + D[dir][0], ny = h.y + D[dir][1];
+    const eat = nx === food.x && ny === food.y;
+    if (!eat) { const t = snake.pop(); grid[t.y * W + t.x] = 0; }
+    sinceFood++;
+
+    let r = 0, dead = false;
+    if (blocked(nx, ny)) { dead = true; r = -10; }
+    else {
+      snake.unshift({ x: nx, y: ny });
+      grid[ny * W + nx] = 1;
+      if (eat) {
+        score++; r = 10; sinceFood = 0;
+        if (snake.length >= W * H) dead = true; else placeFood();
+      } else if (sinceFood > 100 + snake.length * 4) { dead = true; r = -10; }
+    }
+
+    const i = s * 3 + a;
+    if (dead) {
+      Q[i] += ALPHA * (r - Q[i]);
+      games++; scores.push(score); if (score > best) best = score;
+      if (games % 50 === 0) save();
+    } else {
+      const o = stateOf(sense()) * 3;
+      Q[i] += ALPHA * (r + GAMMA * Math.max(Q[o], Q[o + 1], Q[o + 2]) - Q[i]);
+    }
+    return dead;
+  }
+
+  // ---------- rysowanie planszy ----------
+  const board = $("board"), bx = board.getContext("2d");
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  let colors = {};
+  function readColors() {
+    colors = { board: css("--board"), alt: css("--board-alt"), rasp: css("--rasp"), leaf: css("--leaf"), line: css("--line"), muted: css("--muted"), ink: css("--ink") };
+  }
+
+  function fitCanvas(c, w, h) {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+    const ctx = c.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return ctx;
+  }
+  let bsize = 520;
+  function sizeBoard() {
+    bsize = board.clientWidth || 520;
+    fitCanvas(board, bsize, bsize);
+  }
+
+  function drawRaspberry(cx, cy, c) {
+    const r = c * 0.15;
+    const pts = [[0, -1.3], [-1.1, -.55], [1.1, -.55], [0, 0], [-1.1, .65], [1.1, .65], [0, 1.3], [-.55, -.1], [.55, -.1]];
+    bx.fillStyle = "#3E8E4F";
+    bx.beginPath(); bx.ellipse(cx - c * .12, cy - c * .36, c * .14, c * .07, -.5, 0, 7); bx.fill();
+    bx.beginPath(); bx.ellipse(cx + c * .12, cy - c * .36, c * .14, c * .07, .5, 0, 7); bx.fill();
+    for (const [px, py] of pts) {
+      bx.fillStyle = "#D0245E";
+      bx.beginPath(); bx.arc(cx + px * r * 1.05, cy + py * r * 1.05 + c * .05, r, 0, 7); bx.fill();
+      bx.fillStyle = "rgba(255,255,255,.35)";
+      bx.beginPath(); bx.arc(cx + px * r * 1.05 - r * .3, cy + py * r * 1.05 + c * .05 - r * .3, r * .3, 0, 7); bx.fill();
+    }
+  }
+
+  function drawBoard() {
+    const c = bsize / W;
+    bx.fillStyle = colors.board; bx.fillRect(0, 0, bsize, bsize);
+    bx.fillStyle = colors.alt;
+    for (let y = 0; y < H; y++) for (let x = (y % 2); x < W; x += 2) bx.fillRect(x * c, y * c, c, c);
+
+    drawRaspberry((food.x + .5) * c, (food.y + .5) * c, c);
+
+    const n = snake.length;
+    for (let i = n - 1; i >= 0; i--) {
+      const p = snake[i];
+      const t = i / Math.max(1, n - 1);
+      const light = deadPending ? 45 : 58 - t * 22;
+      bx.fillStyle = deadPending ? `hsl(345 60% ${light}%)` : `hsl(${138 - t * 10} 55% ${light}%)`;
+      const pad = i === 0 ? c * .06 : c * .12;
+      roundRect(p.x * c + pad, p.y * c + pad, c - pad * 2, c - pad * 2, c * .3);
+    }
+    // oczy
+    const h = snake[0], [dx, dy] = D[dir];
+    const ex = (h.x + .5) * c + dx * c * .18, ey = (h.y + .5) * c + dy * c * .18;
+    const ox = -dy * c * .2, oy = dx * c * .2;
+    for (const s of [1, -1]) {
+      bx.fillStyle = "#fff"; bx.beginPath(); bx.arc(ex + ox * s, ey + oy * s, c * .12, 0, 7); bx.fill();
+      bx.fillStyle = "#111"; bx.beginPath(); bx.arc(ex + ox * s + dx * c * .04, ey + oy * s + dy * c * .04, c * .06, 0, 7); bx.fill();
+    }
+  }
+  function roundRect(x, y, w, h, r) {
+    bx.beginPath();
+    bx.moveTo(x + r, y); bx.arcTo(x + w, y, x + w, y + h, r); bx.arcTo(x + w, y + h, x, y + h, r);
+    bx.arcTo(x, y + h, x, y, r); bx.arcTo(x, y, x + w, y, r); bx.closePath(); bx.fill();
+  }
+
+  // ---------- panel ----------
+  const sensesEl = $("senses"), qrowsEl = $("qrows");
+  function updatePanel() {
+    $("stGames").textContent = games;
+    $("stBest").textContent = best;
+    const last = scores.slice(-50);
+    $("stAvg").textContent = last.length ? (last.reduce((a, b) => a + b, 0) / last.length).toFixed(1) : "0.0";
+    const e = epsilon() * 100;
+    $("stEps").textContent = (e < 1 ? e.toFixed(1) : Math.round(e)) + "%";
+    $("boardTag").textContent = `gra ${games + 1} · maliny ${score}`;
+
+    if (deadPending) return;
+    const b = sense();
+    const fd = [b[7] && "wyżej", b[8] && "niżej", b[9] && "z lewej", b[10] && "z prawej"].filter(Boolean).join(", ");
+    sensesEl.innerHTML =
+      `<span class="chip ${b[0] ? "on" : ""}">przeszkoda przed</span>` +
+      `<span class="chip ${b[1] ? "on" : ""}">z lewej</span>` +
+      `<span class="chip ${b[2] ? "on" : ""}">z prawej</span>` +
+      `<span class="chip food">malina: ${fd || "tutaj"}</span>`;
+
+    const s = stateOf(b), o = s * 3;
+    const rows = [["W lewo", 2], ["Prosto", 0], ["W prawo", 1]];
+    const vals = rows.map(([, a]) => Q[o + a]);
+    const maxAbs = Math.max(1, ...vals.map(Math.abs));
+    const top = Math.max(...vals);
+    const seen = vals.some(v => v !== 0);
+    qrowsEl.innerHTML = rows.map(([lbl], k) => {
+      const v = vals[k], w = Math.abs(v) / maxAbs * 50;
+      const style = v >= 0 ? `left:50%;width:${w}%;background:var(--leaf)` : `right:50%;width:${w}%;background:var(--rasp)`;
+      return `<div class="qrow ${seen && v === top ? "pick" : ""}"><span class="lbl">${lbl}</span><span class="track"><span class="fill" style="${style}"></span></span><span class="val">${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(2)}</span></div>`;
+    }).join("");
+  }
+
+  // ---------- wykres ----------
+  const chart = $("chart");
+  let cx2, cw = 600, ch = 190;
+  function sizeChart() { cw = chart.clientWidth || 600; ch = chart.clientHeight || 190; cx2 = fitCanvas(chart, cw, ch); }
+  function drawChart() {
+    const g = cx2; g.clearRect(0, 0, cw, ch);
+    const L = 30, R = 8, T = 10, B = 22, pw = cw - L - R, ph = ch - T - B;
+    const n = scores.length;
+    const ymax = Math.max(10, Math.ceil(best / 10) * 10);
+    g.font = "11px " + css("--mono"); g.fillStyle = colors.muted; g.strokeStyle = colors.line; g.lineWidth = 1;
+    for (const v of [0, ymax / 2, ymax]) {
+      const y = T + ph - v / ymax * ph;
+      g.beginPath(); g.moveTo(L, y + .5); g.lineTo(L + pw, y + .5); g.stroke();
+      g.textAlign = "right"; g.textBaseline = "middle"; g.fillText(v, L - 6, y);
+    }
+    g.textBaseline = "top"; g.textAlign = "left"; g.fillText("gra 1", L, T + ph + 6);
+    g.textAlign = "right"; g.fillText(n ? "gra " + n : "czeka na pierwszą grę", L + pw, T + ph + 6);
+    if (!n) return;
+
+    const bins = Math.min(n, Math.floor(pw / 2));
+    const per = n / bins, bw = pw / bins;
+    g.fillStyle = colors.line;
+    for (let b = 0; b < bins; b++) {
+      let m = 0; for (let i = Math.floor(b * per); i < Math.floor((b + 1) * per); i++) m = Math.max(m, scores[i]);
+      const h = m / ymax * ph; g.fillRect(L + b * bw, T + ph - h, Math.max(1, bw - (bw > 3 ? 1 : 0)), h);
+    }
+    g.strokeStyle = colors.rasp; g.lineWidth = 2.2; g.lineJoin = "round"; g.beginPath();
+    let sum = 0;
+    const avg = scores.map((v, i) => { sum += v; if (i >= 50) sum -= scores[i - 50]; return sum / Math.min(i + 1, 50); });
+    for (let b = 0; b < bins; b++) {
+      const i = Math.min(n - 1, Math.floor((b + 1) * per) - 1);
+      const x = L + (b + .5) * bw, y = T + ph - avg[i] / ymax * ph;
+      b ? g.lineTo(x, y) : g.moveTo(x, y);
+    }
+    g.stroke();
+    const lx = L + (bins - .5) * bw, ly = T + ph - avg[n - 1] / ymax * ph;
+    g.fillStyle = colors.rasp; g.beginPath(); g.arc(lx, ly, 3.5, 0, 7); g.fill();
+  }
+
+  // ---------- sterowanie ----------
+  const speedBtns = document.querySelectorAll(".seg button");
+  speedBtns.forEach(b => b.addEventListener("click", () => {
+    speedBtns.forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    sps = Number(b.dataset.sps); acc = 0;
+  }));
+  $("pauseBtn").addEventListener("click", () => {
+    paused = !paused; $("pauseBtn").textContent = paused ? "Wznów" : "Pauza";
+  });
+  const resetBtn = $("resetBtn");
+  let confirmTimer;
+  resetBtn.addEventListener("click", () => {
+    if (resetBtn.dataset.confirm !== "1") {
+      resetBtn.dataset.confirm = "1"; resetBtn.textContent = "Na pewno? Kliknij znowu";
+      clearTimeout(confirmTimer);
+      confirmTimer = setTimeout(() => { resetBtn.dataset.confirm = ""; resetBtn.textContent = "Nowy mózg"; }, 3000);
+      return;
+    }
+    clearTimeout(confirmTimer);
+    resetBtn.dataset.confirm = ""; resetBtn.textContent = "Nowy mózg";
+    Q = new Float32Array(2048 * 3); games = 0; best = 0; scores = []; deadPending = false;
+    reset(); save(); drawChart(); updatePanel();
+  });
+
+  // ---------- pętla ----------
+  let lastT = performance.now(), lastUi = 0, lastChartN = -1;
+  function frame(t) {
+    const dt = Math.min(0.1, (t - lastT) / 1000); lastT = t;
+    if (deadPending && t >= pauseUntil) { deadPending = false; reset(); }
+    if (!paused && !deadPending) {
+      acc += dt * sps;
+      let n = Math.floor(acc); acc -= n;
+      const start = performance.now();
+      while (n-- > 0) {
+        if (step()) {
+          if (sps <= 25) { deadPending = true; pauseUntil = t + 450; acc = 0; break; }
+          reset();
+        }
+        if ((n & 255) === 0 && performance.now() - start > 12) { acc = 0; break; }
+      }
+    }
+    drawBoard();
+    if (t - lastUi > 90) {
+      lastUi = t; updatePanel();
+      if (scores.length !== lastChartN) { lastChartN = scores.length; drawChart(); }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function relayout() { readColors(); sizeBoard(); sizeChart(); drawBoard(); drawChart(); }
+  window.addEventListener("resize", relayout);
+  matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", relayout);
+  new MutationObserver(relayout).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  addEventListener("pagehide", save);
+
+  load(); reset(); relayout(); updatePanel();
+  requestAnimationFrame(frame);
+})();
+</script>
