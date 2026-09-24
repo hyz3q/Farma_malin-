@@ -1,0 +1,516 @@
+<title>Malinowa Ewolucja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Nunito+Sans:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  :root {
+    --bg: #F1F4EC;
+    --surface: #FFFFFF;
+    --ink: #1B281D;
+    --muted: #5B685C;
+    --line: #D5DCCD;
+    --rasp: #C21E56;
+    --rasp-soft: #F7DCE5;
+    --leaf: #2E7D46;
+    --leaf-soft: #DCEEDF;
+    --board: #1C2E20;
+    --board-alt: #213626;
+    --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+    --body: "Nunito Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #111713;
+      --surface: #19211B;
+      --ink: #E4ECE2;
+      --muted: #97A597;
+      --line: #2B372D;
+      --rasp: #F0527F;
+      --rasp-soft: #3A1B26;
+      --leaf: #5CC07A;
+      --leaf-soft: #1D3324;
+      --board: #0E1A11;
+      --board-alt: #122016;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #111713;
+    --surface: #19211B;
+    --ink: #E4ECE2;
+    --muted: #97A597;
+    --line: #2B372D;
+    --rasp: #F0527F;
+    --rasp-soft: #3A1B26;
+    --leaf: #5CC07A;
+    --leaf-soft: #1D3324;
+    --board: #0E1A11;
+    --board-alt: #122016;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.5;
+    padding: 0 16px;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding-block: 28px 48px; display: grid; gap: 28px; }
+
+  header { display: grid; gap: 6px; }
+  .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--rasp); font-weight: 700; }
+  h1 { font-family: var(--display); font-weight: 800; font-size: clamp(30px, 6vw, 52px); line-height: 1.02; margin: 0; letter-spacing: -.02em; text-wrap: balance; }
+  h1 em { font-style: normal; color: var(--rasp); }
+  .lede { margin: 4px 0 0; color: var(--muted); max-width: 62ch; }
+
+  .main { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+  @media (max-width: 780px) { .main { grid-template-columns: 1fr; } }
+
+  .board-box { position: relative; width: 100%; max-width: 520px; aspect-ratio: 1; border-radius: 14px; overflow: hidden; background: var(--board); box-shadow: 0 1px 0 var(--line), 0 12px 30px -18px rgba(0,0,0,.45); justify-self: center; }
+  #board { width: 100%; height: 100%; display: block; }
+  .board-tag { position: absolute; left: 12px; top: 10px; font-family: var(--mono); font-size: 12px; color: #CFE3D2; background: rgba(0,0,0,.35); padding: 3px 8px; border-radius: 6px; font-variant-numeric: tabular-nums; }
+
+  .panel { display: grid; gap: 18px; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+  .seg button { border: 0; background: transparent; color: var(--ink); font: 600 14px var(--body); padding: 8px 12px; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button[aria-pressed="true"] { background: var(--leaf); color: #fff; }
+  .btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 600 14px var(--body); padding: 8px 14px; border-radius: 10px; cursor: pointer; }
+  .btn.danger { color: var(--rasp); }
+  button:focus-visible { outline: 3px solid var(--rasp); outline-offset: 2px; }
+  .seg button:hover:not([aria-pressed="true"]), .btn:hover { background: var(--leaf-soft); }
+
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  @media (max-width: 420px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .stat { background: var(--surface); padding: 10px 12px; display: grid; gap: 2px; }
+  .stat .k { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  .stat .v { font-family: var(--mono); font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 12px; }
+  .card h2 { font-family: var(--display); font-weight: 600; font-size: 18px; margin: 0; }
+  .card .sub { color: var(--muted); font-size: 13px; margin: -8px 0 0; }
+
+  .senses { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font-size: 12.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+  .chip.on { background: var(--rasp-soft); border-color: transparent; color: var(--rasp); }
+  .chip.food { background: var(--leaf-soft); border-color: transparent; color: var(--leaf); }
+
+  .qrows { display: grid; gap: 8px; }
+  .qrow { display: grid; grid-template-columns: 74px 1fr 64px; gap: 10px; align-items: center; font-size: 14px; }
+  .qrow .lbl { font-weight: 700; }
+  .qrow .val { font-family: var(--mono); font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+  .track { position: relative; height: 14px; background: var(--bg); border-radius: 4px; }
+  .track::before { content: ""; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--line); }
+  .fill { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
+  .qrow.pick .lbl::after { content: " ◀"; color: var(--leaf); font-size: 11px; }
+
+  .chart-card canvas { width: 100%; height: 190px; display: block; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); }
+  .legend i { display: inline-block; width: 12px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+
+  .how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 780px) { .how { grid-template-columns: 1fr; } }
+  .how div { display: grid; gap: 4px; align-content: start; }
+  .how b { font-family: var(--display); font-size: 17px; font-weight: 600; }
+  .how span.n { font-family: var(--mono); color: var(--rasp); font-size: 12px; font-weight: 700; }
+  .how p { margin: 0; color: var(--muted); max-width: 40ch; }
+  code { font-family: var(--mono); font-size: .9em; background: var(--bg); padding: 1px 5px; border-radius: 4px; }
+  [hidden] { display: none !important; }
+  #net { width: 100%; height: 300px; display: block; }
+  .decision { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+  .decision .pill { font-weight: 700; font-size: 13px; padding: 3px 10px; border-radius: 999px; background: var(--leaf-soft); color: var(--leaf); }
+  .vs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  @media (max-width: 620px) { .vs { grid-template-columns: 1fr; } }
+  .vs div { background: var(--surface); padding: 14px 16px; display: grid; gap: 6px; align-content: start; }
+  .vs b { font-family: var(--display); font-size: 17px; font-weight: 600; }
+  .vs span.n { font-family: var(--mono); color: var(--rasp); font-size: 12px; font-weight: 700; letter-spacing: .06em; }
+  .vs p { margin: 0; color: var(--muted); }
+  .vs ul { margin: 0; padding-left: 18px; color: var(--muted); display: grid; gap: 2px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Neuroewolucja · algorytm genetyczny</div>
+    <h1>300 węży i jedna ewolucja: <em>kto zje najwięcej malin?</em></h1>
+    <p class="lede">Ta sama gra co w wersji z Q-learningiem, ale inna metoda nauki. Każdy wąż ma własny mały mózg z losowych liczb. Wszystkie 300 gra po kolei, a najlepsze zostają rodzicami następnego pokolenia. Na planszy oglądasz powtórkę gry mistrza z ostatniego pokolenia.</p>
+  </header>
+
+  <section class="main">
+    <div class="board-box">
+      <canvas id="board" width="520" height="520" aria-label="Powtórka gry najlepszego węża"></canvas>
+      <div class="board-tag" id="boardTag">mistrz pokolenia 1 · maliny 0</div>
+    </div>
+
+    <div class="panel">
+      <div class="controls">
+        <div class="seg" role="group" aria-label="Prędkość">
+          <button data-sps="8" data-budget="4">Wolno</button>
+          <button data-sps="22" data-budget="6" aria-pressed="true">Normalnie</button>
+          <button data-sps="90" data-budget="10">Szybko</button>
+          <button data-sps="600" data-budget="14">Turbo</button>
+        </div>
+        <button class="btn" id="pauseBtn">Pauza</button>
+        <button class="btn danger" id="resetBtn">Od nowa</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><span class="k">Pokolenie</span><span class="v" id="stGen">1</span></div>
+        <div class="stat"><span class="k">Rekord</span><span class="v" id="stBest">0</span></div>
+        <div class="stat"><span class="k">Średnia</span><span class="v" id="stAvg">0.0</span></div>
+        <div class="stat"><span class="k">Gra teraz</span><span class="v" id="stEval">0/300</span></div>
+      </div>
+
+      <div class="card">
+        <h2>Mózg mistrza</h2>
+        <p class="sub">11 zmysłów po lewej, 8 neuronów w środku, 3 ruchy po prawej. Wąż wybiera ruch z największą wartością. Zielone połączenia wzmacniają sygnał, malinowe go osłabiają.</p>
+        <canvas id="net" aria-label="Sieć neuronowa mistrza"></canvas>
+        <div class="decision">Wybrany ruch: <span class="pill" id="decision">prosto</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card chart-card">
+    <h2>Postępy ewolucji</h2>
+    <div class="legend">
+      <span><i style="background: var(--rasp)"></i>mistrz pokolenia (maliny)</span>
+      <span><i style="background: var(--leaf)"></i>średnia 300 węży</span>
+    </div>
+    <canvas id="chart" aria-label="Wykres wyników kolejnych pokoleń"></canvas>
+  </section>
+
+  <section class="vs">
+    <div>
+      <span class="n">Q-LEARNING (poprzednia wersja)</span>
+      <b>Jeden wąż uczy się na błędach</b>
+      <p>Po każdym ruchu dostaje nagrodę albo karę i od razu poprawia swoją tabelę doświadczeń.</p>
+      <ul><li>uczy się w trakcie gry</li><li>potrzebuje nagród za każdy krok</li><li>zna tylko 2048 sytuacji z tabeli</li></ul>
+    </div>
+    <div>
+      <span class="n">EWOLUCJA (ta wersja)</span>
+      <b>Wiele węży, przeżywają najlepsi</b>
+      <p>Pojedynczy wąż niczego się nie uczy. Poprawia się całe pokolenie, bo dzieci dostają mózgi po najlepszych rodzicach z drobnymi mutacjami.</p>
+      <ul><li>ocenia się tylko wynik końcowy</li><li>10 najlepszych przechodzi dalej</li><li>mózg to 123 liczby, a nie tabela</li></ul>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const W = 20, H = 20;
+  const D = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+  const POP = 300, ELITE = 10, FRESH = 10;
+  const NI = 11, NH = 8, NO = 3, NG = NI * NH + NH + NO * NH + NO;
+
+  function rng(seed) {
+    return () => { seed |= 0; seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+
+  // ---------- gra ----------
+  function newGame(seed) {
+    const g = { rand: rng(seed), grid: new Uint8Array(W * H), snake: [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }], dir: 1, score: 0, steps: 0, since: 0, dead: false, food: null };
+    for (const p of g.snake) g.grid[p.y * W + p.x] = 1;
+    placeFood(g);
+    return g;
+  }
+  function placeFood(g) {
+    const free = [];
+    for (let i = 0; i < W * H; i++) if (!g.grid[i]) free.push(i);
+    if (!free.length) { g.dead = true; return; }
+    const i = free[Math.floor(g.rand() * free.length)];
+    g.food = { x: i % W, y: (i / W) | 0 };
+  }
+  const blocked = (g, x, y) => x < 0 || y < 0 || x >= W || y >= H || g.grid[y * W + x] === 1;
+  function sense(g) {
+    const h = g.snake[0], d = g.dir;
+    const look = (k) => (blocked(g, h.x + D[k][0], h.y + D[k][1]) ? 1 : 0);
+    return [look(d), look((d + 3) % 4), look((d + 1) % 4),
+      d === 0 ? 1 : 0, d === 1 ? 1 : 0, d === 2 ? 1 : 0, d === 3 ? 1 : 0,
+      g.food.y < h.y ? 1 : 0, g.food.y > h.y ? 1 : 0, g.food.x < h.x ? 1 : 0, g.food.x > h.x ? 1 : 0];
+  }
+  // akcje: 0 w lewo, 1 prosto, 2 w prawo
+  function move(g, a) {
+    if (a === 0) g.dir = (g.dir + 3) % 4; else if (a === 2) g.dir = (g.dir + 1) % 4;
+    const h = g.snake[0], nx = h.x + D[g.dir][0], ny = h.y + D[g.dir][1];
+    const eat = nx === g.food.x && ny === g.food.y;
+    if (!eat) { const t = g.snake.pop(); g.grid[t.y * W + t.x] = 0; }
+    g.steps++; g.since++;
+    if (blocked(g, nx, ny)) { g.dead = true; return; }
+    g.snake.unshift({ x: nx, y: ny }); g.grid[ny * W + nx] = 1;
+    if (eat) { g.score++; g.since = 0; placeFood(g); }
+    else if (g.since > 100 + g.snake.length * 4) g.dead = true;
+  }
+
+  // ---------- mózg ----------
+  const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+  const randomGenome = () => Float32Array.from({ length: NG }, () => gauss() * 0.8);
+  const hidBuf = new Float32Array(NH), outBuf = new Float32Array(NO);
+  function think(gn, inp, keep) {
+    const hid = keep ? new Float32Array(NH) : hidBuf, out = keep ? new Float32Array(NO) : outBuf;
+    for (let h = 0; h < NH; h++) {
+      let s = gn[NI * NH + h];
+      for (let i = 0; i < NI; i++) s += gn[h * NI + i] * inp[i];
+      hid[h] = Math.tanh(s);
+    }
+    const o2 = NI * NH + NH, ob = o2 + NO * NH;
+    let bestA = 0;
+    for (let k = 0; k < NO; k++) {
+      let s = gn[ob + k];
+      for (let h = 0; h < NH; h++) s += gn[o2 + k * NH + h] * hid[h];
+      out[k] = s;
+      if (s > out[bestA]) bestA = k;
+    }
+    if (keep) { keep.inp = inp; keep.hid = hid; keep.out = out; keep.a = bestA; }
+    return bestA;
+  }
+  const fitness = (g) => g.steps * 0.5 + g.score * g.score * 120 + g.score * 300;
+
+  // ---------- ewolucja ----------
+  let gen, pop, results, evalIdx, evalGame, genSeed, history, best, champ;
+  function start() {
+    gen = 1; history = []; best = 0; champ = null;
+    pop = Array.from({ length: POP }, randomGenome);
+    beginGen();
+  }
+  function beginGen() {
+    genSeed = (Math.random() * 1e9) | 0;
+    results = []; evalIdx = 0; evalGame = newGame(genSeed);
+  }
+  function evolveStep(budgetMs) {
+    const t0 = performance.now();
+    let n = 0;
+    while (true) {
+      const g = evalGame;
+      move(g, think(pop[evalIdx], sense(g)));
+      if (g.dead || g.steps > 20000) {
+        results.push({ g: pop[evalIdx], fit: fitness(g), score: g.score });
+        evalIdx++;
+        if (evalIdx >= POP) finishGen(); else evalGame = newGame(genSeed);
+      }
+      if ((++n & 255) === 0 && performance.now() - t0 > budgetMs) break;
+    }
+  }
+  function finishGen() {
+    const ranked = results.slice().sort((a, b) => b.fit - a.fit);
+    const avg = results.reduce((s, r) => s + r.score, 0) / results.length;
+    history.push({ best: ranked[0].score, avg });
+    if (history.length > 3000) history.shift();
+    best = Math.max(best, ranked[0].score);
+    champ = { g: ranked[0].g, seed: genSeed, score: ranked[0].score, gen };
+
+    const pool = ranked.slice(0, 60);
+    const total = pool.reduce((s, r) => s + r.fit, 0);
+    const pick = () => { let r = Math.random() * total; for (const p of pool) { r -= p.fit; if (r <= 0) return p.g; } return pool[0].g; };
+    const next = ranked.slice(0, ELITE).map((r) => r.g);
+    while (next.length < POP - FRESH) {
+      const a = pick(), b = pick(), c = new Float32Array(NG);
+      const cut = Math.floor(Math.random() * NG);
+      for (let i = 0; i < NG; i++) { c[i] = i < cut ? a[i] : b[i]; if (Math.random() < 0.08) c[i] += gauss() * 0.5; }
+      next.push(c);
+    }
+    while (next.length < POP) next.push(randomGenome());
+    pop = next; gen++;
+    beginGen();
+    chartDirty = true;
+  }
+
+  // ---------- powtórka mistrza ----------
+  let replay = null, replayChamp = null, deadUntil = 0;
+  function startReplay() {
+    if (!champ) return;
+    replayChamp = champ;
+    replay = newGame(champ.seed);
+  }
+  function stepReplay() {
+    move(replay, think(replayChamp.g, sense(replay)));
+  }
+
+  // ---------- rysowanie ----------
+  const board = $("board"), bx = board.getContext("2d");
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  let colors = {};
+  function readColors() { colors = { board: css("--board"), alt: css("--board-alt"), rasp: css("--rasp"), leaf: css("--leaf"), line: css("--line"), muted: css("--muted"), ink: css("--ink"), surface: css("--surface"), mono: css("--mono") }; }
+  function fitCanvas(c, w, h) {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+    const x = c.getContext("2d"); x.setTransform(dpr, 0, 0, dpr, 0, 0); return x;
+  }
+  let bsize = 520;
+  function sizeBoard() { bsize = board.clientWidth || 520; fitCanvas(board, bsize, bsize); }
+  function drawRaspberry(cx, cy, c) {
+    const r = c * 0.15;
+    const pts = [[0, -1.3], [-1.1, -.55], [1.1, -.55], [0, 0], [-1.1, .65], [1.1, .65], [0, 1.3], [-.55, -.1], [.55, -.1]];
+    bx.fillStyle = "#3E8E4F";
+    bx.beginPath(); bx.ellipse(cx - c * .12, cy - c * .36, c * .14, c * .07, -.5, 0, 7); bx.fill();
+    bx.beginPath(); bx.ellipse(cx + c * .12, cy - c * .36, c * .14, c * .07, .5, 0, 7); bx.fill();
+    for (const [px, py] of pts) {
+      bx.fillStyle = "#D0245E";
+      bx.beginPath(); bx.arc(cx + px * r * 1.05, cy + py * r * 1.05 + c * .05, r, 0, 7); bx.fill();
+      bx.fillStyle = "rgba(255,255,255,.35)";
+      bx.beginPath(); bx.arc(cx + px * r * 1.05 - r * .3, cy + py * r * 1.05 + c * .05 - r * .3, r * .3, 0, 7); bx.fill();
+    }
+  }
+  function roundRect(x, y, w, h, r) {
+    bx.beginPath();
+    bx.moveTo(x + r, y); bx.arcTo(x + w, y, x + w, y + h, r); bx.arcTo(x + w, y + h, x, y + h, r);
+    bx.arcTo(x, y + h, x, y, r); bx.arcTo(x, y, x + w, y, r); bx.closePath(); bx.fill();
+  }
+  function drawBoard() {
+    const c = bsize / W;
+    bx.fillStyle = colors.board; bx.fillRect(0, 0, bsize, bsize);
+    bx.fillStyle = colors.alt;
+    for (let y = 0; y < H; y++) for (let x = (y % 2); x < W; x += 2) bx.fillRect(x * c, y * c, c, c);
+    if (!replay) return;
+    const dead = replay.dead;
+    if (replay.food) drawRaspberry((replay.food.x + .5) * c, (replay.food.y + .5) * c, c);
+    const sn = replay.snake, n = sn.length;
+    for (let i = n - 1; i >= 0; i--) {
+      const p = sn[i], t = i / Math.max(1, n - 1);
+      const light = dead ? 45 : 58 - t * 22;
+      bx.fillStyle = dead ? `hsl(345 60% ${light}%)` : `hsl(${138 - t * 10} 55% ${light}%)`;
+      const pad = i === 0 ? c * .06 : c * .12;
+      roundRect(p.x * c + pad, p.y * c + pad, c - pad * 2, c - pad * 2, c * .3);
+    }
+    const h = sn[0], [dx, dy] = D[replay.dir];
+    const ex = (h.x + .5) * c + dx * c * .18, ey = (h.y + .5) * c + dy * c * .18, ox = -dy * c * .2, oy = dx * c * .2;
+    for (const s of [1, -1]) {
+      bx.fillStyle = "#fff"; bx.beginPath(); bx.arc(ex + ox * s, ey + oy * s, c * .12, 0, 7); bx.fill();
+      bx.fillStyle = "#111"; bx.beginPath(); bx.arc(ex + ox * s + dx * c * .04, ey + oy * s + dy * c * .04, c * .06, 0, 7); bx.fill();
+    }
+  }
+
+  // ---------- sieć ----------
+  const net = $("net");
+  let nx, nw = 400, nh = 300;
+  function sizeNet() { nw = net.clientWidth || 400; nh = net.clientHeight || 300; nx = fitCanvas(net, nw, nh); }
+  const IN_LABELS = ["ściana przed", "ściana z lewej", "ściana z prawej", "jadę ↑", "jadę →", "jadę ↓", "jadę ←", "malina ↑", "malina ↓", "malina ←", "malina →"];
+  const OUT_LABELS = ["w lewo", "prosto", "w prawo"];
+  function drawNet() {
+    const x = nx; x.clearRect(0, 0, nw, nh);
+    if (!replay || replay.dead || !replayChamp) return;
+    const k = {}; think(replayChamp.g, sense(replay), k);
+    const g = replayChamp.g;
+    const colX = [nw * 0.3, nw * 0.58, nw * 0.8];
+    const ys = (n) => Array.from({ length: n }, (_, i) => 12 + (i + 0.5) * ((nh - 24) / n));
+    const yi = ys(NI), yh = ys(NH), yo = ys(NO).map((y) => nh / 2 + (y - nh / 2) * 0.45);
+    const edge = (x1, y1, x2, y2, w) => {
+      x.strokeStyle = w >= 0 ? colors.leaf : colors.rasp;
+      x.globalAlpha = Math.min(0.85, 0.08 + Math.abs(w) * 0.25);
+      x.lineWidth = Math.min(3.5, 0.4 + Math.abs(w));
+      x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2, y2); x.stroke();
+    };
+    for (let h = 0; h < NH; h++) for (let i = 0; i < NI; i++) if (k.inp[i]) edge(colX[0], yi[i], colX[1], yh[h], g[h * NI + i]);
+    const o2 = NI * NH + NH;
+    for (let o = 0; o < NO; o++) for (let h = 0; h < NH; h++) edge(colX[1], yh[h], colX[2], yo[o], g[o2 + o * NH + h]);
+    x.globalAlpha = 1;
+    const node = (cx, cy, a, r = 8, ring) => {
+      x.fillStyle = colors.surface; x.strokeStyle = ring ? colors.rasp : colors.ink; x.lineWidth = ring ? 3 : 1.4;
+      x.beginPath(); x.arc(cx, cy, r, 0, 7); x.fill(); x.stroke();
+      x.fillStyle = a >= 0 ? colors.leaf : colors.rasp; x.globalAlpha = Math.min(1, Math.abs(a));
+      x.beginPath(); x.arc(cx, cy, r - 3, 0, 7); x.fill(); x.globalAlpha = 1;
+    };
+    x.font = "11px " + colors.mono; x.textBaseline = "middle";
+    yi.forEach((y, i) => { node(colX[0], y, k.inp[i], 7); x.textAlign = "right"; x.fillStyle = k.inp[i] ? colors.ink : colors.muted; x.fillText(IN_LABELS[i], colX[0] - 12, y); });
+    yh.forEach((y, h) => node(colX[1], y, k.hid[h]));
+    const mx = Math.max(...k.out), mn = Math.min(...k.out);
+    yo.forEach((y, o) => {
+      node(colX[2], y, (k.out[o] - mn) / Math.max(0.001, mx - mn), 10, o === k.a);
+      x.textAlign = "left"; x.fillStyle = o === k.a ? colors.ink : colors.muted;
+      x.font = (o === k.a ? "bold " : "") + "12px " + colors.mono; x.fillText(OUT_LABELS[o], colX[2] + 16, y);
+      x.font = "11px " + colors.mono;
+    });
+    $("decision").textContent = OUT_LABELS[k.a];
+  }
+
+  // ---------- wykres ----------
+  const chart = $("chart");
+  let cx2, cw = 600, ch = 190, chartDirty = true;
+  function sizeChart() { cw = chart.clientWidth || 600; ch = chart.clientHeight || 190; cx2 = fitCanvas(chart, cw, ch); }
+  function drawChart() {
+    const g = cx2; g.clearRect(0, 0, cw, ch);
+    const L = 30, R = 8, T = 10, B = 22, pw = cw - L - R, ph = ch - T - B, n = history.length;
+    const ymax = Math.max(10, Math.ceil(best / 10) * 10);
+    g.font = "11px " + colors.mono; g.fillStyle = colors.muted; g.strokeStyle = colors.line; g.lineWidth = 1;
+    for (const v of [0, ymax / 2, ymax]) {
+      const y = T + ph - (v / ymax) * ph;
+      g.beginPath(); g.moveTo(L, y + .5); g.lineTo(L + pw, y + .5); g.stroke();
+      g.textAlign = "right"; g.textBaseline = "middle"; g.fillText(v, L - 6, y);
+    }
+    g.textBaseline = "top"; g.textAlign = "left"; g.fillText("pokolenie 1", L, T + ph + 6);
+    g.textAlign = "right"; g.fillText(n ? "pokolenie " + n : "czeka na pierwsze pokolenie", L + pw, T + ph + 6);
+    if (!n) return;
+    const X = (i) => L + (n === 1 ? pw / 2 : (i / (n - 1)) * pw), Y = (v) => T + ph - (v / ymax) * ph;
+    for (const [key, col, lw] of [["avg", colors.leaf, 2], ["best", colors.rasp, 2.4]]) {
+      g.strokeStyle = col; g.lineWidth = lw; g.lineJoin = "round"; g.beginPath();
+      history.forEach((h, i) => (i ? g.lineTo(X(i), Y(h[key])) : g.moveTo(X(i), Y(h[key]))));
+      g.stroke();
+    }
+    g.fillStyle = colors.rasp; g.beginPath(); g.arc(X(n - 1), Y(history[n - 1].best), 3.5, 0, 7); g.fill();
+  }
+
+  // ---------- sterowanie ----------
+  let sps = 22, budget = 6, paused = false;
+  const speedBtns = document.querySelectorAll(".seg button");
+  speedBtns.forEach((b) => b.addEventListener("click", () => {
+    speedBtns.forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    sps = Number(b.dataset.sps); budget = Number(b.dataset.budget);
+  }));
+  $("pauseBtn").addEventListener("click", () => { paused = !paused; $("pauseBtn").textContent = paused ? "Wznów" : "Pauza"; });
+  const resetBtn = $("resetBtn");
+  let confirmT;
+  resetBtn.addEventListener("click", () => {
+    if (resetBtn.dataset.confirm !== "1") {
+      resetBtn.dataset.confirm = "1"; resetBtn.textContent = "Na pewno? Kliknij znowu";
+      confirmT = setTimeout(() => { resetBtn.dataset.confirm = ""; resetBtn.textContent = "Od nowa"; }, 3000);
+      return;
+    }
+    clearTimeout(confirmT); resetBtn.dataset.confirm = ""; resetBtn.textContent = "Od nowa";
+    start(); while (!champ) evolveStep(50);
+    startReplay(); chartDirty = true;
+  });
+
+  function updateUi() {
+    $("stGen").textContent = gen;
+    $("stBest").textContent = best;
+    $("stAvg").textContent = history.length ? history[history.length - 1].avg.toFixed(1) : "0.0";
+    $("stEval").textContent = `${evalIdx}/${POP}`;
+    if (replay) $("boardTag").textContent = `mistrz pokolenia ${replayChamp.gen} · maliny ${replay.score}`;
+  }
+
+  // ---------- pętla ----------
+  let acc = 0, lastT = performance.now(), lastUi = 0;
+  function frame(t) {
+    const dt = Math.min(0.1, (t - lastT) / 1000); lastT = t;
+    if (!paused) {
+      evolveStep(budget);
+      if (replay && replay.dead) {
+        if (!deadUntil) deadUntil = t + 700;
+        if (t >= deadUntil) { deadUntil = 0; startReplay(); }
+      } else if (replay) {
+        acc += dt * sps;
+        let n = Math.floor(acc); acc -= n;
+        while (n-- > 0 && !replay.dead) stepReplay();
+      }
+    }
+    drawBoard();
+    if (t - lastUi > 90) { lastUi = t; updateUi(); drawNet(); if (chartDirty) { chartDirty = false; drawChart(); } }
+    requestAnimationFrame(frame);
+  }
+
+  function relayout() { readColors(); sizeBoard(); sizeNet(); sizeChart(); drawBoard(); drawNet(); drawChart(); }
+  window.addEventListener("resize", relayout);
+  matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", relayout);
+  new MutationObserver(relayout).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  start();
+  while (!champ) evolveStep(50);
+  startReplay();
+  relayout(); updateUi();
+  requestAnimationFrame(frame);
+})();
+</script>
