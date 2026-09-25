@@ -1,0 +1,375 @@
+<title>Żabie Strzelanie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  :root {
+    --bg: #F2F6EE;
+    --surface: #FFFFFF;
+    --ink: #16241A;
+    --muted: #5B6A5E;
+    --line: #D5DECF;
+    --pond: #2F8A4A;
+    --pond-soft: #DDEFE0;
+    --tongue: #D6456E;
+    --tongue-soft: #F9DFE6;
+    --c1: #D6456E; --c2: #E0762B; --c3: #B8891A; --c4: #2F8A4A;
+    --c5: #1F8A8A; --c6: #2F6FC4; --c7: #7A55C4; --c8: #B04BA8; --c9: #5B6A5E;
+    --display: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+    --body: "Nunito Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0F1611; --surface: #172019; --ink: #E3ECE4; --muted: #95A597; --line: #29352C;
+      --pond: #5CC07A; --pond-soft: #1C3223; --tongue: #F0668C; --tongue-soft: #3A1C26;
+      --c1: #F0668C; --c2: #F2934F; --c3: #E0B84A; --c4: #5CC07A;
+      --c5: #4CC2C2; --c6: #6FA5EE; --c7: #A889EE; --c8: #DB7CD3; --c9: #95A597;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0F1611; --surface: #172019; --ink: #E3ECE4; --muted: #95A597; --line: #29352C;
+    --pond: #5CC07A; --pond-soft: #1C3223; --tongue: #F0668C; --tongue-soft: #3A1C26;
+    --c1: #F0668C; --c2: #F2934F; --c3: #E0B84A; --c4: #5CC07A;
+    --c5: #4CC2C2; --c6: #6FA5EE; --c7: #A889EE; --c8: #DB7CD3; --c9: #95A597;
+  }
+
+  [hidden] { display: none !important; }
+  * { box-sizing: border-box; }
+  .wrap > *, .wrap section > * { min-width: 0; }
+  body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--body); padding: 0 16px; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 56px; display: grid; gap: 32px; }
+
+  header { display: grid; gap: 8px; }
+  .eyebrow { font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--pond); }
+  h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(34px, 7vw, 60px); line-height: 1; letter-spacing: -.01em; text-wrap: balance; }
+  h1 em { font-style: normal; color: var(--tongue); }
+  .lede { margin: 0; color: var(--muted); max-width: 64ch; }
+  .jump { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .jump a { font-weight: 700; font-size: 14px; color: var(--ink); text-decoration: none; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); }
+  .jump a:hover { background: var(--pond-soft); }
+
+  h2 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 28px; }
+  .sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+  .sec-head p { margin: 0; color: var(--muted); font-size: 14px; }
+
+  .map-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 8px; }
+  .map-scroll { overflow-x: auto; }
+  #map { display: block; width: 100%; min-width: 900px; height: auto; }
+  #map text { font-family: var(--body); }
+  #map .leaf { font-size: 14px; fill: var(--ink); }
+  #map .bname { font-family: var(--display); font-weight: 600; font-size: 17px; fill: #fff; }
+  #map .branch { transition: opacity .15s; }
+  #map.focus .branch { opacity: .22; }
+  #map.focus .branch.on { opacity: 1; }
+  .map-hint { margin: 6px 8px 4px; font-size: 13px; color: var(--muted); }
+
+  .progress { display: grid; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+  .progress .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .progress b { font-family: var(--display); font-size: 20px; font-weight: 600; }
+  .progress .num { font-family: var(--mono); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .bar { height: 12px; border-radius: 6px; background: var(--pond-soft); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--pond); border-radius: 6px; transition: width .3s; }
+  .save-note { font-size: 13px; color: var(--muted); }
+
+  .stages { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 16px; align-items: start; }
+  .stage { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px 12px; display: grid; gap: 8px; }
+  .stage.done { border-color: var(--pond); }
+  .stage-top { display: flex; align-items: center; gap: 10px; }
+  .stage-top .n { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 700 13px var(--mono); background: var(--pond-soft); color: var(--pond); }
+  .stage.done .stage-top .n { background: var(--pond); color: var(--surface); }
+  .stage-top h3 { margin: 0; flex: 1; font-family: var(--display); font-weight: 600; font-size: 18px; line-height: 1.2; }
+  .stage-top .cnt { font: 700 12px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .stage .mini { height: 4px; border-radius: 2px; background: var(--pond-soft); overflow: hidden; }
+  .stage .mini i { display: block; height: 100%; background: var(--pond); width: 0; transition: width .3s; }
+  .stage ul { list-style: none; margin: 0; padding: 0; display: grid; }
+  .stage li label { display: flex; gap: 10px; align-items: flex-start; padding: 7px 4px; border-radius: 8px; cursor: pointer; }
+  .stage li label:hover { background: var(--bg); }
+  .stage input[type="checkbox"] { appearance: none; -webkit-appearance: none; flex-shrink: 0; width: 20px; height: 20px; margin: 1px 0 0; border: 2px solid var(--line); border-radius: 6px; background: var(--surface); display: grid; place-items: center; cursor: pointer; }
+  .stage input[type="checkbox"]:checked { background: var(--pond); border-color: var(--pond); }
+  .stage input[type="checkbox"]:checked::after { content: ""; width: 5px; height: 10px; border: solid var(--surface); border-width: 0 2.5px 2.5px 0; transform: translateY(-1px) rotate(45deg); }
+  .stage input[type="checkbox"]:focus-visible { outline: 3px solid var(--tongue); outline-offset: 2px; }
+  .stage li span { font-size: 14.5px; }
+  .stage li input:checked + span { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
+  .tag { display: inline-block; font: 700 10.5px var(--mono); letter-spacing: .04em; padding: 1px 6px; border-radius: 4px; margin-left: 6px; vertical-align: 1px; background: var(--tongue-soft); color: var(--tongue); }
+  .tag.you { background: var(--pond-soft); color: var(--pond); }
+  .legend-tags { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
+  .legend-tags .tag { margin: 0 6px 0 0; }
+  @media (prefers-reduced-motion: reduce) { .bar i, .stage .mini i, #map .branch { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Projekt gry · Roblox</div>
+    <h1>Żabie <em>Strzelanie</em></h1>
+    <p class="lede">Szalone żabie bitwy dla 8–12 graczy: pistolet w pysku, język działający jak hak i mystery boxy z absurdalnymi mocami. Wyżej jest mapa myśli całej gry, niżej lista zadań od pustego Roblox Studio do opublikowanej gry.</p>
+    <nav class="jump"><a href="#mapa">Mapa myśli</a><a href="#zadania">Lista zadań</a></nav>
+  </header>
+
+  <section id="mapa" style="display: grid; gap: 14px">
+    <div class="sec-head">
+      <h2>Mapa myśli</h2>
+      <p>9 gałęzi, wszystkie pomysły z projektu gry</p>
+    </div>
+    <div class="map-card">
+      <div class="map-scroll"><svg id="map" viewBox="0 0 1280 900" role="img" aria-label="Mapa myśli gry Żabie Strzelanie"></svg></div>
+      <p class="map-hint">Najedź na gałąź albo ją kliknij, żeby ją wyróżnić. Na telefonie przesuń mapę palcem w bok.</p>
+    </div>
+  </section>
+
+  <section id="zadania" style="display: grid; gap: 16px">
+    <div class="sec-head">
+      <h2>Lista zadań</h2>
+      <div class="legend-tags"><span><span class="tag">AI</span>napiszę skrypt</span><span><span class="tag you">TY</span>robisz w Studio</span></div>
+    </div>
+    <div class="progress">
+      <div class="row"><b id="progTitle">Zaczynamy!</b><span class="num" id="progNum">0 / 0</span></div>
+      <div class="bar"><i id="progBar"></i></div>
+      <span class="save-note" id="saveNote">Postęp zapisuje się w tej przeglądarce.</span>
+    </div>
+    <div class="stages" id="stages"></div>
+  </section>
+</div>
+
+<script>
+(() => {
+  // ================= MAPA MYŚLI =================
+  const BRANCHES = [
+    { name: "Pistolet w pysku", c: "--c1", leaves: ["celujesz obracając głowę", "amunicja to muchy (6)", "rakietowy skok z odrzutu", "„KUM!” przy każdym strzale"] },
+    { name: "Język-hak", c: "--c2", leaves: ["przyciąganie do ścian", "bujanie się na linie", "łapanie i rzucanie rzeczy", "przyciąganie wrogów", "pojedynek języków"] },
+    { name: "Mystery boxy", c: "--c3", leaves: ["co 20–30 sekund", "otwierasz strzałem lub językiem", "4 rzadkości: zielone → złote", "16 umiejętności"] },
+    { name: "System rechotu %", c: "--c4", leaves: ["trafienie dodaje %", "więcej % = dalszy lot", "odpadasz poza mapą", "3 życia na rundę"] },
+    { name: "Mapy", c: "--c5", leaves: ["Staw o zachodzie", "Kuchnia restauracji", "Bagno z krokodylem", "eventy: deszcz, bocian, kucharz"] },
+    { name: "Tryby gry", c: "--c6", leaves: ["każdy na każdego", "drużyny 4 na 4", "Król liścia", "Muchobranie"] },
+    { name: "Progresja", c: "--c7", leaves: ["monety i XP", "skórki i kapelusze", "wygląd pistoletu", "bez pay-to-win"] },
+    { name: "Fun i efekty", c: "--c8", leaves: ["ragdoll przy trafieniu", "trzęsienie kamery", "killcam: kto cię wyrzucił", "respawn po 3 sekundach"] },
+    { name: "Technika Roblox", c: "--c9", leaves: ["Raycast do strzałów", "Beam + RopeConstraint", "RemoteEvents klient–serwer", "ModuleScript z umiejętnościami"] }
+  ];
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("map");
+  const CX = 640, CY = 450;
+  const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); (parent || svg).appendChild(e); return e; };
+  const col = (v) => `var(${v})`;
+
+  function measure(text, cls) {
+    const t = el("text", { class: cls, x: -9999, y: -9999 }); t.textContent = text;
+    const w = t.getComputedTextLength(); t.remove(); return w || text.length * 8;
+  }
+
+  const n = BRANCHES.length;
+  const groups = [];
+  BRANCHES.forEach((b, i) => {
+    const ang = -Math.PI / 2 + (i / n) * Math.PI * 2;
+    const cos = Math.cos(ang), sin = Math.sin(ang);
+    const bx = CX + cos * 250, by = CY + sin * 215;
+    const right = cos > 0.15, left = cos < -0.15;
+    const g = el("g", { class: "branch", tabindex: "0", role: "button", "aria-label": `${b.name}: ${b.leaves.join(", ")}` });
+    groups.push(g);
+
+    el("path", { d: `M${CX},${CY} Q${CX + cos * 120},${CY + sin * 150} ${bx},${by}`, fill: "none", stroke: col(b.c), "stroke-width": 6, "stroke-linecap": "round" }, g);
+
+    const leafX = sin > 0.5 ? bx + (right ? 40 : -40) : right ? bx + 125 : left ? bx - 125 : bx;
+    const spread = 32;
+    const baseY = sin < -0.5 ? by - 58 - (b.leaves.length - 1) * spread : sin > 0.5 ? by + 58 : by - ((b.leaves.length - 1) * spread) / 2;
+    const ly = (k) => baseY + k * spread;
+    b.leaves.forEach((leaf, k) => {
+      const y = ly(k);
+      const tw = measure(leaf, "leaf");
+      let tx, anchor;
+      if (right) { tx = leafX + 10; anchor = "start"; }
+      else if (left) { tx = leafX - 10; anchor = "end"; }
+      else { tx = bx + (k % 2 ? 18 : -18) + (k % 2 ? 0 : 0); anchor = k % 2 ? "start" : "end"; }
+      const dotX = right ? leafX : left ? leafX : bx + (k % 2 ? 8 : -8);
+      el("path", { d: `M${bx},${by} C${(bx + dotX) / 2},${by} ${(bx + dotX) / 2},${y} ${dotX},${y}`, fill: "none", stroke: col(b.c), "stroke-width": 2, opacity: .55 }, g);
+      el("circle", { cx: dotX, cy: y, r: 4.5, fill: col(b.c) }, g);
+      const t = el("text", { class: "leaf", x: tx, y: y + 5, "text-anchor": anchor }, g);
+      t.textContent = leaf;
+      void tw;
+    });
+
+    const bw = measure(b.name, "bname") + 30;
+    el("rect", { x: bx - bw / 2, y: by - 20, width: bw, height: 40, rx: 20, fill: col(b.c) }, g);
+    const t = el("text", { class: "bname", x: bx, y: by + 6, "text-anchor": "middle" }, g);
+    t.textContent = b.name;
+
+    const on = () => { svg.classList.add("focus"); groups.forEach((x) => x.classList.toggle("on", x === g)); };
+    const off = () => { if (!g.classList.contains("pinned")) { svg.classList.remove("focus"); g.classList.remove("on"); } };
+    g.addEventListener("mouseenter", on);
+    g.addEventListener("mouseleave", () => { if (!groups.some((x) => x.classList.contains("pinned"))) off(); });
+    g.addEventListener("click", () => {
+      const was = g.classList.contains("pinned");
+      groups.forEach((x) => x.classList.remove("pinned", "on"));
+      if (was) svg.classList.remove("focus"); else { g.classList.add("pinned"); on(); }
+    });
+    g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); g.dispatchEvent(new Event("click")); } });
+  });
+
+  // środek
+  el("circle", { cx: CX, cy: CY, r: 92, fill: "var(--pond)" });
+  el("circle", { cx: CX - 40, cy: CY - 70, r: 26, fill: "var(--pond)" });
+  el("circle", { cx: CX + 40, cy: CY - 70, r: 26, fill: "var(--pond)" });
+  for (const dx of [-40, 40]) {
+    el("circle", { cx: CX + dx, cy: CY - 72, r: 15, fill: "#fff" });
+    el("circle", { cx: CX + dx + 3, cy: CY - 72, r: 7, fill: "#111" });
+  }
+  const t1 = el("text", { x: CX, y: CY + 4, "text-anchor": "middle", style: "font-family: var(--display); font-weight: 700; font-size: 26px; fill: #fff" }); t1.textContent = "Żabie";
+  const t2 = el("text", { x: CX, y: CY + 34, "text-anchor": "middle", style: "font-family: var(--display); font-weight: 700; font-size: 26px; fill: #fff" }); t2.textContent = "Strzelanie";
+  el("path", { d: `M${CX - 22},${CY + 50} Q${CX},${CY + 64} ${CX + 22},${CY + 50}`, fill: "none", stroke: "#fff", "stroke-width": 3, "stroke-linecap": "round" });
+
+  // ================= LISTA ZADAŃ =================
+  const STAGES = [
+    { t: "Przygotowanie", items: [
+      ["s0a", "Zainstaluj Roblox Studio i zaloguj się", "you"],
+      ["s0b", "Utwórz nowe miejsce z szablonu Baseplate", "you"],
+      ["s0c", "Włącz okna Explorer, Properties i Output (zakładka View)", "you"],
+      ["s0d", "Zapisz projekt pod nazwą „Żabie Strzelanie”", "you"]
+    ] },
+    { t: "Język-hak (podstawa)", items: [
+      ["s1a", "Skrypt: klik = promień (raycast) w miejsce celowania", "ai"],
+      ["s1b", "Różowy język rysowany efektem Beam", "ai"],
+      ["s1c", "Przyciąganie postaci do ściany", "ai"],
+      ["s1d", "Odnowienie języka 1,5 s i dźwięk „plask”", "ai"],
+      ["s1e", "Wklej skrypty, kliknij Play i przetestuj", "you"]
+    ] },
+    { t: "Język-hak (pełny)", items: [
+      ["s2a", "Bujanie się na linie (RopeConstraint)", "ai"],
+      ["s2b", "Przyciąganie i rzucanie przedmiotów", "ai"],
+      ["s2c", "Przyciąganie wrogów z ogłuszeniem 0,5 s", "ai"],
+      ["s2d", "Latające muchy do łapania językiem", "ai"],
+      ["s2e", "Ustaw na mapie kilka skrzynek i beczek do rzucania", "you"]
+    ] },
+    { t: "Pistolet i system %", items: [
+      ["s3a", "RemoteEvent „Shoot” i trafienia liczone na serwerze", "ai"],
+      ["s3b", "Rechot %: trafienie dodaje 8%, z bliska 12%", "ai"],
+      ["s3c", "Odrzut rośnie razem z procentem", "ai"],
+      ["s3d", "Amunicja: 6 much, przeładowanie łapaniem much", "ai"],
+      ["s3e", "Rakietowy skok: strzał w dół w powietrzu", "ai"],
+      ["s3f", "Napis z procentem nad głową żaby", "ai"]
+    ] },
+    { t: "Mystery boxy", items: [
+      ["s4a", "Spawner boxów co 20–30 s w losowych miejscach", "ai"],
+      ["s4b", "4 rzadkości z kolorami i szansami", "ai"],
+      ["s4c", "Otwieranie boxa strzałem lub językiem", "ai"],
+      ["s4d", "Pierwsze 5 umiejętności (bańka, super skok, rój much…)", "ai"],
+      ["s4e", "Użycie umiejętności klawiszem Q i ikonka na ekranie", "ai"],
+      ["s4f", "Postaw na mapie punkty, w których mogą pojawiać się boxy", "you"]
+    ] },
+    { t: "Żaba", items: [
+      ["s5a", "Znajdź albo zbuduj model żaby (Toolbox lub klocki)", "you"],
+      ["s5b", "Pistolet przyczepiony do pyska", "ai"],
+      ["s5c", "Animacje: skok, strzał, wystawienie języka", "you"],
+      ["s5d", "Dźwięki: „KUM!”, rechot, plusk", "you"]
+    ] },
+    { t: "Mapa: Staw o zachodzie", items: [
+      ["s6a", "Zbuduj liście lilii, trzciny i brzegi", "you"],
+      ["s6b", "Woda z piranią jako strefa odpadnięcia", "ai"],
+      ["s6c", "Kołyszące się liście lilii", "ai"],
+      ["s6d", "Oświetlenie zachodu słońca (Lighting)", "you"],
+      ["s6e", "Event: deszcz, podczas którego wszystko jest śliskie", "ai"]
+    ] },
+    { t: "Rundy i lobby", items: [
+      ["s7a", "Lobby na liściu lilii z odliczaniem", "ai"],
+      ["s7b", "Runda 3–4 min, 3 życia, respawn po 3 s", "ai"],
+      ["s7c", "Podnosząca się woda w ostatniej minucie", "ai"],
+      ["s7d", "Podium i tabela wyników", "ai"]
+    ] },
+    { t: "Szlif, czyli dużo fun", items: [
+      ["s8a", "Ragdoll przy mocnym trafieniu", "ai"],
+      ["s8b", "Trzęsienie kamery i spowolnienie przy odpadnięciu", "ai"],
+      ["s8c", "Killcam: kto cię wyrzucił", "ai"],
+      ["s8d", "Krótki tutorial w pierwszej rundzie", "ai"],
+      ["s8e", "Pozostałe 11 umiejętności z boxów", "ai"]
+    ] },
+    { t: "Publikacja", items: [
+      ["s9a", "Test z kolegami (minimum 4 osoby)", "you"],
+      ["s9b", "Popraw balans po testach (co było za mocne?)", "you"],
+      ["s9c", "Ikona gry i 3 miniaturki", "you"],
+      ["s9d", "Opis gry i tagi", "ai"],
+      ["s9e", "Opublikuj grę jako publiczną", "you"]
+    ] }
+  ];
+  const ALL = STAGES.flatMap((s) => s.items.map((i) => i[0]));
+  let done = {};
+
+  const stagesEl = document.getElementById("stages");
+  const boxes = {};
+  STAGES.forEach((s, si) => {
+    const card = document.createElement("article"); card.className = "stage";
+    card.innerHTML = `<div class="stage-top"><span class="n">${si}</span><h3></h3><span class="cnt"></span></div><div class="mini"><i></i></div><ul></ul>`;
+    card.querySelector("h3").textContent = s.t;
+    const ul = card.querySelector("ul");
+    s.items.forEach(([id, text, who]) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<label><input type="checkbox" id="cb-${id}"><span></span></label>`;
+      const span = li.querySelector("span");
+      span.textContent = text;
+      const tag = document.createElement("span"); tag.className = "tag" + (who === "you" ? " you" : ""); tag.textContent = who === "you" ? "TY" : "AI";
+      span.appendChild(tag);
+      const cb = li.querySelector("input");
+      cb.addEventListener("change", () => toggle(id, cb.checked));
+      boxes[id] = cb;
+      ul.appendChild(li);
+    });
+    s.card = card;
+    stagesEl.appendChild(card);
+  });
+
+  const TITLES = [[0, "Zaczynamy!"], [0.01, "Pierwsze kroki zrobione"], [0.25, "Żaba już skacze"], [0.5, "Połowa drogi!"], [0.75, "Prawie gotowe"], [1, "Gra gotowa! 🐸"]];
+  function render() {
+    let total = 0;
+    ALL.forEach((id) => { boxes[id].checked = !!done[id]; if (done[id]) total++; });
+    STAGES.forEach((s) => {
+      const c = s.items.filter((i) => done[i[0]]).length;
+      s.card.querySelector(".cnt").textContent = `${c}/${s.items.length}`;
+      s.card.querySelector(".mini i").style.width = (c / s.items.length) * 100 + "%";
+      s.card.classList.toggle("done", c === s.items.length);
+    });
+    const p = total / ALL.length;
+    document.getElementById("progNum").textContent = `${total} / ${ALL.length} · ${Math.round(p * 100)}%`;
+    document.getElementById("progBar").style.width = p * 100 + "%";
+    document.getElementById("progTitle").textContent = TITLES.filter(([t]) => p >= t).pop()[1];
+  }
+
+  // ================= ZAPIS =================
+  const LS = "zabie-strzelanie-checklist";
+  let ref = null, writing = Promise.resolve();
+  try { done = JSON.parse(localStorage.getItem(LS) || "{}") || {}; } catch (e) { done = {}; }
+  render();
+
+  function toggle(id, val) {
+    done = Object.assign({}, done, { [id]: val });
+    if (!val) delete done[id];
+    render();
+    try { localStorage.setItem(LS, JSON.stringify(done)); } catch (e) {}
+    if (ref) {
+      const snapshot = Object.assign({}, done);
+      writing = writing.then(() => ref.set({ done: snapshot, updatedAt: Date.now() })).catch(() => {
+        document.getElementById("saveNote").textContent = "Nie udało się zapisać zmian na serwerze. Postęp jest zapisany w tej przeglądarce.";
+      });
+    }
+  }
+
+  (async () => {
+    try {
+      const db = window.claude && window.claude.use ? await window.claude.use("db") : null;
+      if (!db) return;
+      ref = db.doc("progress/main");
+      ref.onSnapshot((snap) => {
+        const d = snap.exists ? snap.data() : null;
+        if (d && d.done && typeof d.done === "object") {
+          const next = {};
+          for (const id of ALL) if (d.done[id] === true) next[id] = true;
+          done = next; render();
+        } else if (!snap.exists && Object.keys(done).length) {
+          toggle(Object.keys(done)[0], true);
+        }
+        document.getElementById("saveNote").textContent = "Postęp zapisuje się automatycznie. Każdy, komu udostępnisz link, zobaczy te same odhaczone zadania.";
+      }, () => {
+        document.getElementById("saveNote").textContent = "Brak połączenia z zapisem. Postęp jest zapisany w tej przeglądarce.";
+      });
+    } catch (e) {}
+  })();
+})();
+</script>
