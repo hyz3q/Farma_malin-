@@ -90,7 +90,7 @@
   <header>
     <div class="eyebrow">Żabie Strzelanie · model postaci</div>
     <h1>Żaba <em>bandyta</em></h1>
-    <p class="lede">Żaba zbudowana w całości z prostokątnych klocków, jak w klasycznym Robloxie: maska na oczy, blizna, chusta, pas z nabojami, kowbojski kapelusz i rewolwer w pysku. Wolisz wersję łagodną? Przełącz na Słodziaka. Obracaj ją myszką albo palcem, wybierz skórkę i skopiuj skrypt. W Roblox Studio zbuduje dokładnie taką samą żabę.</p>
+    <p class="lede">Żaba zbudowana w całości z prostokątnych klocków, jak w klasycznym Robloxie: ciężkie powieki, maska, złoty ząb, chusta, kapelusz i rewolwer zaciśnięty w szerokim pysku. Wolisz wersję łagodną? Przełącz na Słodziaka. Obracaj ją myszką albo palcem, wybierz skórkę i skopiuj skrypt. W Roblox Studio zbuduje dokładnie taką samą żabę.</p>
   </header>
 
   <section class="main">
@@ -156,6 +156,8 @@
   let skinKey = "zielona", withGun = true, style = "bandyta";
 
   // ================= CZĘŚCI (studs, oś Y w górę, przód = -Z jak w Roblox) =================
+  // Jedna bryła: głowa i tułów to jedno ciało (żaby nie mają szyi).
+  // Pysk to szpara między górną wargą a wysuniętą dolną szczęką, a broń jest w niej zaciśnięta.
   // rot = obrót w stopniach [x, y, z]
   function buildParts(s) {
     const P = [];
@@ -166,78 +168,84 @@
       add(name + "_L", size, [-x, y, z], color, [r[0], -r[1], -r[2]]);
       add(name + "_P", size, [x, y, z], color, r);
     };
+    const MOUTH = "#4A1622";
 
-    add("Cialo", [4, 2.4, 4.4], [0, 1.9, 0.3], s.body);
-    add("Brzuch", [3, 1.4, 0.2], [0, 1.6, -1.95], s.belly);
-    add("Glowa", [4.4, 2, 3.4], [0, 3.6, -0.6], s.body);
-    add("Podbrodek", [3.6, 0.3, 0.2], [0, 2.75, -2.35], s.belly);
-    mirror("Oko", [1.4, 1.4, 1.4], [1.35, 4.9, -1.2], s.body);
-    mirror("Bialko", [1.1, 1.1, 0.2], [1.35, 4.95, -1.95], "#FFFFFF");
-    mirror("Nozdrze", [0.22, 0.16, 0.1], [0.45, 3.95, -2.34], s.dark);
+    // --- ciało ---
+    add("Cialo", [5, 3.2, 4.8], [0, 2.2, 0.3], s.body);
+    add("Grzbiet", [4.4, 0.5, 4.2], [0, 4.05, 0.4], s.body);
+    add("Twarz", [5, 1.15, 0.3], [0, 3.225, -2.25], s.body);
+    add("WnetrzePyska", [4.2, 0.45, 0.1], [0, 2.425, -2.15], MOUTH);
+    mirror("KacikPyska", [0.4, 0.45, 0.3], [2.3, 2.425, -2.25], s.body);
+    add("GornaWarga", [4.4, 0.12, 0.34], [0, 2.7, -2.26], s.dark);
+    add("DolnaSzczeka", [5, 0.55, 0.45], [0, 1.925, -2.3], s.body);
+    add("Gardlo", [4.2, 1.1, 0.25], [0, 1.1, -2.2], s.belly);
+    mirror("Nozdrze", [0.26, 0.16, 0.1], [0.45, 3.55, -2.42], s.dark);
+    mirror("PlamaBok1", [0.1, 0.8, 0.9], [2.52, 2.9, 0.9], s.spots);
+    mirror("PlamaBok2", [0.1, 0.55, 0.6], [2.52, 1.9, 1.9], s.spots);
+    add("PlamaTyl1", [1.0, 0.8, 0.1], [0.7, 2.7, 2.75], s.spots);
+    add("PlamaTyl2", [0.6, 0.5, 0.1], [-0.9, 3.3, 2.75], s.spots);
+
+    // --- oczy na czubku głowy ---
+    mirror("Oko", [1.7, 1.5, 1.7], [1.45, 4.45, -1.2], s.body);
+    mirror("Bialko", [1.3, 1.1, 0.12], [1.45, 4.4, -2.1], "#FFFFFF");
+
+    // --- nogi ---
+    mirror("Udo", [1.3, 1.8, 2.6], [2.55, 1.4, 1.3], s.body);
+    mirror("StopaTyl", [1.8, 0.4, 2.4], [2.8, 0.2, 0.2], s.dark);
+    for (const [k, dx] of [[1, -0.6], [2, 0], [3, 0.6]]) mirror("PalecTyl" + k, [0.45, 0.3, 0.8], [2.8 + dx, 0.15, -1.3], s.dark);
+    mirror("Reka", [0.9, 1.6, 0.9], [1.7, 0.8, -1.7], s.body);
+    mirror("Dlon", [1.3, 0.3, 1.3], [1.8, 0.15, -2.2], s.dark);
+    for (const [k, dx] of [[1, -0.4], [2, 0], [3, 0.4]]) mirror("Palec" + k, [0.3, 0.25, 0.45], [1.8 + dx, 0.13, -3.0], s.dark);
 
     if (bandit) {
-      // przymrużone, groźne oczy
-      mirror("Zrenica", [0.42, 0.42, 0.12], [1.25, 4.78, -2.1], "#111111");
-      mirror("Powieka", [1.2, 0.55, 0.12], [1.35, 5.3, -2.08], s.body, [0, 0, 14]);
-      mirror("Brew", [1.45, 0.3, 0.3], [1.3, 5.58, -2.08], s.dark, [0, 0, 22]);
-      // maska bandyty
-      add("Maska", [4.5, 0.75, 0.1], [0, 4.95, -1.9], s.mask);
-      mirror("MaskaBok", [0.12, 0.75, 1.5], [2.08, 4.95, -1.2], s.mask);
-      add("MaskaWstazka1", [0.14, 1.0, 0.3], [2.2, 4.55, -0.35], s.mask, [0, 0, 28]);
-      add("MaskaWstazka2", [0.14, 1.0, 0.3], [2.2, 4.5, -0.05], s.mask, [0, 0, -12]);
-      // blizna przez lewe oko
-      add("Blizna", [0.14, 1.3, 0.08], [-1.2, 5.0, -2.2], "#E9B7BD", [0, 0, 28]);
-      // groźny grymas
-      add("Usta", [2.6, 0.22, 0.1], [0, 3.1, -2.34], s.dark);
-      mirror("KacikUst", [0.55, 0.22, 0.1], [1.45, 2.97, -2.34], s.dark, [0, 0, 25]);
-      // chusta na szyi
-      add("Chusta", [4.6, 0.45, 3.6], [0, 2.62, -0.6], s.bandana);
-      add("ChustaWezel1", [1.8, 0.4, 0.15], [0, 2.25, -2.45], s.bandana);
-      add("ChustaWezel2", [1.1, 0.4, 0.15], [0, 1.88, -2.45], s.bandana);
-      add("ChustaWezel3", [0.45, 0.35, 0.15], [0, 1.55, -2.45], s.bandana);
-      for (const [k, x, y] of [[1, -0.6, 2.3], [2, 0.55, 2.2], [3, 0.1, 1.9], [4, -1.6, 2.7], [5, 1.5, 2.7]]) add("ChustaKropka" + k, [0.16, 0.16, 0.06], [x, y, k > 3 ? -2.45 : -2.55], "#F4EFE6");
-      // pas z nabojami na brzuchu
-      const ang = 38, rad = (ang * Math.PI) / 180, dx = -Math.sin(rad), dy = Math.cos(rad);
-      add("PasNaboje", [0.42, 2.4, 0.12], [0.1, 1.6, -2.08], "#6B4423", [0, 0, ang]);
-      [-0.8, -0.4, 0, 0.4, 0.8].forEach((t, k) => add("Naboj" + (k + 1), [0.16, 0.36, 0.1], [0.1 + dx * t, 1.6 + dy * t, -2.17], "#D9A62E", [0, 0, ang]));
-      // kapelusz kowbojski zsunięty na tył głowy
-      add("KapeluszRondo", [4.8, 0.18, 2.6], [0, 4.74, 0.8], "#5A3A22", [-8, 0, 0]);
-      add("KapeluszGora", [2.7, 1.05, 1.9], [0, 5.32, 0.95], "#6E4A2C", [-8, 0, 0]);
-      add("KapeluszPasek", [2.76, 0.24, 1.96], [0, 5.0, 0.97], "#1B1B1B", [-8, 0, 0]);
+      // ciężkie, przymrużone powieki i poziome źrenice
+      mirror("Zrenica", [0.9, 0.34, 0.08], [1.5, 4.25, -2.18], "#111111");
+      mirror("Powieka", [1.55, 0.6, 0.2], [1.45, 4.82, -2.13], s.dark, [0, 0, 10]);
+      // maska bandyty oplatająca oczy
+      add("Maska", [4.9, 0.7, 0.1], [0, 4.3, -2.07], s.mask);
+      mirror("MaskaBok", [0.1, 0.7, 1.75], [2.33, 4.3, -1.2], s.mask);
+      add("MaskaTyl", [4.9, 0.7, 0.1], [0, 4.3, -0.33], s.mask);
+      add("MaskaWezel", [0.35, 0.35, 0.2], [2.4, 4.3, -0.33], s.mask);
+      add("MaskaKoniec1", [0.12, 0.8, 0.28], [2.5, 3.85, -0.2], s.mask, [0, 0, 22]);
+      add("MaskaKoniec2", [0.12, 0.8, 0.28], [2.45, 3.8, 0.1], s.mask, [0, 0, -10]);
+      // złoty ząb w kąciku pyska
+      add("ZlotyZab", [0.3, 0.28, 0.1], [1.25, 2.5, -2.22], "#F2C14E");
+      // chusta pod pyskiem
+      add("ChustaPas", [5.1, 0.35, 5.0], [0, 1.6, 0.3], s.bandana);
+      add("Chusta1", [2.6, 0.4, 0.15], [0, 1.45, -2.4], s.bandana);
+      add("Chusta2", [1.7, 0.4, 0.15], [0, 1.05, -2.4], s.bandana);
+      add("Chusta3", [0.8, 0.4, 0.15], [0, 0.65, -2.4], s.bandana);
+      for (const [k, x, y] of [[1, -0.8, 1.45], [2, 0.75, 1.5], [3, -0.35, 1.05], [4, 0.4, 0.95]]) add("ChustaKropka" + k, [0.16, 0.16, 0.06], [x, y, -2.5], "#F4EFE6");
+      // kapelusz za oczami
+      add("KapeluszRondo", [4.2, 0.18, 2.8], [0, 4.39, 1.3], "#5A3A22");
+      add("KapeluszGora", [2.6, 1.1, 2.0], [0, 5.03, 1.35], "#6E4A2C");
+      add("KapeluszPasek", [2.66, 0.24, 2.06], [0, 4.6, 1.35], "#1B1B1B");
     } else {
-      mirror("Zrenica", [0.5, 0.6, 0.12], [1.3, 4.9, -2.1], "#111111");
-      mirror("Blysk", [0.18, 0.18, 0.06], [1.45, 5.08, -2.18], "#FFFFFF");
-      add("Usta", [3.4, 0.22, 0.1], [0, 3.05, -2.34], s.dark);
-      mirror("Policzek", [0.7, 0.4, 0.1], [1.75, 3.35, -2.34], s.cheek);
-      add("Plamka3", [0.8, 0.1, 0.8], [-0.4, 4.65, 0.4], s.spots);
-      add("Plamka4", [0.5, 0.1, 0.5], [1.1, 4.65, -0.3], s.spots);
+      mirror("Zrenica", [0.55, 0.6, 0.08], [1.4, 4.45, -2.18], "#111111");
+      mirror("Blysk", [0.2, 0.2, 0.05], [1.55, 4.62, -2.23], "#FFFFFF");
+      mirror("Powieka", [1.5, 0.22, 0.16], [1.45, 5.0, -2.12], s.body);
+      mirror("Policzek", [0.7, 0.4, 0.1], [1.9, 3.0, -2.42], s.cheek);
+      add("Plamka1", [0.8, 0.1, 0.8], [-0.9, 4.32, 1.4], s.spots);
+      add("Plamka2", [0.6, 0.1, 0.6], [0.9, 4.32, 1.9], s.spots);
     }
-    // plamki na grzbiecie
-    add("Plamka1", [0.9, 0.1, 0.9], [0.8, 3.15, 1.8], s.spots);
-    add("Plamka2", [0.7, 0.1, 0.7], [-0.9, 3.15, 1.6], s.spots);
-    // tylne nogi
-    mirror("Udo", [1.2, 1.6, 2.4], [2.45, 1.25, 1.2], s.body);
-    mirror("StopaTyl", [1.6, 0.4, 2.2], [2.65, 0.2, 0.35], s.dark);
-    for (const [k, dx] of [[1, -0.55], [2, 0], [3, 0.55]]) mirror("PalecTyl" + k, [0.4, 0.3, 0.7], [2.65 + dx, 0.15, -1.05], s.dark);
-    // przednie nogi
-    mirror("Reka", [0.8, 1.6, 0.8], [1.5, 0.85, -1.45], s.body);
-    mirror("StopaPrzod", [1.2, 0.3, 1.2], [1.6, 0.15, -1.85], s.dark);
-    // broń
-    if (withGun && bandit) {
-      add("Rama", [0.8, 0.9, 1.5], [0, 3.1, -2.95], "#23262B");
-      add("Beben", [1.05, 0.85, 0.8], [0, 3.1, -3.15], "#7C838C");
-      add("Lufa", [0.42, 0.42, 1.7], [0, 3.32, -4.45], "#9AA2AB");
-      add("Wylot", [0.5, 0.5, 0.12], [0, 3.32, -5.3], "#1A1A1A");
-      add("Muszka", [0.14, 0.24, 0.22], [0, 3.62, -5.1], "#23262B");
-      add("Kurek", [0.2, 0.35, 0.25], [0, 3.62, -2.3], "#23262B", [-25, 0, 0]);
-      add("Rekojesc", [0.6, 1.25, 0.72], [0, 2.3, -2.6], "#7A4A26", [-12, 0, 0]);
-      add("Spust", [0.14, 0.35, 0.14], [0, 2.55, -3.25], "#9AA2AB");
-    } else if (withGun) {
-      add("Pistolet", [0.9, 0.9, 2.3], [0, 3.1, -3.3], "#3A3F47");
-      add("Lufa", [0.55, 0.55, 0.5], [0, 3.2, -4.65], "#FF8A1F");
-      add("Rekojesc", [0.6, 1.1, 0.7], [0, 2.3, -2.85], "#2A2E34");
-      add("Muszka", [0.2, 0.3, 0.3], [0, 3.7, -4.1], "#FF8A1F");
-      add("Spust", [0.15, 0.35, 0.15], [0, 2.55, -3.35], "#FF8A1F");
+
+    // --- broń zaciśnięta w pysku ---
+    if (withGun) {
+      const revolver = bandit;
+      const frame = revolver ? "#23262B" : "#2F6FC4";
+      const steel = revolver ? "#8E969F" : "#FFB020";
+      const grip = revolver ? "#7A4A26" : "#2F6FC4";
+      const tip = revolver ? "#15171A" : "#FF6A13";
+      add("BronTyl", [0.7, 0.42, 1.2], [0, 2.42, -2.4], frame);
+      add("BronRama", [0.8, 0.8, 1.5], [0, 2.5, -3.6], frame);
+      if (revolver) add("Beben", [1.05, 0.75, 0.75], [0, 2.5, -3.3], steel);
+      add("Lufa", [0.42, 0.42, 1.6], [0, 2.68, -5.1], steel);
+      add("Wylot", [0.5, 0.5, 0.12], [0, 2.68, -5.95], tip);
+      add("Muszka", [0.14, 0.22, 0.2], [0, 2.98, -5.7], frame);
+      add("Kurek", [0.2, 0.32, 0.25], [0, 2.95, -2.95], frame, [-25, 0, 0]);
+      add("Rekojesc", [0.6, 1.2, 0.7], [0, 1.75, -3.05], grip, [-15, 0, 0]);
+      add("Oslona", [0.14, 0.12, 0.6], [0, 1.85, -3.75], steel);
+      add("Spust", [0.12, 0.3, 0.12], [0, 2.0, -3.6], steel);
     }
     return P;
   }
@@ -300,7 +308,7 @@
   let spin = false, needsRender = true;
 
   function init3d() {
-    target = new THREE.Vector3(0, 2.4, -0.5);
+    target = new THREE.Vector3(0, 2.6, -1.2);
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
     renderer.shadowMap.enabled = true;
@@ -354,7 +362,7 @@
     const code = luau(parts, SKINS[skinKey].name);
     $("code").textContent = code;
     $("codeText").value = code;
-    $("meta").textContent = `${parts.length} klocków · wysokość ok. ${style === "bandyta" ? "6" : "5,7"} studa (jak postać Roblox)`;
+    $("meta").textContent = `${parts.length} klocków · wysokość ok. ${style === "bandyta" ? "5,6" : "5,2"} studa (jak postać Roblox)`;
   }
 
   function resize() {
