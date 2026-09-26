@@ -69,6 +69,10 @@
   .seg button + button { border-left: 1px solid var(--line); }
   .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
   .meta { font-size: 13px; color: var(--muted); }
+  .slider { display: grid; gap: 4px; margin-top: 10px; font-weight: 600; font-size: 14px; }
+  .slider span { display: flex; justify-content: space-between; }
+  .slider b { font-family: var(--mono); color: var(--pond); }
+  .slider input { width: 100%; accent-color: var(--pond); }
 
   .steps { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
   .steps li::marker { font-family: var(--mono); font-weight: 700; color: var(--pond); }
@@ -130,8 +134,11 @@
         <div class="seg" role="group" aria-label="Powierzchnia"><button data-surf="all" aria-pressed="true">Studsy wszędzie</button><button data-surf="classic" aria-pressed="false">Studsy na górze</button><button data-surf="smooth" aria-pressed="false">Gładka</button></div>
         <div class="toggles">
           <label><input type="checkbox" id="optGun" checked> Broń w pysku</label>
+          <label><input type="checkbox" id="optRoll" checked> Broń obrócona o 90° w prawo</label>
           <label><input type="checkbox" id="optSpin"> Kręć się sama</label>
         </div>
+        <label class="slider"><span>Rozmiar czapki <b id="hatScaleVal">130%</b></span><input type="range" id="hatScale" min="1" max="1.6" step="0.05" value="1.3"></label>
+        <label class="slider"><span>Wsunięcie czapki na oczy <b id="hatSinkVal">0.55</b></span><input type="range" id="hatSink" min="0" max="1" step="0.05" value="0.55"></label>
         <span class="meta" id="meta"></span>
       </div>
 
@@ -202,7 +209,7 @@
     slodziak: { name: "Słodziak", desc: "kwiatek, pistolet na wodę", skin: "zielona", face: "cute", acc: ["flower"], gun: "toy" }
   };
 
-  let charKey = "bandyta", skinKey = CHARS.bandyta.skin, withGun = true, surf = "all", shape = "zgrabna", showAll = false;
+  let charKey = "bandyta", skinKey = CHARS.bandyta.skin, withGun = true, hatScale = 1.3, hatSink = 0.55, gunRoll = 90, surf = "all", shape = "zgrabna", showAll = false;
 
   // ================= NARZĘDZIA =================
   function kit() {
@@ -231,6 +238,24 @@
       const v = rotate(local, rot);
       k.add(name, size, [pivot[0] + v[0], pivot[1] + v[1], pivot[2] + v[2]], color, ownRot || rot);
     };
+  }
+  // składanie obrotów: najpierw własny obrót klocka, potem obrót całej grupy (wynik znów jako Euler XYZ)
+  function eulerMat([rx, ry, rz]) {
+    const [a, b, c] = [rx * RAD, ry * RAD, rz * RAD];
+    const [ca, sa, cb, sb, cc, sc] = [Math.cos(a), Math.sin(a), Math.cos(b), Math.sin(b), Math.cos(c), Math.sin(c)];
+    return [
+      [cb * cc, -cb * sc, sb],
+      [ca * sc + sa * sb * cc, ca * cc - sa * sb * sc, -sa * cb],
+      [sa * sc - ca * sb * cc, sa * cc + ca * sb * sc, ca * cb]
+    ];
+  }
+  function composeRot(outer, inner) {
+    const A = eulerMat(outer), B = eulerMat(inner);
+    const m = A.map((row) => [0, 1, 2].map((j) => row[0] * B[0][j] + row[1] * B[1][j] + row[2] * B[2][j]));
+    const y = Math.asin(Math.max(-1, Math.min(1, m[0][2])));
+    const x = Math.abs(m[0][2]) < 0.9999 ? Math.atan2(-m[1][2], m[2][2]) : Math.atan2(m[2][1], m[1][1]);
+    const z = Math.abs(m[0][2]) < 0.9999 ? Math.atan2(-m[0][1], m[0][0]) : 0;
+    return [x / RAD, y / RAD, z / RAD].map((v) => Math.round(v * 1000) / 1000);
   }
   const MOUTH = "#4A1622", GOLD = "#F2C14E", GOLD_DARK = "#C99A1E", WHITE = "#F4EFE6";
 
@@ -361,9 +386,14 @@
       k.add(name + "Koniec2", [0.1, 0.8, 0.22], [-0.2, y - 0.5, A.bumpZ + A.bumpD / 2 + 0.12], color, [0, 0, -12]);
     }
   }
-  function hatPivot(A, dz) { return [0, A.eyeTop + 0.07, A.bumpZ + (dz ?? 0.55)]; }
+  function hatPivot(A, dz) { return [0, A.eyeTop + 0.07 - hatSink, A.bumpZ + (dz ?? 0.55)]; }
+  // czapka: większa (hatScale) i wsunięta na oczy (hatSink)
+  function hat(k, pivot, rot) {
+    const g = group(k, pivot, rot);
+    return (name, size, local, color, ownRot) => g(name, size.map((v) => v * hatScale), local.map((v) => v * hatScale), color, ownRot);
+  }
   function cowboy(k, A, c, tilt) {
-    const g = group(k, hatPivot(A), tilt);
+    const g = hat(k, hatPivot(A), tilt);
     const bw = A.headW * 1.35, bd = A.bumpD + 1.9, cw = A.headW * 0.62, cd = bd * 0.55;
     g("KapeluszRondo", [bw, 0.14, bd], [0, 0, 0], c.brim);
     g("KapeluszRondoL", [0.14, 0.32, bd * 0.85], [-bw / 2 + 0.07, 0.14, 0], c.brim);
@@ -383,7 +413,7 @@
       g("KapeluszGwiazda2", [0.26, 0.26, 0.05], [0, 0.2, 0.1 - cd / 2 - 0.06], GOLD_DARK, [-4, 0, 51]);
     },
     tricorn: (k, A) => {
-      const p = hatPivot(A, 0.5), g = group(k, p, [0, 0, 0]);
+      const p = hatPivot(A, 0.5), g = hat(k, p, [0, 0, 0]);
       const bw = A.headW * 1.15, bd = A.bumpD + 1.4;
       g("KapeluszRondo", [bw, 0.14, bd], [0, 0, 0], "#1B1B22");
       g("KapeluszGora", [A.headW * 0.55, 0.7, 1.3], [0, 0.4, 0.1], "#1B1B22");
@@ -397,7 +427,7 @@
       g("CzaszkaOczy", [0.22, 0.07, 0.03], [0, 0.48, 0.1 - 0.72], "#111111");
     },
     fedora: (k, A) => {
-      const g = group(k, hatPivot(A, 0.5), [0, 0, -6]);
+      const g = hat(k, hatPivot(A, 0.5), [0, 0, -6]);
       const cw = A.headW * 0.55;
       g("KapeluszRondo", [A.headW * 1.05, 0.12, A.bumpD + 1.6], [0, 0, 0], "#2B2B30");
       g("KapeluszGora", [cw, 0.85, 1.5], [0, 0.48, 0.1], "#3A3A42");
@@ -406,7 +436,7 @@
       g("Piorko", [0.08, 0.55, 0.14], [cw / 2 + 0.03, 0.4, 0.3], "#B8242E", [0, 0, -20]);
     },
     crown: (k, A) => {
-      const g = group(k, [0, A.eyeTop + 0.05, A.bumpZ + A.bumpD / 2 + 0.55], [-6, 0, 0]);
+      const g = hat(k, [0, A.eyeTop + 0.05 - hatSink * 0.3, A.bumpZ + A.bumpD / 2 + 0.55], [-6, 0, 0]);
       const w = A.headW * 0.66, d = 1.5;
       g("KoronaPrzod", [w, 0.45, 0.12], [0, 0, -d / 2], GOLD);
       g("KoronaTyl", [w, 0.45, 0.12], [0, 0, d / 2], GOLD);
@@ -422,14 +452,14 @@
       g("SzafirP", [0.15, 0.15, 0.05], [w * 0.3, 0.02, -d / 2 - 0.08], "#2F6FC4");
     },
     chef: (k, A) => {
-      const g = group(k, hatPivot(A, 0.6), [-4, 0, 0]);
+      const g = hat(k, hatPivot(A, 0.6), [-4, 0, 0]);
       g("CzapkaOpaska", [A.headW * 0.6, 0.45, 1.5], [0, 0.2, 0], "#F7F7F2");
       g("CzapkaPuch", [A.headW * 0.78, 1.2, 1.9], [0, 1.0, 0], "#FFFFFF");
       g("CzapkaGora", [A.headW * 0.6, 0.3, 1.5], [0, 1.72, 0], "#FFFFFF");
       [-0.3, 0, 0.3].forEach((t, i) => g("CzapkaFalda" + (i + 1), [0.05, 0.9, 0.04], [t * A.headW * 0.6, 1.0, -0.97], "#DADAD2"));
     },
     viking: (k, A) => {
-      const g = group(k, hatPivot(A, 0.5), [0, 0, 0]);
+      const g = hat(k, hatPivot(A, 0.5), [0, 0, 0]);
       const w = A.headW * 0.7, hx = w / 2;
       g("HelmRant", [w + 0.1, 0.18, 2.06], [0, -0.1, 0], "#5E656D");
       g("Helm", [w, 0.7, 2.0], [0, 0.3, 0], "#8A9199");
@@ -519,7 +549,12 @@
   };
   function gun(k, A, type) {
     const g = GUNS[type], sc = A.gunScale;
-    const at = (name, size, [dx, dy, dz], color, rot) => k.add(name, size.map((v) => v * sc), [dx * sc, A.mouthY + dy * sc, A.mouthZ + dz * sc], color, rot);
+    // cała broń obrócona wokół lufy o gunRoll stopni (w prawo, patrząc na żabę z przodu)
+    const roll = [0, 0, gunRoll];
+    const at = (name, size, local, color, rot) => {
+      const [x, y, z] = rotate(local.map((v) => v * sc), roll);
+      k.add(name, size.map((v) => v * sc), [x, A.mouthY + y, A.mouthZ + z], color, composeRot(roll, rot || [0, 0, 0]));
+    };
     at("BronTyl", [0.5, 0.3, 1.0], [0, 0, 0], g.frame);
     at("BronRama", [0.55, 0.6, 1.1], [0, 0.06, -0.95], g.frame);
     if (g.cyl) at("Beben", [0.8, 0.55, 0.55], [0, 0.06, -0.7], g.steel);
@@ -949,6 +984,9 @@
   segment("shape", (v) => (shape = v));
   segment("surf", (v) => (surf = v));
   $("optGun").addEventListener("change", (e) => { withGun = e.target.checked; rebuild(); });
+  $("optRoll").addEventListener("change", (e) => { gunRoll = e.target.checked ? 90 : 0; rebuild(); });
+  $("hatScale").addEventListener("input", (e) => { hatScale = +e.target.value; $("hatScaleVal").textContent = Math.round(hatScale * 100) + "%"; rebuild(); });
+  $("hatSink").addEventListener("input", (e) => { hatSink = +e.target.value; $("hatSinkVal").textContent = hatSink.toFixed(2); rebuild(); });
   $("optSpin").addEventListener("change", (e) => { spin = e.target.checked; });
   $("optAll").addEventListener("change", (e) => { showAll = e.target.checked; frameView(); rebuild(); });
 
