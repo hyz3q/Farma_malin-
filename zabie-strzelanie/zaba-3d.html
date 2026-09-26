@@ -64,7 +64,7 @@
   .toggles { display: grid; gap: 8px; }
   .toggles label { display: flex; align-items: center; gap: 10px; font-weight: 600; cursor: pointer; }
   .toggles input { width: 18px; height: 18px; accent-color: var(--pond); }
-  .seg { display: inline-flex; justify-self: start; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .seg { display: inline-flex; flex-wrap: wrap; justify-self: start; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
   .seg button { border: 0; background: var(--surface); color: var(--ink); font: 600 14px var(--body); padding: 8px 14px; cursor: pointer; }
   .seg button + button { border-left: 1px solid var(--line); }
   .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
@@ -90,7 +90,7 @@
   <header>
     <div class="eyebrow">Żabie Strzelanie · model postaci</div>
     <h1>Żaba <em>bandyta</em></h1>
-    <p class="lede">Żaba zbudowana w całości z prostokątnych klocków, jak w klasycznym Robloxie: ciężkie powieki, maska, złoty ząb, chusta, kapelusz i rewolwer zaciśnięty w szerokim pysku. Wolisz wersję łagodną? Przełącz na Słodziaka. Obracaj ją myszką albo palcem, wybierz skórkę i skopiuj skrypt. W Roblox Studio zbuduje dokładnie taką samą żabę.</p>
+    <p class="lede">Smukła żaba z prostokątnych klocków z klasycznymi robloxowymi studsami: ciężkie powieki, maska, złoty ząb, chusta, kapelusz i rewolwer zaciśnięty w szerokim pysku. Wolisz wersję łagodną? Przełącz na Słodziaka. Obracaj ją myszką albo palcem, wybierz skórkę i skopiuj skrypt. W Roblox Studio zbuduje dokładnie taką samą żabę.</p>
   </header>
 
   <section class="main">
@@ -109,6 +109,7 @@
         <div class="skins" id="skins"></div>
         <div class="toggles">
           <div class="seg" role="group" aria-label="Wygląd"><button data-style="bandyta" aria-pressed="true">Bandyta</button><button data-style="slodziak" aria-pressed="false">Słodziak</button></div>
+          <div class="seg" role="group" aria-label="Powierzchnia"><button data-surf="classic" aria-pressed="true">Studsy na górze</button><button data-surf="all" aria-pressed="false">Studsy wszędzie</button><button data-surf="smooth" aria-pressed="false">Gładka</button></div>
           <label><input type="checkbox" id="optGun" checked> Broń w pysku</label>
           <label><input type="checkbox" id="optSpin"> Kręć się sama</label>
         </div>
@@ -153,10 +154,10 @@
     lawowa: { name: "Lawowa", body: "#D8452B", dark: "#7A1F14", belly: "#FFB054", spots: "#2A1410", cheek: "#FFD166", mask: "#151515", bandana: "#1E1E1E" },
     malinowa: { name: "Malinowa", body: "#D6456E", dark: "#8E1F43", belly: "#F9C3D2", spots: "#8E1F43", cheek: "#FFFFFF", mask: "#151515", bandana: "#1E1E1E" }
   };
-  let skinKey = "zielona", withGun = true, style = "bandyta";
+  let skinKey = "zielona", withGun = true, style = "bandyta", surf = "classic";
 
   // ================= CZĘŚCI (studs, oś Y w górę, przód = -Z jak w Roblox) =================
-  // Jedna bryła: głowa i tułów to jedno ciało (żaby nie mają szyi).
+  // Jedna smukła bryła: głowa i tułów to jedno ciało (żaby nie mają szyi), zwężające się ku dołowi.
   // Pysk to szpara między górną wargą a wysuniętą dolną szczęką, a broń jest w niej zaciśnięta.
   // rot = obrót w stopniach [x, y, z]
   function buildParts(s) {
@@ -171,62 +172,63 @@
     const MOUTH = "#4A1622";
 
     // --- ciało ---
-    add("Cialo", [5, 3.2, 4.8], [0, 2.2, 0.3], s.body);
-    add("Grzbiet", [4.4, 0.5, 4.2], [0, 4.05, 0.4], s.body);
-    add("Twarz", [5, 1.15, 0.3], [0, 3.225, -2.25], s.body);
-    add("WnetrzePyska", [4.2, 0.45, 0.1], [0, 2.425, -2.15], MOUTH);
-    mirror("KacikPyska", [0.4, 0.45, 0.3], [2.3, 2.425, -2.25], s.body);
-    add("GornaWarga", [4.4, 0.12, 0.34], [0, 2.7, -2.26], s.dark);
-    add("DolnaSzczeka", [5, 0.55, 0.45], [0, 1.925, -2.3], s.body);
-    add("Gardlo", [4.2, 1.1, 0.25], [0, 1.1, -2.2], s.belly);
-    mirror("Nozdrze", [0.26, 0.16, 0.1], [0.45, 3.55, -2.42], s.dark);
-    mirror("PlamaBok1", [0.1, 0.8, 0.9], [2.52, 2.9, 0.9], s.spots);
-    mirror("PlamaBok2", [0.1, 0.55, 0.6], [2.52, 1.9, 1.9], s.spots);
-    add("PlamaTyl1", [1.0, 0.8, 0.1], [0.7, 2.7, 2.75], s.spots);
-    add("PlamaTyl2", [0.6, 0.5, 0.1], [-0.9, 3.3, 2.75], s.spots);
+    add("Cialo", [4.2, 2.6, 4.2], [0, 2.5, 0.3], s.body);
+    add("CialoDol", [3.6, 0.7, 3.6], [0, 0.85, 0.3], s.body);
+    add("Grzbiet", [3.6, 0.45, 3.6], [0, 4.025, 0.4], s.body);
+    add("Twarz", [4.2, 1.15, 0.3], [0, 3.225, -1.95], s.body);
+    add("WnetrzePyska", [3.5, 0.45, 0.1], [0, 2.425, -1.85], MOUTH);
+    mirror("KacikPyska", [0.35, 0.45, 0.3], [1.925, 2.425, -1.95], s.body);
+    add("GornaWarga", [3.7, 0.12, 0.34], [0, 2.7, -1.96], s.dark);
+    add("DolnaSzczeka", [4.2, 0.5, 0.4], [0, 1.95, -2.0], s.body);
+    add("Gardlo", [3.4, 0.9, 0.25], [0, 1.25, -1.9], s.belly);
+    mirror("Nozdrze", [0.24, 0.15, 0.1], [0.4, 3.55, -2.12], s.dark);
+    mirror("PlamaBok1", [0.1, 0.8, 0.9], [2.12, 2.9, 0.9], s.spots);
+    mirror("PlamaBok2", [0.1, 0.55, 0.6], [2.12, 2.0, 1.8], s.spots);
+    add("PlamaTyl1", [0.9, 0.8, 0.1], [0.6, 2.7, 2.45], s.spots);
+    add("PlamaTyl2", [0.55, 0.5, 0.1], [-0.8, 3.3, 2.45], s.spots);
 
     // --- oczy na czubku głowy ---
-    mirror("Oko", [1.7, 1.5, 1.7], [1.45, 4.45, -1.2], s.body);
-    mirror("Bialko", [1.3, 1.1, 0.12], [1.45, 4.4, -2.1], "#FFFFFF");
+    mirror("Oko", [1.5, 1.4, 1.5], [1.25, 4.4, -1.0], s.body);
+    mirror("Bialko", [1.15, 1.0, 0.12], [1.25, 4.35, -1.8], "#FFFFFF");
 
     // --- nogi ---
-    mirror("Udo", [1.3, 1.8, 2.6], [2.55, 1.4, 1.3], s.body);
-    mirror("StopaTyl", [1.8, 0.4, 2.4], [2.8, 0.2, 0.2], s.dark);
-    for (const [k, dx] of [[1, -0.6], [2, 0], [3, 0.6]]) mirror("PalecTyl" + k, [0.45, 0.3, 0.8], [2.8 + dx, 0.15, -1.3], s.dark);
-    mirror("Reka", [0.9, 1.6, 0.9], [1.7, 0.8, -1.7], s.body);
-    mirror("Dlon", [1.3, 0.3, 1.3], [1.8, 0.15, -2.2], s.dark);
-    for (const [k, dx] of [[1, -0.4], [2, 0], [3, 0.4]]) mirror("Palec" + k, [0.3, 0.25, 0.45], [1.8 + dx, 0.13, -3.0], s.dark);
+    mirror("Udo", [1.0, 1.7, 2.4], [2.2, 1.35, 1.2], s.body);
+    mirror("StopaTyl", [1.3, 0.35, 2.2], [2.35, 0.175, 0.2], s.dark);
+    for (const [k, dx] of [[1, -0.45], [2, 0], [3, 0.45]]) mirror("PalecTyl" + k, [0.35, 0.28, 0.7], [2.35 + dx, 0.14, -1.2], s.dark);
+    mirror("Reka", [0.7, 1.5, 0.7], [1.45, 0.75, -1.45], s.body);
+    mirror("Dlon", [1.0, 0.26, 1.1], [1.5, 0.13, -1.85], s.dark);
+    for (const [k, dx] of [[1, -0.33], [2, 0], [3, 0.33]]) mirror("Palec" + k, [0.26, 0.22, 0.4], [1.5 + dx, 0.11, -2.55], s.dark);
 
     if (bandit) {
       // ciężkie, przymrużone powieki i poziome źrenice
-      mirror("Zrenica", [0.9, 0.34, 0.08], [1.5, 4.25, -2.18], "#111111");
-      mirror("Powieka", [1.55, 0.6, 0.2], [1.45, 4.82, -2.13], s.dark, [0, 0, 10]);
+      mirror("Zrenica", [0.8, 0.3, 0.08], [1.3, 4.2, -1.88], "#111111");
+      mirror("Powieka", [1.35, 0.55, 0.2], [1.25, 4.75, -1.83], s.dark, [0, 0, 10]);
       // maska bandyty oplatająca oczy
-      add("Maska", [4.9, 0.7, 0.1], [0, 4.3, -2.07], s.mask);
-      mirror("MaskaBok", [0.1, 0.7, 1.75], [2.33, 4.3, -1.2], s.mask);
-      add("MaskaTyl", [4.9, 0.7, 0.1], [0, 4.3, -0.33], s.mask);
-      add("MaskaWezel", [0.35, 0.35, 0.2], [2.4, 4.3, -0.33], s.mask);
-      add("MaskaKoniec1", [0.12, 0.8, 0.28], [2.5, 3.85, -0.2], s.mask, [0, 0, 22]);
-      add("MaskaKoniec2", [0.12, 0.8, 0.28], [2.45, 3.8, 0.1], s.mask, [0, 0, -10]);
+      add("Maska", [4.1, 0.65, 0.1], [0, 4.25, -1.77], s.mask);
+      mirror("MaskaBok", [0.1, 0.65, 1.55], [2.03, 4.25, -1.0], s.mask);
+      add("MaskaTyl", [4.1, 0.65, 0.1], [0, 4.25, -0.23], s.mask);
+      add("MaskaWezel", [0.32, 0.32, 0.2], [2.1, 4.25, -0.23], s.mask);
+      add("MaskaKoniec1", [0.12, 0.75, 0.26], [2.2, 3.82, -0.1], s.mask, [0, 0, 22]);
+      add("MaskaKoniec2", [0.12, 0.75, 0.26], [2.15, 3.77, 0.18], s.mask, [0, 0, -10]);
       // złoty ząb w kąciku pyska
-      add("ZlotyZab", [0.3, 0.28, 0.1], [1.25, 2.5, -2.22], "#F2C14E");
+      add("ZlotyZab", [0.28, 0.26, 0.1], [1.05, 2.5, -1.92], "#F2C14E");
       // chusta pod pyskiem
-      add("ChustaPas", [5.1, 0.35, 5.0], [0, 1.6, 0.3], s.bandana);
-      add("Chusta1", [2.6, 0.4, 0.15], [0, 1.45, -2.4], s.bandana);
-      add("Chusta2", [1.7, 0.4, 0.15], [0, 1.05, -2.4], s.bandana);
-      add("Chusta3", [0.8, 0.4, 0.15], [0, 0.65, -2.4], s.bandana);
-      for (const [k, x, y] of [[1, -0.8, 1.45], [2, 0.75, 1.5], [3, -0.35, 1.05], [4, 0.4, 0.95]]) add("ChustaKropka" + k, [0.16, 0.16, 0.06], [x, y, -2.5], "#F4EFE6");
+      add("ChustaPas", [4.3, 0.32, 4.3], [0, 1.55, 0.3], s.bandana);
+      add("Chusta1", [2.2, 0.36, 0.14], [0, 1.4, -2.1], s.bandana);
+      add("Chusta2", [1.4, 0.36, 0.14], [0, 1.04, -2.1], s.bandana);
+      add("Chusta3", [0.6, 0.36, 0.14], [0, 0.68, -2.1], s.bandana);
+      for (const [k, x, y] of [[1, -0.65, 1.4], [2, 0.6, 1.45], [3, -0.3, 1.04], [4, 0.35, 0.98]]) add("ChustaKropka" + k, [0.14, 0.14, 0.06], [x, y, -2.19], "#F4EFE6");
       // kapelusz za oczami
-      add("KapeluszRondo", [4.2, 0.18, 2.8], [0, 4.39, 1.3], "#5A3A22");
-      add("KapeluszGora", [2.6, 1.1, 2.0], [0, 5.03, 1.35], "#6E4A2C");
-      add("KapeluszPasek", [2.66, 0.24, 2.06], [0, 4.6, 1.35], "#1B1B1B");
+      add("KapeluszRondo", [3.6, 0.16, 2.5], [0, 4.33, 1.2], "#5A3A22");
+      add("KapeluszGora", [2.2, 1.0, 1.8], [0, 4.91, 1.25], "#6E4A2C");
+      add("KapeluszPasek", [2.26, 0.22, 1.86], [0, 4.52, 1.25], "#1B1B1B");
     } else {
-      mirror("Zrenica", [0.55, 0.6, 0.08], [1.4, 4.45, -2.18], "#111111");
-      mirror("Blysk", [0.2, 0.2, 0.05], [1.55, 4.62, -2.23], "#FFFFFF");
-      mirror("Powieka", [1.5, 0.22, 0.16], [1.45, 5.0, -2.12], s.body);
-      mirror("Policzek", [0.7, 0.4, 0.1], [1.9, 3.0, -2.42], s.cheek);
-      add("Plamka1", [0.8, 0.1, 0.8], [-0.9, 4.32, 1.4], s.spots);
-      add("Plamka2", [0.6, 0.1, 0.6], [0.9, 4.32, 1.9], s.spots);
+      mirror("Zrenica", [0.5, 0.55, 0.08], [1.2, 4.4, -1.88], "#111111");
+      mirror("Blysk", [0.18, 0.18, 0.05], [1.35, 4.57, -1.93], "#FFFFFF");
+      mirror("Powieka", [1.3, 0.2, 0.16], [1.25, 4.95, -1.82], s.body);
+      mirror("Policzek", [0.6, 0.35, 0.1], [1.65, 3.0, -2.12], s.cheek);
+      add("Plamka1", [0.7, 0.1, 0.7], [-0.8, 4.28, 1.3], s.spots);
+      add("Plamka2", [0.5, 0.1, 0.5], [0.8, 4.28, 1.8], s.spots);
     }
 
     // --- broń zaciśnięta w pysku ---
@@ -236,16 +238,16 @@
       const steel = revolver ? "#8E969F" : "#FFB020";
       const grip = revolver ? "#7A4A26" : "#2F6FC4";
       const tip = revolver ? "#15171A" : "#FF6A13";
-      add("BronTyl", [0.7, 0.42, 1.2], [0, 2.42, -2.4], frame);
-      add("BronRama", [0.8, 0.8, 1.5], [0, 2.5, -3.6], frame);
-      if (revolver) add("Beben", [1.05, 0.75, 0.75], [0, 2.5, -3.3], steel);
-      add("Lufa", [0.42, 0.42, 1.6], [0, 2.68, -5.1], steel);
-      add("Wylot", [0.5, 0.5, 0.12], [0, 2.68, -5.95], tip);
-      add("Muszka", [0.14, 0.22, 0.2], [0, 2.98, -5.7], frame);
-      add("Kurek", [0.2, 0.32, 0.25], [0, 2.95, -2.95], frame, [-25, 0, 0]);
-      add("Rekojesc", [0.6, 1.2, 0.7], [0, 1.75, -3.05], grip, [-15, 0, 0]);
-      add("Oslona", [0.14, 0.12, 0.6], [0, 1.85, -3.75], steel);
-      add("Spust", [0.12, 0.3, 0.12], [0, 2.0, -3.6], steel);
+      add("BronTyl", [0.6, 0.4, 1.2], [0, 2.42, -2.1], frame);
+      add("BronRama", [0.7, 0.75, 1.4], [0, 2.5, -3.25], frame);
+      if (revolver) add("Beben", [0.95, 0.7, 0.7], [0, 2.5, -2.95], steel);
+      add("Lufa", [0.36, 0.36, 1.6], [0, 2.66, -4.7], steel);
+      add("Wylot", [0.44, 0.44, 0.12], [0, 2.66, -5.55], tip);
+      add("Muszka", [0.12, 0.2, 0.18], [0, 2.93, -5.3], frame);
+      add("Kurek", [0.18, 0.3, 0.22], [0, 2.93, -2.6], frame, [-25, 0, 0]);
+      add("Rekojesc", [0.55, 1.1, 0.65], [0, 1.8, -2.7], grip, [-15, 0, 0]);
+      add("Oslona", [0.12, 0.12, 0.55], [0, 1.9, -3.4], steel);
+      add("Spust", [0.1, 0.28, 0.1], [0, 2.02, -3.25], steel);
     }
     return P;
   }
@@ -271,9 +273,22 @@
     L.push(`\tp.Size = size`);
     L.push(`\tp.CFrame = origin * CFrame.new(pos) * CFrame.Angles(math.rad(rot.X), math.rad(rot.Y), math.rad(rot.Z))`);
     L.push(`\tp.Color = color`);
-    L.push(`\tp.Material = Enum.Material.SmoothPlastic`);
-    L.push(`\tp.TopSurface = Enum.SurfaceType.Smooth`);
-    L.push(`\tp.BottomSurface = Enum.SurfaceType.Smooth`);
+    if (surf === "smooth") {
+      L.push(`\tp.Material = Enum.Material.SmoothPlastic`);
+      L.push(`\tp.TopSurface = Enum.SurfaceType.Smooth`);
+      L.push(`\tp.BottomSurface = Enum.SurfaceType.Smooth`);
+    } else {
+      L.push(`\t-- Studsy widać tylko na materiale Plastic`);
+      L.push(`\tp.Material = Enum.Material.Plastic`);
+      L.push(`\tp.TopSurface = Enum.SurfaceType.Studs`);
+      L.push(`\tp.BottomSurface = Enum.SurfaceType.Inlet`);
+      if (surf === "all") {
+        L.push(`\tp.FrontSurface = Enum.SurfaceType.Studs`);
+        L.push(`\tp.BackSurface = Enum.SurfaceType.Studs`);
+        L.push(`\tp.LeftSurface = Enum.SurfaceType.Studs`);
+        L.push(`\tp.RightSurface = Enum.SurfaceType.Studs`);
+      }
+    }
     L.push(`\tp.Anchored = true`);
     L.push(`\tp.Parent = model`);
     L.push(`\treturn p`);
@@ -308,7 +323,7 @@
   let spin = false, needsRender = true;
 
   function init3d() {
-    target = new THREE.Vector3(0, 2.6, -1.2);
+    target = new THREE.Vector3(0, 2.5, -1.0);
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
     renderer.shadowMap.enabled = true;
@@ -341,14 +356,51 @@
     requestAnimationFrame(loop);
   }
 
+  // ---- tekstura studsów (1 stud = 1 kafelek) ----
+  const texCache = {};
+  function studCanvas(kind) {
+    if (texCache[kind]) return texCache[kind];
+    const c = document.createElement("canvas"); c.width = c.height = 64;
+    const g = c.getContext("2d");
+    g.fillStyle = "#e4e4e4"; g.fillRect(0, 0, 64, 64);
+    g.strokeStyle = "rgba(0,0,0,.10)"; g.lineWidth = 1; g.strokeRect(0.5, 0.5, 63, 63);
+    if (kind === "studs") {
+      g.fillStyle = "#a9a9a9"; g.beginPath(); g.arc(35, 36, 19, 0, 7); g.fill();
+      const gr = g.createRadialGradient(26, 25, 3, 32, 32, 20);
+      gr.addColorStop(0, "#ffffff"); gr.addColorStop(1, "#ececec");
+      g.fillStyle = gr; g.beginPath(); g.arc(31, 31, 18, 0, 7); g.fill();
+      g.strokeStyle = "rgba(0,0,0,.08)"; g.lineWidth = 2; g.beginPath(); g.arc(31, 31, 12, 0, 7); g.stroke();
+    } else {
+      g.fillStyle = "#b9b9b9"; g.beginPath(); g.arc(32, 32, 17, 0, 7); g.fill();
+      g.fillStyle = "#cfcfcf"; g.beginPath(); g.arc(34, 34, 14, 0, 7); g.fill();
+    }
+    return (texCache[kind] = c);
+  }
+  function faceMat(color, kind, rx, ry) {
+    const opts = { color: new THREE.Color(color).convertSRGBToLinear(), roughness: 0.5, metalness: 0 };
+    if (kind) {
+      const t = new THREE.CanvasTexture(studCanvas(kind));
+      t.encoding = THREE.sRGBEncoding; t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      t.anisotropy = 4; t.repeat.set(Math.max(rx, 0.1), Math.max(ry, 0.1));
+      opts.map = t;
+    }
+    return new THREE.MeshStandardMaterial(opts);
+  }
+  function materialsFor(p) {
+    const [x, y, z] = p.size, c = p.color;
+    if (surf === "smooth") return faceMat(c);
+    const side = surf === "all" ? "studs" : null;
+    // kolejność ścian BoxGeometry: +x, -x, +y (góra), -y (dół), +z, -z
+    return [faceMat(c, side, z, y), faceMat(c, side, z, y), faceMat(c, "studs", x, z), faceMat(c, "inlet", x, z), faceMat(c, side, x, y), faceMat(c, side, x, y)];
+  }
+
   function rebuild() {
     const parts = buildParts(SKINS[skinKey]);
     if (group) {
-      while (group.children.length) { const m = group.children.pop(); m.geometry.dispose(); m.material.dispose(); }
+      while (group.children.length) { const m = group.children.pop(); m.geometry.dispose(); [].concat(m.material).forEach((mt) => { if (mt.map) mt.map.dispose(); mt.dispose(); }); }
       for (const p of parts) {
         const geo = new THREE.BoxGeometry(...p.size);
-        const mat = new THREE.MeshStandardMaterial({ color: new THREE.Color(p.color).convertSRGBToLinear(), roughness: 0.55, metalness: 0 });
-        const m = new THREE.Mesh(geo, mat);
+        const m = new THREE.Mesh(geo, materialsFor(p));
         m.position.set(p.pos[0], p.pos[1], p.pos[2]);
         m.rotation.set(...p.rot.map((d) => (d * Math.PI) / 180), "XYZ");
         m.castShadow = true; m.receiveShadow = true;
@@ -362,7 +414,7 @@
     const code = luau(parts, SKINS[skinKey].name);
     $("code").textContent = code;
     $("codeText").value = code;
-    $("meta").textContent = `${parts.length} klocków · wysokość ok. ${style === "bandyta" ? "5,6" : "5,2"} studa (jak postać Roblox)`;
+    $("meta").textContent = `${parts.length} klocków · wysokość ok. ${style === "bandyta" ? "5,4" : "5,1"} studa (jak postać Roblox)`;
   }
 
   function resize() {
@@ -441,6 +493,11 @@
   document.querySelectorAll("[data-style]").forEach((b) => b.addEventListener("click", () => {
     style = b.dataset.style;
     document.querySelectorAll("[data-style]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    rebuild();
+  }));
+  document.querySelectorAll("[data-surf]").forEach((b) => b.addEventListener("click", () => {
+    surf = b.dataset.surf;
+    document.querySelectorAll("[data-surf]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
     rebuild();
   }));
   $("optGun").addEventListener("change", (e) => { withGun = e.target.checked; rebuild(); });
