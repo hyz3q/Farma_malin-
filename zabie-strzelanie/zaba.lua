@@ -47,6 +47,7 @@ klocek("KacikPyska_P", Vector3.new(0.25, 0.35, 0.2), Vector3.new(1.675, 3.02, -2
 klocek("GornaWarga", Vector3.new(3.2, 0.08, 0.22), Vector3.new(0, 3.2, -2.11), Color3.fromRGB(60, 139, 52), Vector3.new(0, 0, 0))
 klocek("DolnaSzczeka", Vector3.new(3.6, 0.45, 0.3), Vector3.new(0, 2.625, -2.15), Color3.fromRGB(93, 187, 74), Vector3.new(0, 0, 0))
 klocek("Gardlo", Vector3.new(3, 1.2, 0.2), Vector3.new(0, 2, -1.9), Color3.fromRGB(211, 234, 142), Vector3.new(0, 0, 0))
+klocek("Szyja", Vector3.new(3, 1.35, 1.75), Vector3.new(0, 1.95, -0.95), Color3.fromRGB(93, 187, 74), Vector3.new(0, 0, 0))
 klocek("Nozdrze_L", Vector3.new(0.2, 0.12, 0.08), Vector3.new(-0.35, 3.85, -2.22), Color3.fromRGB(60, 139, 52), Vector3.new(0, 0, 0))
 klocek("Nozdrze_P", Vector3.new(0.2, 0.12, 0.08), Vector3.new(0.35, 3.85, -2.22), Color3.fromRGB(60, 139, 52), Vector3.new(0, 0, 0))
 klocek("Oko_L", Vector3.new(1.3, 1.2, 1.3), Vector3.new(-1.35, 4.35, -1.2), Color3.fromRGB(93, 187, 74), Vector3.new(0, 0, 0))
@@ -138,4 +139,4 @@ model.PrimaryPart = cialo
 model.Parent = workspace
 pcall(function() game:GetService("Selection"):Set({ model }) end)
 pcall(function() ChangeHistory:SetWaypoint("Dodano żabę: Bandyta") end)
-print("Żaba Bandyta gotowa! Klocków: 88")
+print("Żaba Bandyta gotowa! Klocków: 89")
