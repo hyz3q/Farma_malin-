@@ -1,4 +1,4 @@
--- Żaba z klocków (bandyta, skórka: Zielona) – Żabie Strzelanie
+-- Żaba z klocków: Bandyta (zgrabna, skórka: Zielona) – Żabie Strzelanie
 -- Wklej do Command Bar w Roblox Studio (View -> Command Bar) i naciśnij Enter.
 local ChangeHistory = game:GetService("ChangeHistoryService")
 local cam = workspace.CurrentCamera
@@ -6,9 +6,9 @@ local focus = cam and cam.Focus.Position or Vector3.new(0, 0, 0)
 local origin = CFrame.new(focus.X, 0, focus.Z)
 
 local model = Instance.new("Model")
-model.Name = "Zaba"
+model.Name = "Zaba_Bandyta"
 
-local function klocek(name, size, pos, color, rot)
+local function klocek(name, size, pos, color, rot, przezroczystosc)
 	local p = Instance.new("Part")
 	p.Name = name
 	p.Size = size
@@ -22,29 +22,37 @@ local function klocek(name, size, pos, color, rot)
 	p.BackSurface = Enum.SurfaceType.Studs
 	p.LeftSurface = Enum.SurfaceType.Studs
 	p.RightSurface = Enum.SurfaceType.Studs
+	if przezroczystosc then
+		p.Transparency = przezroczystosc
+		p.Material = Enum.Material.Glass
+		p.CastShadow = false
+		for _, face in Enum.NormalId:GetEnumItems() do
+			p[face.Name .. "Surface"] = Enum.SurfaceType.Smooth
+		end
+	end
 	p.Anchored = true
 	p.Parent = model
 	return p
 end
 
 klocek("Tulow", Vector3.new(3.2, 2.2, 3.4), Vector3.new(0, 1.75, 0.8), Color3.fromRGB(93, 187, 74), Vector3.new(25, 0, 0))
-klocek("PlamaGrzbiet1", Vector3.new(0.8, 0.06, 0.7), Vector3.new(0.6, 2.6, 1.64), Color3.fromRGB(60, 139, 52), Vector3.new(25, 0, 0))
-klocek("PlamaGrzbiet2", Vector3.new(0.6, 0.06, 0.5), Vector3.new(-0.7, 2.34, 2.18), Color3.fromRGB(60, 139, 52), Vector3.new(25, 0, 0))
-klocek("PlamaGrzbiet3", Vector3.new(0.45, 0.06, 0.45), Vector3.new(0.1, 2.85, 1.09), Color3.fromRGB(60, 139, 52), Vector3.new(25, 0, 0))
+klocek("PlamaGrzbiet1", Vector3.new(0.8, 0.06, 0.7), Vector3.new(0.6, 2.596, 1.636), Color3.fromRGB(60, 139, 52), Vector3.new(25, 0, 0))
+klocek("PlamaGrzbiet2", Vector3.new(0.6, 0.06, 0.5), Vector3.new(-0.7, 2.342, 2.18), Color3.fromRGB(60, 139, 52), Vector3.new(25, 0, 0))
+klocek("PlamaGrzbiet3", Vector3.new(0.45, 0.06, 0.45), Vector3.new(0.1, 2.85, 1.092), Color3.fromRGB(60, 139, 52), Vector3.new(25, 0, 0))
 klocek("Glowa", Vector3.new(3.6, 1.5, 2.4), Vector3.new(0, 3.3, -0.8), Color3.fromRGB(93, 187, 74), Vector3.new(0, 0, 0))
-klocek("Twarz", Vector3.new(3.6, 0.85, 0.2), Vector3.new(0, 3.63, -2.1), Color3.fromRGB(93, 187, 74), Vector3.new(0, 0, 0))
+klocek("Twarz", Vector3.new(3.6, 0.85, 0.2), Vector3.new(0, 3.625, -2.1), Color3.fromRGB(93, 187, 74), Vector3.new(0, 0, 0))
 klocek("WnetrzePyska", Vector3.new(3.1, 0.35, 0.1), Vector3.new(0, 3.02, -2.03), Color3.fromRGB(74, 22, 34), Vector3.new(0, 0, 0))
-klocek("KacikPyska_L", Vector3.new(0.25, 0.35, 0.2), Vector3.new(-1.67, 3.02, -2.1), Color3.fromRGB(93, 187, 74), Vector3.new(0, 0, 0))
-klocek("KacikPyska_P", Vector3.new(0.25, 0.35, 0.2), Vector3.new(1.68, 3.02, -2.1), Color3.fromRGB(93, 187, 74), Vector3.new(0, 0, 0))
+klocek("KacikPyska_L", Vector3.new(0.25, 0.35, 0.2), Vector3.new(-1.675, 3.02, -2.1), Color3.fromRGB(93, 187, 74), Vector3.new(0, 0, 0))
+klocek("KacikPyska_P", Vector3.new(0.25, 0.35, 0.2), Vector3.new(1.675, 3.02, -2.1), Color3.fromRGB(93, 187, 74), Vector3.new(0, 0, 0))
 klocek("GornaWarga", Vector3.new(3.2, 0.08, 0.22), Vector3.new(0, 3.2, -2.11), Color3.fromRGB(60, 139, 52), Vector3.new(0, 0, 0))
-klocek("DolnaSzczeka", Vector3.new(3.6, 0.45, 0.3), Vector3.new(0, 2.63, -2.15), Color3.fromRGB(93, 187, 74), Vector3.new(0, 0, 0))
+klocek("DolnaSzczeka", Vector3.new(3.6, 0.45, 0.3), Vector3.new(0, 2.625, -2.15), Color3.fromRGB(93, 187, 74), Vector3.new(0, 0, 0))
 klocek("Gardlo", Vector3.new(3, 1.2, 0.2), Vector3.new(0, 2, -1.9), Color3.fromRGB(211, 234, 142), Vector3.new(0, 0, 0))
 klocek("Nozdrze_L", Vector3.new(0.2, 0.12, 0.08), Vector3.new(-0.35, 3.85, -2.22), Color3.fromRGB(60, 139, 52), Vector3.new(0, 0, 0))
 klocek("Nozdrze_P", Vector3.new(0.2, 0.12, 0.08), Vector3.new(0.35, 3.85, -2.22), Color3.fromRGB(60, 139, 52), Vector3.new(0, 0, 0))
 klocek("Oko_L", Vector3.new(1.3, 1.2, 1.3), Vector3.new(-1.35, 4.35, -1.2), Color3.fromRGB(93, 187, 74), Vector3.new(0, 0, 0))
 klocek("Oko_P", Vector3.new(1.3, 1.2, 1.3), Vector3.new(1.35, 4.35, -1.2), Color3.fromRGB(93, 187, 74), Vector3.new(0, 0, 0))
-klocek("Bialko_L", Vector3.new(1, 0.85, 0.08), Vector3.new(-1.35, 4.3, -1.88), Color3.fromRGB(255, 255, 255), Vector3.new(0, 0, 0))
-klocek("Bialko_P", Vector3.new(1, 0.85, 0.08), Vector3.new(1.35, 4.3, -1.88), Color3.fromRGB(255, 255, 255), Vector3.new(0, 0, 0))
+klocek("Bialko_L", Vector3.new(1, 0.85, 0.08), Vector3.new(-1.35, 4.3, -1.89), Color3.fromRGB(255, 255, 255), Vector3.new(0, 0, 0))
+klocek("Bialko_P", Vector3.new(1, 0.85, 0.08), Vector3.new(1.35, 4.3, -1.89), Color3.fromRGB(255, 255, 255), Vector3.new(0, 0, 0))
 klocek("Udo_L", Vector3.new(1.1, 1.3, 2.8), Vector3.new(-1.75, 1.2, 1.1), Color3.fromRGB(93, 187, 74), Vector3.new(8, 0, 0))
 klocek("Udo_P", Vector3.new(1.1, 1.3, 2.8), Vector3.new(1.75, 1.2, 1.1), Color3.fromRGB(93, 187, 74), Vector3.new(8, 0, 0))
 klocek("PlamaUdo_L", Vector3.new(0.06, 0.5, 0.8), Vector3.new(-2.31, 1.3, 1.1), Color3.fromRGB(60, 139, 52), Vector3.new(8, 0, 0))
@@ -81,40 +89,43 @@ klocek("Palec3_L", Vector3.new(0.2, 0.18, 0.55), Vector3.new(-1.48, 0.09, -2.2),
 klocek("Palec3_P", Vector3.new(0.2, 0.18, 0.55), Vector3.new(1.48, 0.09, -2.2), Color3.fromRGB(60, 139, 52), Vector3.new(0, -14, 0))
 klocek("Przylga3_L", Vector3.new(0.28, 0.2, 0.22), Vector3.new(-1.62, 0.1, -2.5), Color3.fromRGB(60, 139, 52), Vector3.new(0, 14, 0))
 klocek("Przylga3_P", Vector3.new(0.28, 0.2, 0.22), Vector3.new(1.62, 0.1, -2.5), Color3.fromRGB(60, 139, 52), Vector3.new(0, -14, 0))
-klocek("Zrenica_L", Vector3.new(0.7, 0.25, 0.05), Vector3.new(-1.38, 4.2, -1.93), Color3.fromRGB(17, 17, 17), Vector3.new(0, 0, 0))
-klocek("Zrenica_P", Vector3.new(0.7, 0.25, 0.05), Vector3.new(1.38, 4.2, -1.93), Color3.fromRGB(17, 17, 17), Vector3.new(0, 0, 0))
-klocek("Powieka_L", Vector3.new(1.2, 0.45, 0.14), Vector3.new(-1.35, 4.62, -1.9), Color3.fromRGB(60, 139, 52), Vector3.new(0, 0, -10))
-klocek("Powieka_P", Vector3.new(1.2, 0.45, 0.14), Vector3.new(1.35, 4.62, -1.9), Color3.fromRGB(60, 139, 52), Vector3.new(0, 0, 10))
-klocek("Maska", Vector3.new(3.8, 0.5, 0.08), Vector3.new(0, 4.3, -1.86), Color3.fromRGB(21, 21, 21), Vector3.new(0, 0, 0))
-klocek("MaskaBok_L", Vector3.new(0.08, 0.5, 1.3), Vector3.new(-1.97, 4.3, -1.2), Color3.fromRGB(21, 21, 21), Vector3.new(0, 0, 0))
-klocek("MaskaBok_P", Vector3.new(0.08, 0.5, 1.3), Vector3.new(1.97, 4.3, -1.2), Color3.fromRGB(21, 21, 21), Vector3.new(0, 0, 0))
-klocek("MaskaTyl", Vector3.new(3.8, 0.5, 0.08), Vector3.new(0, 4.3, -0.53), Color3.fromRGB(21, 21, 21), Vector3.new(0, 0, 0))
-klocek("MaskaKoniec1", Vector3.new(0.08, 0.6, 0.2), Vector3.new(2.05, 3.95, -0.45), Color3.fromRGB(21, 21, 21), Vector3.new(0, 0, 22))
-klocek("MaskaKoniec2", Vector3.new(0.08, 0.6, 0.2), Vector3.new(2.02, 3.92, -0.2), Color3.fromRGB(21, 21, 21), Vector3.new(0, 0, -10))
-klocek("ZlotyZab", Vector3.new(0.24, 0.22, 0.08), Vector3.new(1, 3.08, -2.12), Color3.fromRGB(242, 193, 78), Vector3.new(0, 0, 0))
-klocek("ChustaWiazanie", Vector3.new(3.4, 0.25, 0.1), Vector3.new(0, 2.36, -2.1), Color3.fromRGB(184, 36, 46), Vector3.new(0, 0, 0))
-klocek("Chusta1", Vector3.new(1.8, 0.32, 0.12), Vector3.new(0, 2.2, -2.13), Color3.fromRGB(184, 36, 46), Vector3.new(0, 0, 0))
-klocek("Chusta2", Vector3.new(1.1, 0.32, 0.12), Vector3.new(0, 1.88, -2.13), Color3.fromRGB(184, 36, 46), Vector3.new(0, 0, 0))
-klocek("Chusta3", Vector3.new(0.45, 0.3, 0.12), Vector3.new(0, 1.57, -2.13), Color3.fromRGB(184, 36, 46), Vector3.new(0, 0, 0))
-klocek("ChustaKropka1", Vector3.new(0.13, 0.13, 0.05), Vector3.new(-0.45, 2.2, -2.21), Color3.fromRGB(244, 239, 230), Vector3.new(0, 0, 0))
-klocek("ChustaKropka2", Vector3.new(0.13, 0.13, 0.05), Vector3.new(0.4, 2.16, -2.21), Color3.fromRGB(244, 239, 230), Vector3.new(0, 0, 0))
-klocek("ChustaKropka3", Vector3.new(0.13, 0.13, 0.05), Vector3.new(0.05, 1.86, -2.21), Color3.fromRGB(244, 239, 230), Vector3.new(0, 0, 0))
-klocek("KapeluszRondo", Vector3.new(3, 0.14, 1.5), Vector3.new(0, 4.12, 0.2), Color3.fromRGB(90, 58, 34), Vector3.new(0, 0, 0))
-klocek("KapeluszGora", Vector3.new(1.8, 0.8, 1.2), Vector3.new(0, 4.6, 0.25), Color3.fromRGB(110, 74, 44), Vector3.new(0, 0, 0))
-klocek("KapeluszPasek", Vector3.new(1.84, 0.18, 1.24), Vector3.new(0, 4.3, 0.25), Color3.fromRGB(27, 27, 27), Vector3.new(0, 0, 0))
+klocek("Zrenica_L", Vector3.new(0.7, 0.255, 0.05), Vector3.new(-1.38, 4.2, -1.95), Color3.fromRGB(17, 17, 17), Vector3.new(0, 0, 0))
+klocek("Powieka_L", Vector3.new(1.2, 0.442, 0.12), Vector3.new(-1.35, 4.623, -1.95), Color3.fromRGB(60, 139, 52), Vector3.new(0, 0, -10))
+klocek("Zrenica_P", Vector3.new(0.7, 0.255, 0.05), Vector3.new(1.38, 4.2, -1.95), Color3.fromRGB(17, 17, 17), Vector3.new(0, 0, 0))
+klocek("Powieka_P", Vector3.new(1.2, 0.442, 0.12), Vector3.new(1.35, 4.623, -1.95), Color3.fromRGB(60, 139, 52), Vector3.new(0, 0, 10))
+klocek("Maska", Vector3.new(4.1, 0.527, 0.06), Vector3.new(0, 4.3, -1.87), Color3.fromRGB(21, 21, 21), Vector3.new(0, 0, 0))
+klocek("MaskaBok_L", Vector3.new(0.08, 0.527, 1.34), Vector3.new(-2.03, 4.3, -1.2), Color3.fromRGB(21, 21, 21), Vector3.new(0, 0, 0))
+klocek("MaskaBok_P", Vector3.new(0.08, 0.527, 1.34), Vector3.new(2.03, 4.3, -1.2), Color3.fromRGB(21, 21, 21), Vector3.new(0, 0, 0))
+klocek("MaskaTyl", Vector3.new(4.1, 0.527, 0.06), Vector3.new(0, 4.3, -0.52), Color3.fromRGB(21, 21, 21), Vector3.new(0, 0, 0))
+klocek("MaskaKoniec1", Vector3.new(0.1, 0.8, 0.22), Vector3.new(0.25, 3.85, -0.45), Color3.fromRGB(21, 21, 21), Vector3.new(0, 0, 15))
+klocek("MaskaKoniec2", Vector3.new(0.1, 0.8, 0.22), Vector3.new(-0.2, 3.8, -0.43), Color3.fromRGB(21, 21, 21), Vector3.new(0, 0, -12))
+klocek("KapeluszRondo", Vector3.new(4.86, 0.14, 3.2), Vector3.new(0, 5.02, -0.65), Color3.fromRGB(78, 50, 32), Vector3.new(-5, 0, -7))
+klocek("KapeluszRondoL", Vector3.new(0.14, 0.32, 2.72), Vector3.new(-2.325, 5.445, -0.687), Color3.fromRGB(78, 50, 32), Vector3.new(-5, 0, -7))
+klocek("KapeluszRondoP", Vector3.new(0.14, 0.32, 2.72), Vector3.new(2.359, 4.872, -0.637), Color3.fromRGB(78, 50, 32), Vector3.new(-5, 0, -7))
+klocek("KapeluszGora", Vector3.new(2.232, 1.05, 1.76), Vector3.new(0.073, 5.622, -0.602), Color3.fromRGB(94, 60, 36), Vector3.new(-5, 0, -7))
+klocek("KapeluszWgniecenie", Vector3.new(0.781, 0.1, 1.232), Vector3.new(0.136, 6.136, -0.647), Color3.fromRGB(78, 50, 32), Vector3.new(-5, 0, -7))
+klocek("KapeluszPasek", Vector3.new(2.272, 0.2, 1.8), Vector3.new(0.024, 5.226, -0.568), Color3.fromRGB(27, 27, 27), Vector3.new(-5, 0, -7))
+klocek("ZlotyZab", Vector3.new(0.24, 0.22, 0.08), Vector3.new(0.936, 3.08, -2.12), Color3.fromRGB(242, 193, 78), Vector3.new(0, 0, 0))
+klocek("ChustaWiazanie", Vector3.new(3.384, 0.25, 0.1), Vector3.new(0, 2.35, -2.1), Color3.fromRGB(184, 36, 46), Vector3.new(0, 0, 0))
+klocek("Chusta1", Vector3.new(1.8, 0.32, 0.12), Vector3.new(0, 2.2, -2.12), Color3.fromRGB(184, 36, 46), Vector3.new(0, 0, 0))
+klocek("Chusta2", Vector3.new(1.08, 0.32, 0.12), Vector3.new(0, 1.88, -2.12), Color3.fromRGB(184, 36, 46), Vector3.new(0, 0, 0))
+klocek("Chusta3", Vector3.new(0.45, 0.3, 0.12), Vector3.new(0, 1.57, -2.12), Color3.fromRGB(184, 36, 46), Vector3.new(0, 0, 0))
+klocek("ChustaKropka1", Vector3.new(0.13, 0.13, 0.05), Vector3.new(-0.45, 2.2, -2.2), Color3.fromRGB(244, 239, 230), Vector3.new(0, 0, 0))
+klocek("ChustaKropka2", Vector3.new(0.13, 0.13, 0.05), Vector3.new(0.4, 2.16, -2.2), Color3.fromRGB(244, 239, 230), Vector3.new(0, 0, 0))
+klocek("ChustaKropka3", Vector3.new(0.13, 0.13, 0.05), Vector3.new(0.05, 1.86, -2.2), Color3.fromRGB(244, 239, 230), Vector3.new(0, 0, 0))
 klocek("BronTyl", Vector3.new(0.5, 0.3, 1), Vector3.new(0, 3.02, -2.15), Color3.fromRGB(35, 38, 43), Vector3.new(0, 0, 0))
 klocek("BronRama", Vector3.new(0.55, 0.6, 1.1), Vector3.new(0, 3.08, -3.1), Color3.fromRGB(35, 38, 43), Vector3.new(0, 0, 0))
 klocek("Beben", Vector3.new(0.8, 0.55, 0.55), Vector3.new(0, 3.08, -2.85), Color3.fromRGB(142, 150, 159), Vector3.new(0, 0, 0))
 klocek("Lufa", Vector3.new(0.3, 0.3, 1.3), Vector3.new(0, 3.22, -4.3), Color3.fromRGB(142, 150, 159), Vector3.new(0, 0, 0))
 klocek("Wylot", Vector3.new(0.36, 0.36, 0.1), Vector3.new(0, 3.22, -4.98), Color3.fromRGB(21, 23, 26), Vector3.new(0, 0, 0))
-klocek("Muszka", Vector3.new(0.1, 0.16, 0.14), Vector3.new(0, 3.44, -4.75), Color3.fromRGB(35, 38, 43), Vector3.new(0, 0, 0))
+klocek("Muszka", Vector3.new(0.1, 0.16, 0.14), Vector3.new(0, 3.44, -4.7), Color3.fromRGB(35, 38, 43), Vector3.new(0, 0, 0))
 klocek("Kurek", Vector3.new(0.14, 0.25, 0.18), Vector3.new(0, 3.44, -2.55), Color3.fromRGB(35, 38, 43), Vector3.new(-25, 0, 0))
 klocek("Rekojesc", Vector3.new(0.45, 0.9, 0.55), Vector3.new(0, 2.5, -2.75), Color3.fromRGB(122, 74, 38), Vector3.new(-15, 0, 0))
 klocek("Oslona", Vector3.new(0.1, 0.1, 0.45), Vector3.new(0, 2.62, -3.3), Color3.fromRGB(142, 150, 159), Vector3.new(0, 0, 0))
 klocek("Spust", Vector3.new(0.08, 0.22, 0.08), Vector3.new(0, 2.75, -3.15), Color3.fromRGB(142, 150, 159), Vector3.new(0, 0, 0))
 
 -- Wszystkie klocki przyspawane do ciała, więc żaba rusza się jako jedna całość.
-local cialo = model:FindFirstChild("Cialo")
+local cialo = model:FindFirstChild("Tulow") or model:FindFirstChild("Cialo")
 for _, p in model:GetChildren() do
 	if p:IsA("BasePart") and p ~= cialo then
 		local weld = Instance.new("WeldConstraint")
@@ -126,5 +137,5 @@ end
 model.PrimaryPart = cialo
 model.Parent = workspace
 game:GetService("Selection"):Set({ model })
-ChangeHistory:SetWaypoint("Dodano żabę")
-print("Żaba gotowa! Klocków: 85")
+ChangeHistory:SetWaypoint("Dodano żabę: Bandyta")
+print("Żaba Bandyta gotowa! Klocków: 88")
