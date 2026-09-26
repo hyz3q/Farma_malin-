@@ -90,7 +90,7 @@
   <header>
     <div class="eyebrow">Żabie Strzelanie · model postaci</div>
     <h1>Żaba <em>bandyta</em></h1>
-    <p class="lede">Smukła żaba z prostokątnych klocków z klasycznymi robloxowymi studsami: ciężkie powieki, maska, złoty ząb, chusta, kapelusz i rewolwer zaciśnięty w szerokim pysku. Wolisz wersję łagodną? Przełącz na Słodziaka. Obracaj ją myszką albo palcem, wybierz skórkę i skopiuj skrypt. W Roblox Studio zbuduje dokładnie taką samą żabę.</p>
+    <p class="lede">Żaba-bandyta stojąca na dwóch nogach, zbudowana jak postać Roblox, z klasycznymi studsami na klockach: ciężkie powieki, maska, złoty ząb, chusta, kapelusz i rewolwer zaciśnięty w szerokim pysku. Wolisz wersję łagodną? Przełącz na Słodziaka. Obracaj ją myszką albo palcem, wybierz skórkę i skopiuj skrypt. W Roblox Studio zbuduje dokładnie taką samą żabę.</p>
   </header>
 
   <section class="main">
@@ -108,8 +108,9 @@
         <h2>Skórka</h2>
         <div class="skins" id="skins"></div>
         <div class="toggles">
+          <div class="seg" role="group" aria-label="Sylwetka"><button data-shape="stojaca" aria-pressed="true">Stojąca</button><button data-shape="przysadzista" aria-pressed="false">Przysadzista</button></div>
           <div class="seg" role="group" aria-label="Wygląd"><button data-style="bandyta" aria-pressed="true">Bandyta</button><button data-style="slodziak" aria-pressed="false">Słodziak</button></div>
-          <div class="seg" role="group" aria-label="Powierzchnia"><button data-surf="classic" aria-pressed="true">Studsy na górze</button><button data-surf="all" aria-pressed="false">Studsy wszędzie</button><button data-surf="smooth" aria-pressed="false">Gładka</button></div>
+          <div class="seg" role="group" aria-label="Powierzchnia"><button data-surf="all" aria-pressed="true">Studsy wszędzie</button><button data-surf="classic" aria-pressed="false">Studsy na górze</button><button data-surf="smooth" aria-pressed="false">Gładka</button></div>
           <label><input type="checkbox" id="optGun" checked> Broń w pysku</label>
           <label><input type="checkbox" id="optSpin"> Kręć się sama</label>
         </div>
@@ -154,13 +155,13 @@
     lawowa: { name: "Lawowa", body: "#D8452B", dark: "#7A1F14", belly: "#FFB054", spots: "#2A1410", cheek: "#FFD166", mask: "#151515", bandana: "#1E1E1E" },
     malinowa: { name: "Malinowa", body: "#D6456E", dark: "#8E1F43", belly: "#F9C3D2", spots: "#8E1F43", cheek: "#FFFFFF", mask: "#151515", bandana: "#1E1E1E" }
   };
-  let skinKey = "zielona", withGun = true, style = "bandyta", surf = "classic";
+  let skinKey = "zielona", withGun = true, style = "bandyta", surf = "all", shape = "stojaca";
 
   // ================= CZĘŚCI (studs, oś Y w górę, przód = -Z jak w Roblox) =================
   // Jedna smukła bryła: głowa i tułów to jedno ciało (żaby nie mają szyi), zwężające się ku dołowi.
   // Pysk to szpara między górną wargą a wysuniętą dolną szczęką, a broń jest w niej zaciśnięta.
   // rot = obrót w stopniach [x, y, z]
-  function buildParts(s) {
+  function buildSquat(s) {
     const P = [];
     const bandit = style === "bandyta";
     const add = (name, size, pos, color, rot) => P.push({ name, size, pos, color, rot: rot || [0, 0, 0] });
@@ -252,6 +253,104 @@
     return P;
   }
 
+  // ================= SYLWETKA STOJĄCA (jak postać Roblox: głowa, tułów, 2 ręce, 2 nogi) =================
+  function buildStanding(s) {
+    const P = [];
+    const bandit = style === "bandyta";
+    const add = (name, size, pos, color, rot) => P.push({ name, size, pos, color, rot: rot || [0, 0, 0] });
+    const mirror = (name, size, [x, y, z], color, rot) => {
+      const r = rot || [0, 0, 0];
+      add(name + "_L", size, [-x, y, z], color, [r[0], -r[1], -r[2]]);
+      add(name + "_P", size, [x, y, z], color, r);
+    };
+    const MOUTH = "#4A1622";
+
+    // --- nogi z płetwami ---
+    mirror("Noga", [0.9, 1.9, 0.9], [0.5, 1.25, 0], s.body);
+    mirror("Stopa", [1.2, 0.3, 1.6], [0.55, 0.15, -0.3], s.dark);
+    for (const [k, dx] of [[1, -0.38], [2, 0], [3, 0.38]]) mirror("PalecStopy" + k, [0.3, 0.22, 0.5], [0.55 + dx, 0.11, -1.3], s.dark);
+
+    // --- tułów ---
+    add("Tulow", [2.0, 2.0, 1.2], [0, 3.2, 0], s.body);
+    add("Brzuch", [1.5, 1.6, 0.1], [0, 3.15, -0.62], s.belly);
+    add("PlamaPlecy1", [0.6, 0.5, 0.06], [0.4, 3.5, 0.63], s.spots);
+    add("PlamaPlecy2", [0.4, 0.35, 0.06], [-0.45, 2.9, 0.63], s.spots);
+
+    // --- ręce ---
+    mirror("Reka", [0.6, 1.8, 0.6], [1.3, 3.25, 0], s.body);
+    mirror("Dlon", [0.7, 0.4, 0.7], [1.3, 2.2, 0], s.dark);
+
+    // --- głowa: szeroka i płaska, z pyskiem ---
+    add("Glowa", [3.0, 1.3, 2.2], [0, 5.0, -0.1], s.body);
+    add("Twarz", [3.0, 0.7, 0.2], [0, 5.3, -1.3], s.body);
+    add("WnetrzePyska", [2.6, 0.3, 0.1], [0, 4.8, -1.25], MOUTH);
+    mirror("KacikPyska", [0.2, 0.3, 0.2], [1.4, 4.8, -1.3], s.body);
+    add("GornaWarga", [2.7, 0.08, 0.22], [0, 4.97, -1.31], s.dark);
+    add("DolnaSzczeka", [3.0, 0.45, 0.3], [0, 4.43, -1.35], s.body);
+    add("Gardlo", [2.2, 0.2, 0.1], [0, 4.25, -1.25], s.belly);
+    mirror("Nozdrze", [0.18, 0.1, 0.08], [0.3, 5.45, -1.42], s.dark);
+    mirror("PlamaGlowa", [0.06, 0.4, 0.5], [1.52, 5.1, 0.3], s.spots);
+
+    // --- oczy na czubku głowy ---
+    mirror("Oko", [1.0, 0.9, 1.0], [0.9, 6.05, -0.7], s.body);
+    mirror("Bialko", [0.8, 0.62, 0.08], [0.9, 6.0, -1.23], "#FFFFFF");
+
+    if (bandit) {
+      mirror("Zrenica", [0.55, 0.2, 0.05], [0.93, 5.92, -1.28], "#111111");
+      mirror("Powieka", [0.95, 0.38, 0.14], [0.9, 6.27, -1.25], s.dark, [0, 0, 10]);
+      add("Maska", [2.9, 0.45, 0.08], [0, 5.98, -1.21], s.mask);
+      mirror("MaskaBok", [0.08, 0.45, 1.05], [1.43, 5.98, -0.7], s.mask);
+      add("MaskaTyl", [2.9, 0.45, 0.08], [0, 5.98, -0.17], s.mask);
+      add("MaskaKoniec1", [0.08, 0.55, 0.18], [1.5, 5.65, -0.1], s.mask, [0, 0, 22]);
+      add("MaskaKoniec2", [0.08, 0.55, 0.18], [1.47, 5.62, 0.12], s.mask, [0, 0, -10]);
+      add("ZlotyZab", [0.2, 0.18, 0.08], [0.8, 4.86, -1.31], "#F2C14E");
+      // chusta na szyi
+      add("Chusta", [2.1, 0.3, 1.3], [0, 4.3, 0], s.bandana);
+      add("ChustaTrojkat1", [1.2, 0.35, 0.1], [0, 4.05, -0.67], s.bandana);
+      add("ChustaTrojkat2", [0.6, 0.3, 0.1], [0, 3.75, -0.67], s.bandana);
+      add("ChustaKropka1", [0.12, 0.12, 0.05], [-0.3, 4.08, -0.74], "#F4EFE6");
+      add("ChustaKropka2", [0.12, 0.12, 0.05], [0.28, 4.02, -0.74], "#F4EFE6");
+      // pas z nabojami i pasek z klamrą
+      const ang = 35, rad = (ang * Math.PI) / 180, dx = -Math.sin(rad), dy = Math.cos(rad);
+      add("PasNaboje", [0.3, 2.3, 0.1], [0, 3.2, -0.68], "#6B4423", [0, 0, ang]);
+      [-0.7, -0.35, 0, 0.35, 0.7].forEach((t, k) => add("Naboj" + (k + 1), [0.12, 0.26, 0.08], [dx * t, 3.2 + dy * t, -0.75], "#D9A62E", [0, 0, ang]));
+      add("Pasek", [2.06, 0.3, 1.26], [0, 2.35, 0], "#4A2F1A");
+      add("Klamra", [0.42, 0.3, 0.08], [0, 2.35, -0.66], "#F2C14E");
+      // kapelusz
+      add("KapeluszRondo", [2.6, 0.12, 1.6], [0, 5.71, 0.35], "#5A3A22");
+      add("KapeluszGora", [1.6, 0.75, 1.2], [0, 6.15, 0.4], "#6E4A2C");
+      add("KapeluszPasek", [1.64, 0.16, 1.24], [0, 5.86, 0.4], "#1B1B1B");
+    } else {
+      mirror("Zrenica", [0.34, 0.38, 0.05], [0.86, 6.0, -1.28], "#111111");
+      mirror("Blysk", [0.12, 0.12, 0.04], [0.96, 6.12, -1.31], "#FFFFFF");
+      mirror("Policzek", [0.45, 0.25, 0.06], [1.15, 5.15, -1.42], s.cheek);
+      add("Plamka1", [0.5, 0.06, 0.5], [-0.5, 5.68, 0.5], s.spots);
+      add("Plamka2", [0.35, 0.06, 0.35], [0.55, 5.68, 0.3], s.spots);
+    }
+
+    // --- broń zaciśnięta w pysku ---
+    if (withGun) {
+      const revolver = bandit;
+      const frame = revolver ? "#23262B" : "#2F6FC4";
+      const steel = revolver ? "#8E969F" : "#FFB020";
+      const grip = revolver ? "#7A4A26" : "#2F6FC4";
+      const tip = revolver ? "#15171A" : "#FF6A13";
+      add("BronTyl", [0.45, 0.3, 0.9], [0, 4.8, -1.45], frame);
+      add("BronRama", [0.5, 0.55, 1.0], [0, 4.85, -2.3], frame);
+      if (revolver) add("Beben", [0.7, 0.5, 0.5], [0, 4.85, -2.1], steel);
+      add("Lufa", [0.26, 0.26, 1.2], [0, 4.97, -3.4], steel);
+      add("Wylot", [0.32, 0.32, 0.08], [0, 4.97, -4.03], tip);
+      add("Muszka", [0.08, 0.14, 0.12], [0, 5.15, -3.85], frame);
+      add("Kurek", [0.12, 0.22, 0.16], [0, 5.15, -1.85], frame, [-25, 0, 0]);
+      add("Rekojesc", [0.4, 0.8, 0.48], [0, 4.3, -2.0], grip, [-15, 0, 0]);
+      add("Oslona", [0.08, 0.08, 0.4], [0, 4.4, -2.5], steel);
+      add("Spust", [0.07, 0.2, 0.07], [0, 4.5, -2.4], steel);
+    }
+    return P;
+  }
+
+  const buildParts = (s) => (shape === "stojaca" ? buildStanding(s) : buildSquat(s));
+
   // ================= SKRYPT LUAU =================
   const hexToRgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
   const f = (n) => (Math.round(n * 100) / 100).toString();
@@ -323,7 +422,7 @@
   let spin = false, needsRender = true;
 
   function init3d() {
-    target = new THREE.Vector3(0, 2.5, -1.0);
+    target = new THREE.Vector3(0, 3.4, -0.8);
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
     renderer.shadowMap.enabled = true;
@@ -362,10 +461,10 @@
     if (texCache[kind]) return texCache[kind];
     const c = document.createElement("canvas"); c.width = c.height = 64;
     const g = c.getContext("2d");
-    g.fillStyle = "#e4e4e4"; g.fillRect(0, 0, 64, 64);
-    g.strokeStyle = "rgba(0,0,0,.10)"; g.lineWidth = 1; g.strokeRect(0.5, 0.5, 63, 63);
+    g.fillStyle = "#d6d6d6"; g.fillRect(0, 0, 64, 64);
+    g.strokeStyle = "rgba(0,0,0,.16)"; g.lineWidth = 1; g.strokeRect(0.5, 0.5, 63, 63);
     if (kind === "studs") {
-      g.fillStyle = "#a9a9a9"; g.beginPath(); g.arc(35, 36, 19, 0, 7); g.fill();
+      g.fillStyle = "#858585"; g.beginPath(); g.arc(35, 36, 19, 0, 7); g.fill();
       const gr = g.createRadialGradient(26, 25, 3, 32, 32, 20);
       gr.addColorStop(0, "#ffffff"); gr.addColorStop(1, "#ececec");
       g.fillStyle = gr; g.beginPath(); g.arc(31, 31, 18, 0, 7); g.fill();
@@ -414,7 +513,8 @@
     const code = luau(parts, SKINS[skinKey].name);
     $("code").textContent = code;
     $("codeText").value = code;
-    $("meta").textContent = `${parts.length} klocków · wysokość ok. ${style === "bandyta" ? "5,4" : "5,1"} studa (jak postać Roblox)`;
+    const top = Math.max(...parts.map((p) => p.pos[1] + p.size[1] / 2));
+    $("meta").textContent = `${parts.length} klocków · wysokość ${top.toFixed(1).replace(".", ",")} studa (postać Roblox ma ok. 5)`;
   }
 
   function resize() {
@@ -495,9 +595,21 @@
     document.querySelectorAll("[data-style]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
     rebuild();
   }));
+  document.querySelectorAll("[data-shape]").forEach((b) => b.addEventListener("click", () => {
+    shape = b.dataset.shape;
+    document.querySelectorAll("[data-shape]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    target.set(0, shape === "stojaca" ? 3.4 : 2.5, shape === "stojaca" ? -0.8 : -1.0);
+    rebuild();
+  }));
   document.querySelectorAll("[data-surf]").forEach((b) => b.addEventListener("click", () => {
     surf = b.dataset.surf;
-    document.querySelectorAll("[data-surf]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    document.querySelectorAll("[data-shape]").forEach((b) => b.addEventListener("click", () => {
+    shape = b.dataset.shape;
+    document.querySelectorAll("[data-shape]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    target.set(0, shape === "stojaca" ? 3.4 : 2.5, shape === "stojaca" ? -0.8 : -1.0);
+    rebuild();
+  }));
+  document.querySelectorAll("[data-surf]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
     rebuild();
   }));
   $("optGun").addEventListener("change", (e) => { withGun = e.target.checked; rebuild(); });
