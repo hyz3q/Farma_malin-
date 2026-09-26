@@ -136,6 +136,6 @@ for _, p in model:GetChildren() do
 end
 model.PrimaryPart = cialo
 model.Parent = workspace
-game:GetService("Selection"):Set({ model })
-ChangeHistory:SetWaypoint("Dodano żabę: Bandyta")
+pcall(function() game:GetService("Selection"):Set({ model }) end)
+pcall(function() ChangeHistory:SetWaypoint("Dodano żabę: Bandyta") end)
 print("Żaba Bandyta gotowa! Klocków: 88")

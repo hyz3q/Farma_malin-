@@ -149,6 +149,17 @@
         </div>
         <span class="meta">Skrypt buduje żabę, która jest teraz wybrana. Pomyliło się? Naciśnij <kbd>Ctrl</kbd>+<kbd>Z</kbd> w Studio.</span>
       </div>
+
+      <div class="card">
+        <h2>Wszystkie 20 żab naraz</h2>
+        <p class="meta" style="margin: 0">Jeden skrypt stawia w Studio 2 rzędy po 10 żab: z przodu zgrabne, z tyłu przysadziste. Każda postać ma swoją startową skórkę, a wszystkie trafiają do folderu <b>Zaby</b> w Workspace. Powierzchnia i broń są takie, jak wybrałeś wyżej.</p>
+        <div class="btn-row">
+          <button class="btn" id="dlAllBtn">Pobierz skrypt z 20 żabami</button>
+          <button class="btn ghost" id="copyAllBtn">Kopiuj</button>
+        </div>
+        <span class="copied" id="allMsg" role="status" aria-live="polite"></span>
+        <span class="meta">Pobrany plik otwórz w Notatniku, skopiuj całość (<kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>Ctrl</kbd>+<kbd>C</kbd>) i wklej do Command Bar. Jeśli Command Bar nie przyjmie tak długiego tekstu, wklej go do nowego <b>Script</b> w ServerScriptService, kliknij <b>Play</b>, skopiuj folder Zaby z Workspace, zatrzymaj grę i wklej folder z powrotem.</span>
+      </div>
     </div>
   </section>
 
@@ -605,11 +616,121 @@
     L.push(`end`);
     L.push(`model.PrimaryPart = cialo`);
     L.push(`model.Parent = workspace`);
-    L.push(`game:GetService("Selection"):Set({ model })`);
-    L.push(`ChangeHistory:SetWaypoint("Dodano żabę: ${c.name}")`);
+    L.push(`pcall(function() game:GetService("Selection"):Set({ model }) end)`);
+    L.push(`pcall(function() ChangeHistory:SetWaypoint("Dodano żabę: ${c.name}") end)`);
     L.push(`print("Żaba ${c.name} gotowa! Klocków: ${parts.length}")`);
     return { code: L.join("\n"), model };
   }
+
+  // ================= SKRYPT: WSZYSTKIE 20 ŻAB =================
+  function surfaceLines(L, ind) {
+    if (surf === "smooth") {
+      L.push(`${ind}p.Material = Enum.Material.SmoothPlastic`);
+      L.push(`${ind}p.TopSurface = Enum.SurfaceType.Smooth`);
+      L.push(`${ind}p.BottomSurface = Enum.SurfaceType.Smooth`);
+      return;
+    }
+    L.push(`${ind}p.Material = Enum.Material.Plastic -- studsy widać tylko na materiale Plastic`);
+    L.push(`${ind}p.TopSurface = Enum.SurfaceType.Studs`);
+    L.push(`${ind}p.BottomSurface = Enum.SurfaceType.Inlet`);
+    if (surf === "all") for (const side of ["Front", "Back", "Left", "Right"]) L.push(`${ind}p.${side}Surface = Enum.SurfaceType.Studs`);
+  }
+  function luauAll() {
+    const keys = Object.keys(CHARS), L = [];
+    let total = 0;
+    L.push(`-- Żabie Strzelanie: wszystkie 20 żab (10 zgrabnych + 10 przysadzistych)`);
+    L.push(`-- Wklej do Command Bar w Roblox Studio (View -> Command Bar) i naciśnij Enter.`);
+    L.push(`local cam = workspace.CurrentCamera`);
+    L.push(`local focus = cam and cam.Focus.Position or Vector3.new(0, 0, 0)`);
+    L.push(`local origin = CFrame.new(focus.X, 0, focus.Z)`);
+    L.push(`local folder = Instance.new("Folder")`);
+    L.push(`folder.Name = "Zaby"`);
+    L.push(``);
+    L.push(`local function klocek(model, cf, name, size, pos, color, rot, przezroczystosc)`);
+    L.push(`\tlocal p = Instance.new("Part")`);
+    L.push(`\tp.Name = name`);
+    L.push(`\tp.Size = size`);
+    L.push(`\tp.CFrame = cf * CFrame.new(pos) * CFrame.Angles(math.rad(rot.X), math.rad(rot.Y), math.rad(rot.Z))`);
+    L.push(`\tp.Color = color`);
+    surfaceLines(L, "\t");
+    L.push(`\tif przezroczystosc then`);
+    L.push(`\t\tp.Transparency = przezroczystosc`);
+    L.push(`\t\tp.Material = Enum.Material.Glass`);
+    L.push(`\t\tp.CastShadow = false`);
+    L.push(`\t\tfor _, face in Enum.NormalId:GetEnumItems() do`);
+    L.push(`\t\t\tp[face.Name .. "Surface"] = Enum.SurfaceType.Smooth`);
+    L.push(`\t\tend`);
+    L.push(`\tend`);
+    L.push(`\tp.Anchored = true`);
+    L.push(`\tp.Parent = model`);
+    L.push(`end`);
+    L.push(``);
+    L.push(`local function spawaj(model)`);
+    L.push(`\tlocal cialo = model:FindFirstChild("Tulow") or model:FindFirstChild("Cialo")`);
+    L.push(`\tfor _, p in model:GetChildren() do`);
+    L.push(`\t\tif p:IsA("BasePart") and p ~= cialo then`);
+    L.push(`\t\t\tlocal weld = Instance.new("WeldConstraint")`);
+    L.push(`\t\t\tweld.Part0 = cialo`);
+    L.push(`\t\t\tweld.Part1 = p`);
+    L.push(`\t\t\tweld.Parent = p`);
+    L.push(`\t\tend`);
+    L.push(`\tend`);
+    L.push(`\tmodel.PrimaryPart = cialo`);
+    L.push(`\tmodel.Parent = folder`);
+    L.push(`end`);
+    [["zgrabna", "Zgrabna", 0], ["przysadzista", "Przysadzista", 12]].forEach(([sh, label, z]) => {
+      keys.forEach((ck, i) => {
+        const parts = buildFrog(ck, CHARS[ck].skin, sh);
+        total += parts.length;
+        const x = (i - (keys.length - 1) / 2) * 8;
+        L.push(``);
+        L.push(`do -- ${CHARS[ck].name} (${label.toLowerCase()})`);
+        L.push(`\tlocal m = Instance.new("Model")`);
+        L.push(`\tm.Name = "${ascii(CHARS[ck].name)}_${label}"`);
+        L.push(`\tlocal cf = origin * CFrame.new(${f(x)}, 0, ${z})`);
+        for (const p of parts) {
+          const [r, g, b] = hexToRgb(p.color);
+          const tr = p.transparency ? `, ${f(p.transparency)}` : "";
+          L.push(`\tklocek(m, cf, "${p.name}", Vector3.new(${p.size.map(f).join(", ")}), Vector3.new(${p.pos.map(f).join(", ")}), Color3.fromRGB(${r}, ${g}, ${b}), Vector3.new(${p.rot.map(f).join(", ")})${tr})`);
+        }
+        L.push(`\tspawaj(m)`);
+        L.push(`end`);
+      });
+    });
+    L.push(``);
+    L.push(`folder.Parent = workspace`);
+    L.push(`pcall(function() game:GetService("Selection"):Set({ folder }) end)`);
+    L.push(`pcall(function() game:GetService("ChangeHistoryService"):SetWaypoint("Dodano 20 żab") end)`);
+    L.push(`print("Gotowe! 20 żab, klocków: ${total}")`);
+    return L.join("\n");
+  }
+
+  let downloadsP = null;
+  try { downloadsP = window.claude && window.claude.use ? window.claude.use("downloads") : null; } catch (e) { downloadsP = null; }
+  function allMsg(t) { $("allMsg").textContent = t; }
+  $("dlAllBtn").addEventListener("click", async () => {
+    const code = luauAll(), name = "zaby_wszystkie_20.txt";
+    let dl = null;
+    try { dl = downloadsP ? await downloadsP : null; } catch (e) { dl = null; }
+    if (dl) {
+      try { await dl.save({ filename: name, data: code }); allMsg("Zapisano plik " + name + "."); }
+      catch (err) {
+        const c = err && err.code;
+        allMsg(c === "declined" ? "Anulowano pobieranie." : c === "rate_limited" ? "Poczekaj chwilę i spróbuj jeszcze raz." : "Pobieranie nie działa w tym widoku. Użyj przycisku Kopiuj.");
+      }
+    } else if (!window.claude) {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([code], { type: "text/plain" }));
+      a.download = name; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      allMsg("Pobrano plik " + name + ".");
+    } else allMsg("Pobieranie nie działa w tym widoku. Użyj przycisku Kopiuj.");
+  });
+  $("copyAllBtn").addEventListener("click", () => {
+    const code = luauAll();
+    try { navigator.clipboard.writeText(code).then(() => allMsg("Skopiowano skrypt z 20 żabami!"), () => allMsg("Nie udało się skopiować. Użyj przycisku Pobierz.")); }
+    catch (e) { allMsg("Nie udało się skopiować. Użyj przycisku Pobierz."); }
+  });
 
   // ================= 3D =================
   const viewer = $("viewer");
