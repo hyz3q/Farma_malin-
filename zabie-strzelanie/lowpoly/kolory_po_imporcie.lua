@@ -1,4 +1,5 @@
 -- Kolory dla low poly żaby po imporcie FBX do Roblox Studio.
+-- Uwaga: model ma już kolory z tekstury paleta.png. Ten skrypt jest tylko na wypadek, gdyby po imporcie żaba była szara.
 -- 1. Zaimportuj Zaba_LowPoly.fbx (Home -> Import 3D) i zaznacz model w Explorerze.
 -- 2. Wklej to do Command Bar i naciśnij Enter.
 local KOLORY = {

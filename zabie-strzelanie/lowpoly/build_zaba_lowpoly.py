@@ -1,6 +1,8 @@
 # Low poly żaba (Bandyta) – buduje model w Blenderze (bpy), renderuje podglądy i eksportuje FBX/OBJ.
 # Uruchom: python build_zaba_lowpoly.py <folder_wyjsciowy>
 import bpy, bmesh, math, sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from lowpoly_wspolne import maluj, eksport, trojkaty, PALETA, hex_srgb
 from mathutils import Vector, Euler
 
 OUT = sys.argv[-1] if len(sys.argv) > 1 and not sys.argv[-1].endswith(".py") else "."
@@ -10,20 +12,10 @@ R = math.radians
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
 
-COLORS = {
-    "Cialo": "#5DBB4A", "Brzuch": "#D3EA8E", "Ciemne": "#3C8B34", "OczyBiale": "#FFFFFF",
-    "Zrenice": "#111111", "Pysk": "#4A1622", "Policzki": "#F28BA0",
-    "Kapelusz": "#5E3C24", "KapeluszPasek": "#1B1B1B", "Bron": "#2A2D33", "BronStal": "#8E969F", "BronRekojesc": "#7A4A26",
-}
+COLORS = ["Cialo", "Brzuch", "Ciemne", "OczyBiale", "Zrenice", "Pysk", "Policzki",
+          "Kapelusz", "KapeluszPasek", "Bron", "BronStal", "BronRekojesc"]
 def hex_rgba(h):
-    h = h.lstrip("#"); c = [int(h[i:i + 2], 16) / 255 for i in (0, 2, 4)]
-    return [x ** 2.2 for x in c] + [1]
-MATS = {}
-for k, v in COLORS.items():
-    m = bpy.data.materials.new(k); m.diffuse_color = hex_rgba(v)
-    m.use_nodes = True; m.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = hex_rgba(v)
-    m.node_tree.nodes["Principled BSDF"].inputs["Roughness"].default_value = 0.8
-    MATS[k] = m
+    return [x ** 2.2 for x in hex_srgb(h)] + [1]
 
 groups = {k: [] for k in COLORS}
 
@@ -53,9 +45,9 @@ sphere("Cialo", (0, -0.75, 2.55), (1.75, 1.45, 0.95), seg=10, rings=7)          
 sphere("Brzuch", (0, -1.05, 1.45), (1.15, 0.75, 1.05), seg=8, rings=6, rot=(-15, 0, 0))  # brzuch
 for sx in (-1, 1):
     # oczy: guzy, białka, źrenice
-    sphere("Cialo", (sx * 0.95, -1.05, 3.25), (0.62, 0.62, 0.6), seg=8, rings=6)
-    sphere("OczyBiale", (sx * 1.0, -1.45, 3.3), (0.4, 0.3, 0.4), seg=8, rings=6)
-    box("Zrenice", (sx * 1.02, -1.73, 3.27), (0.34, 0.06, 0.2))
+    sphere("Cialo", (sx * 0.95, -1.15, 3.12), (0.62, 0.6, 0.45), seg=8, rings=6)  # guz oka niższy, żeby nie wystawał zza kapelusza
+    sphere("OczyBiale", (sx * 1.0, -1.5, 3.22), (0.4, 0.3, 0.38), seg=8, rings=6)
+    box("Zrenice", (sx * 1.02, -1.78, 3.2), (0.34, 0.06, 0.2))
     # policzki
     box("Policzki", (sx * 1.2, -1.95, 2.3), (0.34, 0.05, 0.16), rot=(0, 0, sx * -15))
     # nozdrza
@@ -84,7 +76,7 @@ for sx in (-1, 1):
 # ---------- AKCESORIA: kapelusz kowbojski (przechylony do tyłu) i rewolwer bokiem w pysku ----------
 hat_tilt = (-14, 0, -6)
 def on_hat(local):
-    v = Vector(local); v.rotate(Euler([R(a) for a in hat_tilt])); return Vector((0, -0.85, 3.5)) + v
+    v = Vector(local); v.rotate(Euler([R(a) for a in hat_tilt])); return Vector((0, -0.85, 3.62)) + v
 cyl("Kapelusz", on_hat((0, 0, 0)), 1.0, 0.12, verts=10, rot=hat_tilt, scale=(2.05, 1.8, 1))   # rondo
 cyl("Kapelusz", on_hat((0, 0.05, 0.5)), 0.95, 0.9, verts=8, rot=hat_tilt, scale=(1.0, 0.85, 1))  # główka
 box("Kapelusz", on_hat((0, 0.05, 0.98)), (0.35, 1.0, 0.12), rot=hat_tilt)                        # wgniecenie
@@ -111,13 +103,10 @@ for name, objs in groups.items():
     bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
     if len(objs) > 1: bpy.ops.object.join()
     o = bpy.context.object; o.name = name; o.data.name = name
-    o.data.materials.clear(); o.data.materials.append(MATS[name])
+    maluj(o, name, OUT)
     bpy.ops.object.shade_flat()
     final.append(o)
-tris = 0
-for o in final:
-    o.data.calc_loop_triangles(); tris += len(o.data.loop_triangles)
-print("TROJKATY", tris, "OBIEKTY", len(final))
+print("TROJKATY", trojkaty(final), "OBIEKTY", len(final))
 
 # ---------- PODGLĄDY ----------
 scene.render.engine = "CYCLES"; scene.cycles.samples = 24; scene.cycles.device = "CPU"
@@ -136,9 +125,6 @@ for name, pos in {"przod": (0, -13, 2.6), "bok": (13, -0.4, 2.6), "iso": (8, -10
 ground.hide_set(True); bpy.data.objects.remove(ground)
 
 # ---------- EKSPORT ----------
-bpy.ops.object.select_all(action="DESELECT")
-for o in final: o.select_set(True)
-bpy.ops.export_scene.fbx(filepath=os.path.join(OUT, "Zaba_LowPoly.fbx"), use_selection=True, apply_scale_options="FBX_SCALE_ALL", mesh_smooth_type="FACE")
-bpy.ops.wm.obj_export(filepath=os.path.join(OUT, "Zaba_LowPoly.obj"), export_selected_objects=True)
+eksport(final, OUT, "Zaba_LowPoly")
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUT, "Zaba_LowPoly.blend"))
 print("GOTOWE")
