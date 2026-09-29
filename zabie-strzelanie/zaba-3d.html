@@ -135,6 +135,7 @@
         <div class="toggles">
           <label><input type="checkbox" id="optGun" checked> Broń w pysku</label>
           <label><input type="checkbox" id="optRoll" checked> Broń obrócona o 90° w prawo</label>
+          <label><input type="checkbox" id="optGunRight" checked> Broń w prawym kąciku pyska</label>
           <label><input type="checkbox" id="optHatBack" checked> Czapka przechylona do tyłu</label>
           <label><input type="checkbox" id="optSpin"> Kręć się sama</label>
         </div>
@@ -210,7 +211,7 @@
     slodziak: { name: "Słodziak", desc: "kwiatek, pistolet na wodę", skin: "zielona", face: "cute", acc: ["flower"], gun: "toy" }
   };
 
-  let charKey = "bandyta", skinKey = CHARS.bandyta.skin, withGun = true, hatScale = 1.3, hatSink = 0.55, hatBack = 18, gunRoll = 90, surf = "all", shape = "zgrabna", showAll = false;
+  let charKey = "bandyta", skinKey = CHARS.bandyta.skin, withGun = true, hatScale = 1.3, hatSink = 0.55, hatBack = 18, gunRoll = 90, gunRight = true, surf = "all", shape = "zgrabna", showAll = false;
 
   // ================= NARZĘDZIA =================
   function kit() {
@@ -558,7 +559,9 @@
     const roll = [0, 0, gunRoll];
     const at = (name, size, local, color, rot) => {
       const [x, y, z] = rotate(local.map((v) => v * sc), roll);
-      k.add(name, size.map((v) => v * sc), [x, A.mouthY + y, A.mouthZ + z], color, composeRot(roll, rot || [0, 0, 0]));
+      // gunRight: broń w prawym kąciku pyska (patrząc na żabę z przodu to strona -X)
+      const side = gunRight ? -A.headW * 0.25 : 0;
+      k.add(name, size.map((v) => v * sc), [side + x, A.mouthY + y, A.mouthZ + z], color, composeRot(roll, rot || [0, 0, 0]));
     };
     at("BronTyl", [0.5, 0.3, 1.0], [0, 0, 0], g.frame);
     at("BronRama", [0.55, 0.6, 1.1], [0, 0.06, -0.95], g.frame);
@@ -990,6 +993,7 @@
   segment("surf", (v) => (surf = v));
   $("optGun").addEventListener("change", (e) => { withGun = e.target.checked; rebuild(); });
   $("optHatBack").addEventListener("change", (e) => { hatBack = e.target.checked ? 18 : 0; rebuild(); });
+  $("optGunRight").addEventListener("change", (e) => { gunRight = e.target.checked; rebuild(); });
   $("optRoll").addEventListener("change", (e) => { gunRoll = e.target.checked ? 90 : 0; rebuild(); });
   $("hatScale").addEventListener("input", (e) => { hatScale = +e.target.value; $("hatScaleVal").textContent = Math.round(hatScale * 100) + "%"; rebuild(); });
   $("hatSink").addEventListener("input", (e) => { hatSink = +e.target.value; $("hatSinkVal").textContent = hatSink.toFixed(2); rebuild(); });
