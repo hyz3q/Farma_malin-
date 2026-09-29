@@ -85,7 +85,7 @@ for sx in (-1, 1):  # podwinięte boki ronda
     box("Kapelusz", on_hat((sx * 1.95, 0, 0.18)), (0.14, 1.9, 0.34), rot=(hat_tilt[0], 0, hat_tilt[2] + sx * 0))
 
 # rewolwer obrócony o 90° w prawo (patrząc z przodu): muszka w prawo, rękojeść w lewo; lufa do przodu
-g = Vector((0.7, -2.08, 2.4))  # pistolet w prawym kąciku pyska (patrząc z przodu)
+g = Vector((0, -2.1, 2.4))
 box("Bron", g + Vector((0, 0.1, 0)), (0.3, 0.9, 0.5))                   # tył/rama w pysku
 cyl("BronStal", g + Vector((0, -0.55, 0)), 0.32, 0.5, verts=6, rot=(90, 0, 0))  # bęben
 cyl("BronStal", g + Vector((0.12, -1.35, 0)), 0.13, 1.3, verts=6, rot=(90, 0, 0))  # lufa
