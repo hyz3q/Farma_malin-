@@ -7,8 +7,45 @@ Taśma zawozi przedmiot do sprzedaży i gracz dostaje monety. Im rzadszy przedmi
 Za monety gracz ulepsza maszynę i rozbudowuje bazę. Rzadkie dropy są ogłaszane całemu serwerowi.
 Gra ma być bardzo prosta do zrozumienia w 5 sekund i dawać chwile „O MÓJ BOŻE, SEKRET!”.
 
+## NAJWAŻNIEJSZE PRIORYTETY (ważniejsze niż liczba funkcji)
+1. SATYSFAKCJA Z DROPU: każdy dobry drop ma dawać „WOW”. Gracz ma CZUĆ różnicę między Rare a Legendary, zanim przeczyta napis.
+2. GRAFIKA: gra ma wyglądać ładnie i spójnie od pierwszej sekundy (miniaturki i pierwsze wrażenie decydują, czy ktoś zostanie).
+Jeśli musisz wybierać, lepiej mniej funkcji, ale dopracowany drop i ładny wygląd. Zwykłe dropy mają być krótkie i nienachalne, żeby rzadkie bardziej się wyróżniały.
+
+## SATYSFAKCJA Z DROPU – „DRABINA EFEKTÓW”
+Każda wyższa rzadkość dokłada coś NOWEGO do efektów niższej (gracz uczy się, że „więcej efektów = lepszy drop”):
+| Rzadkość | Efekty |
+|---|---|
+| Common | krótki „pyk”, mała chmurka |
+| Uncommon | + zielony błysk, wyższy dźwięk |
+| Rare | + niebieska poświata (PointLight + Highlight), iskry, napis „RARE!” nad przedmiotem |
+| Epic | + fioletowy słup światła (Beam) z maszyny, lekkie drgnięcie kamery, dźwięk „whoosh” |
+| Legendary | + napięcie przed dropem: maszyna trzęsie się i świeci przez ok. 1 s, potem złoty wybuch cząsteczek, konfetti, mocniejsze drgnięcie kamery, krótki błysk ekranu, wielki napis na środku ekranu |
+| Mythic | + na pół sekundy zwolnione tempo (slow-motion przedmiotu), czerwone pioruny, ogłoszenie na cały serwer, specjalna muzyka-dżingiel |
+| Secret | + ekran przyciemnia się, odliczanie „3…2…1”, tęczowa eksplozja, fajerwerki nad działką widoczne z całej mapy, ogłoszenie z nickiem, przedmiot zostaje na chwilę w powietrzu i się obraca |
+Zasady:
+- Napięcie (trzęsienie maszyny) pokazuj TYLKO, gdy naprawdę wypadło Legendary lub lepiej. Nie oszukuj gracza fałszywymi zapowiedziami.
+- Przy każdym dropie od Rare wzwyż pokaż szansę: „1 na 1 000!” – to buduje dumę.
+- Pierwszy raz zdobyty przedmiot dostaje pieczątkę „NEW!” i dźwięk odblokowania; licznik kolekcji (np. „Index 12/40”) skacze z animacją.
+- Liczby monet „wyskakują” z przedmiotu przy sprzedaży (+150) i lecą do licznika na górze ekranu; licznik krótko się powiększa.
+- Dźwięk każdej rzadkości jest inny i rozpoznawalny bez patrzenia.
+- System „pity”: jeśli gracz przez 300 dropów nie dostał Epic lub lepszego, następny drop to gwarantowany Epic (pokaż pasek „Gwarantowany Epic za: 37 dropów”). Gracz zawsze ma na co czekać.
+- Wszystkie efekty trzymaj w jednym module (EffectsManager) z jedną tabelą ustawień na rzadkość, żebym mógł je łatwo stroić.
+- Efekty i dźwięki odtwarzaj po stronie KLIENTA (serwer tylko wysyła: kto, co, jaka rzadkość). Efekty cudzych dropów pokazuj słabiej niż własnych (oprócz Mythic i Secret).
+- Wydajność na telefonie: limit cząsteczek, efekty sprzątane po 3 s, ustawienie „Mniej efektów” w opcjach.
+
+## GRAFIKA I WYGLĄD
+- Styl: kolorowy LOW POLY (płaskie ściany, mało szczegółów, czyste kolory), jak w nowoczesnych grach Roblox. Wszystko w jednym stylu: działki, maszyna, taśma, przedmioty, UI.
+- Oświetlenie: Lighting.Technology = Future, Atmosphere (lekka mgiełka), Bloom (delikatny, żeby świecące rzeczy ładnie lśniły), ColorCorrection (trochę więcej nasycenia), Sky z ładnym niebem. Podaj dokładne wartości.
+- Maszyna to „gwiazda” działki: wyraźnie widoczna, z animacją pracy (tłoki, migające lampki, kołysanie), z każdym ulepszeniem wygląda lepiej (nowe części, światła, kolory). Gracz ma WIDZIEĆ postęp.
+- Przedmioty: proste, czytelne kształty, rozpoznawalne z daleka; im rzadsze, tym bardziej błyszczą (Material Neon/ForceField w detalach, poświata, unoszenie się i obrót).
+- Działka rośnie wizualnie z postępem: nowe ścieżki, ogrodzenie, dekoracje, podest gabloty.
+- UI: duże, zaokrąglone przyciski (UICorner), gruby czarny obrys (UIStroke), cień, gradienty (UIGradient), czcionka Lilita One/Fredoka, ikonki zamiast długich tekstów. Animacje UI: przyciski lekko rosną po najechaniu i „sprężynują” po kliknięciu (TweenService), okna wjeżdżają płynnie.
+- Kolory rzadkości wszędzie te same (przedmiot, napis, ramka w Indexie, ogłoszenie).
+- Mam własny pipeline low poly w Blenderze (modele eksportowane jako FBX z jedną teksturą palety kolorów). Jeśli potrzebujesz modeli, opisz mi, co ma być (kształt, kolory, rozmiar w studach), a ja je przygotuję; do tego czasu używaj prostych Partów jako tymczasowych.
+
 ## PĘTLA ROZGRYWKI
-1. Maszyna zrzuca przedmiot (animacja + dźwięk zależny od rzadkości).
+1. Maszyna zrzuca przedmiot z efektami z „drabiny efektów” (patrz wyżej).
 2. Przedmiot jedzie taśmą do sprzedawcy → monety (z efektem +liczba nad przedmiotem).
 3. Gracz kupuje ulepszenia przyciskami na działce (styl klasycznego tycoona: przyciski na ziemi z ceną).
 4. Rzadki drop → efekt świetlny, dźwięk, napis na ekranie; od rzadkości Mythic wzwyż ogłoszenie dla całego serwera.
@@ -74,28 +111,30 @@ Obsłuż je przez MarketplaceService.ProcessReceipt POPRAWNIE: zapisz zakup w Da
 Kolorowy, prosty, czytelny. Duże, grube przyciski z czarnym obrysem i cieniem (styl jak popularne gry symulatorowe). Czcionka Lilita One / Fredoka. Rzadkości wyraźnie różnią się kolorem, poświatą i dźwiękiem. Secret ma tęczową poświatę, wstrząs ekranu i wyjątkowy dźwięk.
 
 ## KOLEJNOŚĆ BUDOWANIA (rób po jednym kroku i czekaj, aż napiszę „działa”)
-1. Działka gracza + przypisywanie działki po wejściu.
-2. Maszyna, która co X sekund zrzuca przedmiot (na razie bez rzadkości).
-3. Taśma + sprzedawca + monety (leaderstats).
-4. System rzadkości i losowania (ModuleScript Rarities) + kolory przedmiotów.
-5. Zapisywanie danych.
-6. Przyciski ulepszeń.
-7. UI: monety, szczęście, przycisk sklepu, okno ulepszeń (wszystko w Scale).
-8. Efekty rzadkich dropów + ogłoszenia serwerowe.
-9. Game passy.
-10. Developer products.
-11. Gablota i Index kolekcji.
+1. Oświetlenie i wygląd świata (Lighting, Atmosphere, Bloom, niebo) + działka gracza i przypisywanie działki po wejściu.
+2. Maszyna, która co X sekund zrzuca przedmiot (na razie bez rzadkości), z animacją pracy.
+3. Taśma + sprzedawca + monety (leaderstats) + wyskakujące liczby monet.
+4. System rzadkości i losowania (ModuleScript Rarities) + kolory i poświata przedmiotów.
+5. DRABINA EFEKTÓW dropów (EffectsManager): dźwięki, cząsteczki, kamera, napisy, napięcie przed Legendary+, ogłoszenia serwerowe. Ten krok dopracowujemy, aż będzie naprawdę satysfakcjonujący.
+6. Zapisywanie danych.
+7. Przyciski ulepszeń + wizualne zmiany maszyny po ulepszeniu.
+8. UI: monety, szczęście, pasek „pity”, przycisk sklepu, okno ulepszeń (wszystko w Scale, z animacjami).
+9. Gablota i Index kolekcji z pieczątką „NEW!”.
+10. Game passy.
+11. Developer products.
 12. Rebirth + druga maszyna.
 13. Ranking i tablica najrzadszych dropów.
-14. Dopracowanie: dźwięki, animacje, kody promocyjne (np. RELEASE = 10 000 monet).
+14. Dopracowanie: opcja „Mniej efektów”, kody promocyjne (np. RELEASE = 10 000 monet), drobne poprawki wyglądu.
 
 ## WERSJA NA START (MVP)
 Na premierę wystarczą: 1 działka na gracza (serwer do 8 graczy), 1 maszyna, 7 rzadkości, 15–20 przedmiotów, 4 ulepszenia, rebirth, wszystkie game passy i zapisywanie. Reszta w aktualizacjach co tydzień.
+Nie wypuszczaj gry, dopóki drop Legendary+ nie daje prawdziwego „WOW” i gra nie wygląda ładnie na telefonie – to ważniejsze niż dodatkowe funkcje.
 
 ## JAK MI ODPOWIADAĆ
 - Przy każdym kroku podaj: listę plików, pełny kod każdego pliku (bez „…reszta kodu”), dokładne miejsce w Explorerze i jak przetestować krok w Studio (Play / Test → Device telefon).
 - Jeśli coś wymaga zrobienia ręcznie w Studio (np. stworzenie Partu), opisz to krok po kroku.
 - Po każdym kroku napisz krótko, co mogło pójść źle i jak to rozpoznać w oknie Output.
 - Nie dodawaj rzeczy, o które nie prosiłem, zanim nie skończymy MVP.
+- Przy krokach z efektami i grafiką zaproponuj, co jeszcze mogłoby zwiększyć satysfakcję lub poprawić wygląd, ale zrób to jako osobną listę propozycji.
 
 Zacznij od kroku 1.
