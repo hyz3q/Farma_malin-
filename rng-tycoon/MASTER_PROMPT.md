@@ -9,6 +9,7 @@ Gra ma być bardzo prosta do zrozumienia w 5 sekund i dawać chwile „O MÓJ BO
 
 ## NAJWAŻNIEJSZE PRIORYTETY (ważniejsze niż liczba funkcji)
 1. SATYSFAKCJA Z DROPU: każdy dobry drop ma dawać „WOW”. Gracz ma CZUĆ różnicę między Rare a Legendary, zanim przeczyta napis.
+1b. SATYSFAKCJONUJĄCY ŚWIAT 3D: wszystko, co się rusza (wypadanie z droppera, taśma, sprzedawanie, przyciski, budowanie), ma być płynne, sprężyste i z dźwiękiem – tak, żeby fajnie było na to patrzeć.
 2. GRAFIKA: gra ma wyglądać ładnie i spójnie od pierwszej sekundy (miniaturki i pierwsze wrażenie decydują, czy ktoś zostanie).
 Jeśli musisz wybierać, lepiej mniej funkcji, ale dopracowany drop i ładny wygląd. Zwykłe dropy mają być krótkie i nienachalne, żeby rzadkie bardziej się wyróżniały.
 
@@ -33,6 +34,46 @@ Zasady:
 - Wszystkie efekty trzymaj w jednym module (EffectsManager) z jedną tabelą ustawień na rzadkość, żebym mógł je łatwo stroić.
 - Efekty i dźwięki odtwarzaj po stronie KLIENTA (serwer tylko wysyła: kto, co, jaka rzadkość). Efekty cudzych dropów pokazuj słabiej niż własnych (oprócz Mythic i Secret).
 - Wydajność na telefonie: limit cząsteczek, efekty sprzątane po 3 s, ustawienie „Mniej efektów” w opcjach.
+
+## FIZYKA I ŚWIAT 3D – KAŻDY RUCH MA BYĆ SATYSFAKCJONUJĄCY
+Zasada: nic nie pojawia się ani nie znika „po prostu”. Każda rzecz w świecie ma wejście, ruch i wyjście z animacją, dźwiękiem i małym efektem. Gracz ma lubić samo patrzenie na swoją działkę, nawet gdy nic nie klika.
+
+WYPADANIE PRZEDMIOTU Z DROPPERA (najważniejsza animacja w grze – widać ją setki razy):
+1. Przygotowanie: maszyna lekko „nabiera powietrza” (krótkie ściśnięcie i rozciągnięcie, ok. 0,15 s), lampka mruga, cichy dźwięk ładowania.
+2. Wystrzał: przedmiot wyskakuje z wylotu łukiem (krzywa Béziera / parabola), z lekkim obrotem, z małym obłoczkiem pary i dźwiękiem „pop”. Maszyna po wystrzale odskakuje sprężyście (odrzut).
+3. Lądowanie: przedmiot uderza w taśmę, spłaszcza się na chwilę (squash) i odbija 1–2 razy coraz niżej, robi mały obłoczek kurzu; dźwięk uderzenia zależy od wielkości/ciężaru (ciężkie = niższy, głuchy dźwięk).
+4. Rzadkie przedmioty lądują efektowniej: wolniej opadają, unoszą się chwilę nad taśmą, obracają się i świecą (zgodnie z „drabiną efektów”).
+5. Losuj drobne różnice (kąt, siła obrotu, wysokość łuku), żeby żadne dwa dropy nie wyglądały identycznie.
+
+TAŚMA:
+- Widać, że się kręci (przesuwająca się tekstura/paski, kręcące się wałki na końcach).
+- Przedmioty lekko się kołyszą i podskakują na łączeniach taśmy; rzadkie jadą na środku, z poświatą odbijającą się od taśmy.
+- Gdy taśma przyspiesza po ulepszeniu, widać to i słychać (wyższy dźwięk silnika).
+
+SPRZEDAWANIE:
+- Przedmiot wpada do „zjadacza” (piec/zsyp/skarbonka), który go wciąga: przedmiot maleje i wiruje, zjadacz „przełyka” (ściśnięcie), wyskakują monety, które fizycznie lecą do licznika na ekranie.
+- Przy rzadkim przedmiocie zjadacz reaguje mocniej (trzęsie się, świeci, wyrzuca fontannę monet).
+
+PRZYCISKI TYCOONA I BUDOWANIE:
+- Przycisk na ziemi zapada się pod graczem jak prawdziwy, z dźwiękiem „klik”.
+- Kupiona rzecz NIE pojawia się nagle: wyrasta z ziemi albo spada z nieba i ląduje sprężyście; części składają się po kolei (klocek po klocku), z obłoczkami kurzu i dźwiękami.
+- Ulepszona maszyna zmienia wygląd z animacją (nowe części wjeżdżają na miejsce, błysk, dźwięk „upgrade”).
+
+ŚWIAT ŻYJE:
+- Maszyna stale pracuje: tłoki, obracające się koła zębate, migające lampki, para z komina; im szybsza maszyna, tym szybsze ruchy.
+- Światła na działce pulsują w rytm dropów; przy rzadkim dropie cała działka na moment rozbłyskuje kolorem rzadkości.
+- Drobne żywe detale: kołysząca się trawa, latające motyle/iskierki, flagi na wietrze.
+
+ZASADY RUCHU (zastosuj wszędzie):
+- Używaj krzywych z „charakterem”: Enum.EasingStyle.Back i Elastic dla pojawiania się i odbić, Quad/Sine dla płynnych ruchów. Unikaj liniowych ruchów.
+- Zawsze: przygotowanie → akcja → dobicie (anticipation, action, follow-through). Ściśnięcie i rozciągnięcie (squash & stretch) przy uderzeniach.
+- Każdy ruch ma dźwięk; dźwięki lekko zmieniaj wysokością (PlaybackSpeed losowo ±5%), żeby się nie nudziły.
+- Ruchy krótkie i szybkie (0,1–0,4 s) dla częstych rzeczy, dłuższe tylko dla rzadkich dropów i dużych zakupów.
+
+TECHNICZNIE:
+- Animacje dropów, taśmy i sprzedawania rób po stronie KLIENTA (TweenService, RunService.RenderStepped, krzywe Béziera) na zakotwiczonych (Anchored) przedmiotach. To daje płynność bez szarpania i nie obciąża serwera.
+- Nie używaj prawdziwej fizyki Robloxa dla przedmiotów na taśmie (setki luźnych części = lagi i dziwne zachowania). Prawdziwą fizykę możesz użyć tylko do pojedynczych efektów, np. rozsypujących się monet przy Mythic/Secret, i usuwaj je po kilku sekundach.
+- Serwer decyduje tylko CO wypadło i KIEDY; wygląd ruchu to praca klienta.
 
 ## GRAFIKA I WYGLĄD
 - Styl: kolorowy LOW POLY (płaskie ściany, mało szczegółów, czyste kolory), jak w nowoczesnych grach Roblox. Wszystko w jednym stylu: działki, maszyna, taśma, przedmioty, UI.
@@ -102,7 +143,7 @@ Obsłuż je przez MarketplaceService.ProcessReceipt POPRAWNIE: zapisz zakup w Da
 ## ZASADY TECHNICZNE (bardzo ważne)
 1. SERWER decyduje o wszystkim: losowanie (Random.new()), monety, zakupy, ulepszenia. Klient tylko pokazuje efekty i wysyła prośby („chcę kupić ulepszenie X”). Serwer zawsze sprawdza, czy gracz ma pieniądze i czy prośba ma sens. Nigdy nie ufaj wartościom od klienta.
 2. Zapisywanie: DataStoreService z pcall i ponawianiem, UpdateAsync, autozapis co 2 minuty, zapis przy wyjściu gracza i w game:BindToClose. Wersjonuj dane (pole „wersja”), żeby przyszłe aktualizacje nie psuły zapisów.
-3. Wydajność: maks. ok. 30 przedmiotów na taśmie na gracza; stare usuwaj. Przedmioty to proste Party/MeshParty, bez fizyki tam, gdzie nie trzeba (taśma może przesuwać je przez TweenService albo CFrame po stronie klienta, a serwer liczy tylko czas dojazdu).
+3. Wydajność: maks. ok. 30 przedmiotów na taśmie na gracza; stare usuwaj. Przedmioty to proste Party/MeshParty, animowane po stronie klienta (patrz „Fizyka i świat 3D”), a serwer liczy tylko czas dojazdu.
 4. UI: WSZYSTKO w Scale (procentach), nie w Offset, z UIAspectRatioConstraint dla ikon i TextScaled + UITextSizeConstraint dla tekstów. Gra musi wyglądać dobrze na TELEFONIE. Nie kładź przycisków w lewym dolnym rogu (joystick) ani w prawym dolnym (skok).
 5. Kod modularny: ModuleScripty Config, Rarities, Items, DataManager, DropperManager, ConveyorManager, UpgradeManager, PassManager, ProductManager, RebirthManager, AnnouncementManager, CollectionManager + jeden RemoteEvents folder w ReplicatedStorage.
 6. Każdy plik zaczyna się komentarzem: co robi i gdzie leży. Komentarze po polsku.
@@ -112,12 +153,12 @@ Kolorowy, prosty, czytelny. Duże, grube przyciski z czarnym obrysem i cieniem (
 
 ## KOLEJNOŚĆ BUDOWANIA (rób po jednym kroku i czekaj, aż napiszę „działa”)
 1. Oświetlenie i wygląd świata (Lighting, Atmosphere, Bloom, niebo) + działka gracza i przypisywanie działki po wejściu.
-2. Maszyna, która co X sekund zrzuca przedmiot (na razie bez rzadkości), z animacją pracy.
-3. Taśma + sprzedawca + monety (leaderstats) + wyskakujące liczby monet.
+2. Maszyna, która co X sekund zrzuca przedmiot (na razie bez rzadkości), z PEŁNĄ animacją wypadania (przygotowanie, wystrzał łukiem, lądowanie z odbiciem) i animacją pracy maszyny. Dopracowujemy, aż samo patrzenie będzie przyjemne.
+3. Taśma (widać ruch, kołysanie przedmiotów) + zjadacz/sprzedawca z animacją wciągania + monety (leaderstats) lecące do licznika.
 4. System rzadkości i losowania (ModuleScript Rarities) + kolory i poświata przedmiotów.
 5. DRABINA EFEKTÓW dropów (EffectsManager): dźwięki, cząsteczki, kamera, napisy, napięcie przed Legendary+, ogłoszenia serwerowe. Ten krok dopracowujemy, aż będzie naprawdę satysfakcjonujący.
 6. Zapisywanie danych.
-7. Przyciski ulepszeń + wizualne zmiany maszyny po ulepszeniu.
+7. Przyciski ulepszeń (zapadają się pod graczem) + kupione rzeczy wyrastają/spadają z animacją + wizualne zmiany maszyny po ulepszeniu.
 8. UI: monety, szczęście, pasek „pity”, przycisk sklepu, okno ulepszeń (wszystko w Scale, z animacjami).
 9. Gablota i Index kolekcji z pieczątką „NEW!”.
 10. Game passy.
