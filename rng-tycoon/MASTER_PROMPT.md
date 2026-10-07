@@ -30,7 +30,7 @@ Zasady:
 - Pierwszy raz zdobyty przedmiot dostaje pieczątkę „NEW!” i dźwięk odblokowania; licznik kolekcji (np. „Index 12/40”) skacze z animacją.
 - Liczby monet „wyskakują” z przedmiotu przy sprzedaży (+150) i lecą do licznika na górze ekranu; licznik krótko się powiększa.
 - Dźwięk każdej rzadkości jest inny i rozpoznawalny bez patrzenia.
-- System „pity”: jeśli gracz przez 300 dropów nie dostał Epic lub lepszego, następny drop to gwarantowany Epic (pokaż pasek „Gwarantowany Epic za: 37 dropów”). Gracz zawsze ma na co czekać.
+- System „pity”: jeśli gracz przez 800 dropów nie dostał Legendary lub lepszego, następny drop to gwarantowany Legendary (pokaż pasek „Gwarantowany Legendary za: 137 dropów”). Licznik zapisuj w danych gracza. Gracz zawsze ma na co czekać.
 - Wszystkie efekty trzymaj w jednym module (EffectsManager) z jedną tabelą ustawień na rzadkość, żebym mógł je łatwo stroić.
 - Efekty i dźwięki odtwarzaj po stronie KLIENTA (serwer tylko wysyła: kto, co, jaka rzadkość). Efekty cudzych dropów pokazuj słabiej niż własnych (oprócz Mythic i Secret).
 - Wydajność na telefonie: limit cząsteczek, efekty sprzątane po 3 s, ustawienie „Mniej efektów” w opcjach.
@@ -62,7 +62,7 @@ PRZYCISKI TYCOONA I BUDOWANIE:
 ŚWIAT ŻYJE:
 - Maszyna stale pracuje: tłoki, obracające się koła zębate, migające lampki, para z komina; im szybsza maszyna, tym szybsze ruchy.
 - Światła na działce pulsują w rytm dropów; przy rzadkim dropie cała działka na moment rozbłyskuje kolorem rzadkości.
-- Drobne żywe detale: kołysząca się trawa, latające motyle/iskierki, flagi na wietrze.
+- Drobne żywe detale: lekko kołyszące się krzaki i bambus, latające motyle/iskierki, flagi na wietrze.
 
 ZASADY RUCHU (zastosuj wszędzie):
 - Używaj krzywych z „charakterem”: Enum.EasingStyle.Back i Elastic dla pojawiania się i odbić, Quad/Sine dla płynnych ruchów. Unikaj liniowych ruchów.
@@ -117,19 +117,20 @@ MODELE:
 2. Przedmiot jedzie taśmą do sprzedawcy → monety (z efektem +liczba nad przedmiotem).
 3. Gracz kupuje ulepszenia przyciskami na działce (styl klasycznego tycoona: przyciski na ziemi z ceną).
 4. Rzadki drop → efekt świetlny, dźwięk, napis na ekranie; od rzadkości Mythic wzwyż ogłoszenie dla całego serwera.
-5. Rebirth: reset monet i ulepszeń → stały mnożnik monet + nowa, lepsza maszyna i nowe przedmioty.
+5. Rebirth: reset monet i ulepszeń → stały mnożnik monet. (W aktualizacjach: kolejne rebirthy odblokowują nową, lepszą maszynę z nowymi przedmiotami.)
 
 ## RZADKOŚCI (wartości startowe, trzymaj je w jednym ModuleScript, żebym mógł łatwo zmieniać)
 | Rzadkość | Szansa bazowa | Mnożnik wartości | Kolor |
 |---|---|---|---|
-| Common | 1 na 2 | x1 | szary |
-| Uncommon | 1 na 5 | x3 | zielony |
-| Rare | 1 na 25 | x10 | niebieski |
-| Epic | 1 na 150 | x40 | fioletowy |
-| Legendary | 1 na 1 000 | x200 | złoty |
-| Mythic | 1 na 10 000 | x1 500 | czerwony |
+| Common | reszta (ok. 65%) | x1 | szary |
+| Uncommon | 1 na 4 | x3 | zielony |
+| Rare | 1 na 12 | x10 | niebieski |
+| Epic | 1 na 60 | x40 | fioletowy |
+| Legendary | 1 na 400 | x200 | złoty |
+| Mythic | 1 na 5 000 | x1 500 | czerwony |
 | Secret | 1 na 1 000 000 | x50 000 | tęczowy |
-Szanse liczone jako „1 na X”, a szczęście (Luck) DZIELI X (Luck x2 → Legendary 1 na 500). Common to „reszta”.
+Jak losować: sprawdzaj od NAJRZADSZEJ do najczęstszej; szansa danej rzadkości = Luck / X (np. Luck 2 → Legendary 1 na 200). Pierwsza rzadkość, która „trafi”, wygrywa; jeśli żadna – Common. Ogranicz każdą szansę do maks. 50%, żeby przy dużym Luck gra się nie psuła.
+Luck gracza = 1 + bonus z ulepszenia „Szczęście” + aktywne boosty. Liczenie Luck i mnożnika monet trzymaj w JEDNEJ funkcji (np. Multipliers.Get(gracz)), żeby później łatwo dodać do niej game passy.
 Każda maszyna ma własną listę przedmiotów w każdej rzadkości (np. Maszyna 1: kamień, cegła, puszka… Secret: złota żaba).
 
 ## ULEPSZENIA MASZYNY (kupowane za monety, ceny rosną wykładniczo)
@@ -140,20 +141,8 @@ Każda maszyna ma własną listę przedmiotów w każdej rzadkości (np. Maszyna
 - Dodatkowe dekoracje bazy (tylko wygląd, ale fajne do pokazania)
 
 ## GABLOTA (kolekcja)
-Gracz może zachować rzadki przedmiot zamiast go sprzedać i postawić na podeście w bazie.
+Gracz może zachować rzadki przedmiot zamiast go sprzedać i postawić na podeście w bazie. Na start 3 podesty; kolejne odblokowuje się za monety i rebirthy.
 Każdy przedmiot w gablocie daje mały stały bonus do monet. Index (kolekcja) pokazuje wszystkie przedmioty i które już zdobyłem — to ma motywować do „zebrania wszystkich”.
-
-## GAME PASSY (mam już gotowe ikonki – użyj tych nazw i cen w Robux)
-| Game pass | Cena | Działanie |
-|---|---|---|
-| VIP | 69 | x2 monety, złoty napis VIP nad głową |
-| Auto Sell | 45 | przedmioty sprzedają się od razu, bez czekania na taśmę |
-| +2 sloty | 49 | +2 miejsca w gablocie |
-| Większy plecak | 15 | więcej miejsca na zachowane przedmioty |
-| Potrójny drop (x3 Hatch) | 35 | 10% szansy, że maszyna zrzuci 3 przedmioty naraz |
-| Szybkie otwieranie (Fast Open) | 18 | maszyna działa 1,5x szybciej |
-| Lucky x2 / x3 / x4 / x5 | 10 / 15 / 20 / 24 | mnożnik Luck; liczy się NAJWYŻSZY posiadany, nie sumują się |
-ID passów wpiszę sam do jednego ModuleScript „Config”. Zostaw tam zera i komentarze.
 
 ## DEVELOPER PRODUCTS (kupowane wielokrotnie)
 - Boost szczęścia x2 na 15 minut
@@ -169,10 +158,10 @@ Obsłuż je przez MarketplaceService.ProcessReceipt POPRAWNIE: zapisz zakup w Da
 
 ## ZASADY TECHNICZNE (bardzo ważne)
 1. SERWER decyduje o wszystkim: losowanie (Random.new()), monety, zakupy, ulepszenia. Klient tylko pokazuje efekty i wysyła prośby („chcę kupić ulepszenie X”). Serwer zawsze sprawdza, czy gracz ma pieniądze i czy prośba ma sens. Nigdy nie ufaj wartościom od klienta.
-2. Zapisywanie: DataStoreService z pcall i ponawianiem, UpdateAsync, autozapis co 2 minuty, zapis przy wyjściu gracza i w game:BindToClose. Wersjonuj dane (pole „wersja”), żeby przyszłe aktualizacje nie psuły zapisów.
-3. Wydajność: maks. ok. 30 przedmiotów na taśmie na gracza; stare usuwaj. Przedmioty to proste Party/MeshParty, animowane po stronie klienta (patrz „Fizyka i świat 3D”), a serwer liczy tylko czas dojazdu.
+2. Zapisywanie: DataStoreService z pcall i ponawianiem, UpdateAsync, autozapis co 2 minuty, zapis przy wyjściu gracza i w game:BindToClose. Wersjonuj dane (pole „wersja”), żeby przyszłe aktualizacje nie psuły zapisów. Zapisuj: monety, ulepszenia, rebirthy, przedmioty w gablocie, Index (zdobyte przedmioty), licznik pity, najrzadszy drop, kupione produkty.
+3. Wydajność: maks. ok. 30 przedmiotów na taśmie na gracza; stare usuwaj. Przedmioty to małe modele z klocków (najlepiej do ok. 15 Partów każdy, trzymane jako gotowe szablony w ReplicatedStorage i klonowane), animowane po stronie klienta (patrz „Fizyka i świat 3D”), a serwer liczy tylko czas dojazdu.
 4. UI: WSZYSTKO w Scale (procentach), nie w Offset, z UIAspectRatioConstraint dla ikon i TextScaled + UITextSizeConstraint dla tekstów. Gra musi wyglądać dobrze na TELEFONIE. Nie kładź przycisków w lewym dolnym rogu (joystick) ani w prawym dolnym (skok).
-5. Kod modularny: ModuleScripty Config, Rarities, Items, DataManager, DropperManager, ConveyorManager, UpgradeManager, PassManager, ProductManager, RebirthManager, AnnouncementManager, CollectionManager + jeden RemoteEvents folder w ReplicatedStorage.
+5. Kod modularny: ModuleScripty Config, Rarities, Items, DataManager, DropperManager, ConveyorManager, UpgradeManager, Multipliers, ProductManager, EffectsManager, RebirthManager, AnnouncementManager, CollectionManager + jeden RemoteEvents folder w ReplicatedStorage.
 6. Każdy plik zaczyna się komentarzem: co robi i gdzie leży. Komentarze po polsku.
 
 ## STYL GRAFICZNY – PODSUMOWANIE
@@ -188,15 +177,19 @@ Wszystko z klocków ze studsami (świat, maszyna, przedmioty, zwierzaki) + szach
 7. Przyciski ulepszeń (zapadają się pod graczem) + kupione rzeczy wyrastają/spadają z animacją + wizualne zmiany maszyny po ulepszeniu.
 8. UI: monety, szczęście, pasek „pity”, przycisk sklepu, okno ulepszeń (wszystko w Scale, z animacjami).
 9. Gablota i Index kolekcji z pieczątką „NEW!”.
-10. Game passy.
+10. Rebirth.
 11. Developer products.
-12. Rebirth + druga maszyna.
-13. Ranking i tablica najrzadszych dropów.
-14. Dopracowanie: opcja „Mniej efektów”, kody promocyjne (np. RELEASE = 10 000 monet), drobne poprawki wyglądu.
+12. Ranking i tablica najrzadszych dropów.
+13. Dopracowanie: opcja „Mniej efektów”, kody promocyjne (np. RELEASE = 10 000 monet), drobne poprawki wyglądu.
 
 ## WERSJA NA START (MVP)
-Na premierę wystarczą: 1 działka na gracza (serwer do 8 graczy), 1 maszyna, 7 rzadkości, 15–20 przedmiotów, 4 ulepszenia, rebirth, wszystkie game passy i zapisywanie. Reszta w aktualizacjach co tydzień.
+Na premierę wystarczą: 1 działka na gracza (serwer do 8 graczy), 1 maszyna, 7 rzadkości, 15–20 przedmiotów, 4 ulepszenia + dekoracje, gablota z Indexem, rebirth, developer products i zapisywanie. Game passy dodamy na końcu (patrz niżej). Reszta w aktualizacjach co tydzień.
 Nie wypuszczaj gry, dopóki drop Legendary+ nie daje prawdziwego „WOW” i gra nie wygląda ładnie na telefonie – to ważniejsze niż dodatkowe funkcje.
+
+## DO DODANIA NA KOŃCU: GAME PASSY (na razie NIE rób)
+Game passy zaprojektujemy razem, gdy gra będzie gotowa. Założenia:
+- Jak w popularnych grach: pierwszy pass ma być bardzo tani, „na zachętę”, np. 2x Luck za ok. 2 Robuxy; kolejne passy coraz droższe i mocniejsze.
+- Teraz tylko przygotuj kod tak, żeby dodanie passów było łatwe: wszystkie mnożniki (Luck, monety, szybkość maszyny) liczone w jednym miejscu (Multipliers), a w ModuleScript Config zostaw pustą sekcję „GamePasses” z komentarzem.
 
 ## JAK MI ODPOWIADAĆ
 - Przy każdym kroku podaj: listę plików, pełny kod każdego pliku (bez „…reszta kodu”), dokładne miejsce w Explorerze i jak przetestować krok w Studio (Play / Test → Device telefon).
