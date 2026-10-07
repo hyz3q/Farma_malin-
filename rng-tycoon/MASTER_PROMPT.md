@@ -20,7 +20,7 @@ Zasady:
 Każdy gracz dostaje własną działkę (tycoon) z JEDNĄ maszyną (Dropper).
 Maszyna co kilka sekund zrzuca na taśmę LOSOWY przedmiot. Każdy przedmiot ma rzadkość.
 Taśma zawozi przedmiot do sprzedaży i gracz dostaje monety. Im rzadszy przedmiot, tym więcej monet.
-Za monety gracz ulepsza maszynę i rozbudowuje bazę. Najlepsze dropy (Secret albo mega mutacja na dobrym przedmiocie) są ogłaszane całemu serwerowi. Gracz zbiera mutacje i rzadkie przedmioty do kolekcji i czeka na wydarzenia serwerowe.
+Za monety gracz ulepsza maszynę i rozbudowuje bazę. Najlepsze dropy (Secret albo mega mutacja na dobrym przedmiocie) są ogłaszane całemu serwerowi. Gracz zbiera mutacje i rzadkie przedmioty do kolekcji, ryzykuje je w fuzji, odkrywa sekretne przepisy i czeka na wydarzenia serwerowe.
 Gra ma być bardzo prosta do zrozumienia w 5 sekund i dawać chwile „O MÓJ BOŻE, SEKRET!”.
 
 ## 2. NAJWAŻNIEJSZE PRIORYTETY
@@ -30,13 +30,14 @@ Gra ma być bardzo prosta do zrozumienia w 5 sekund i dawać chwile „O MÓJ BO
 Jeśli musisz wybierać, lepiej mniej funkcji, ale dopracowany drop i ładny wygląd. Zwykłe dropy mają być krótkie i nienachalne, żeby rzadkie bardziej się wyróżniały.
 
 ## 3. PĘTLA ROZGRYWKI
-1. Maszyna zrzuca przedmiot z efektami z „drabiny efektów” (sekcja 7).
+1. Maszyna zrzuca przedmiot z efektami z „drabiny efektów” (sekcja 8).
 2. Przedmiot jedzie taśmą do sprzedawcy → monety (z efektem +liczba nad przedmiotem).
 3. Gracz kupuje ulepszenia przyciskami na działce (styl klasycznego tycoona: przyciski na ziemi z ceną).
-4. Rzadki drop lub mutacja → efekt świetlny, dźwięk, napis na ekranie; ogłoszenie dla całego serwera tylko przy Secret albo mutacji MEGA na przedmiocie Rare+ (sekcja 7).
-5. Najlepsze przedmioty same trafiają do ekwipunku (ustawienie auto-zachowywania), a gracz może postawić je w gablocie (sekcja 12). Maszyna nigdy się nie zatrzymuje.
-6. Co ok. 12 minut wydarzenie serwerowe zmienia zasady na chwilę (sekcja 6).
-7. Rebirth: reset monet i ulepszeń → stały mnożnik monet. (W aktualizacjach: kolejne rebirthy odblokowują nową, lepszą maszynę z nowymi przedmiotami.)
+4. Rzadki drop lub mutacja → efekt świetlny, dźwięk, napis na ekranie; ogłoszenie dla całego serwera tylko przy Secret albo mutacji MEGA na przedmiocie Rare+ (sekcja 8).
+5. Najlepsze przedmioty same trafiają do ekwipunku (ustawienie auto-zachowywania), a gracz może postawić je w gablocie (sekcja 13). Maszyna nigdy się nie zatrzymuje.
+6. W dowolnym momencie gracz może zaryzykować przedmioty z ekwipunku w fuzji albo spróbować sekretnego przepisu (sekcja 6).
+7. Co ok. 12 minut wydarzenie serwerowe zmienia zasady na chwilę (sekcja 7).
+8. Rebirth: reset monet i ulepszeń → stały mnożnik monet. (W aktualizacjach: kolejne rebirthy odblokowują nową, lepszą maszynę z nowymi przedmiotami.)
 
 ## 4. RZADKOŚCI I LOSOWANIE
 | Rzadkość | Szansa bazowa | Mnożnik wartości | Kolor |
@@ -68,7 +69,42 @@ Każdy drop ma OSOBNE losowanie mutacji (niezależne od rzadkości). Ten sam prz
 - Mutacje są w danych przedmiotu (ekwipunek, gablota, Index – Index pokazuje też, jakie mutacje danego przedmiotu już zdobyłem).
 - Tabelę mutacji trzymaj w osobnym ModuleScript Mutations, żebym mógł łatwo dodawać nowe.
 
-## 6. WYDARZENIA SERWEROWE
+## 6. FUZJA (z ryzykiem) I SEKRETNE PRZEPISY
+Fuzja to drugi, AKTYWNY sposób zdobywania przedmiotów: gracz ryzykuje swoje przedmioty, żeby dostać lepsze. Maszyna dropiąca działa przez cały czas – fuzję robi się z przedmiotów z ekwipunku (sekcja 13), nie trzeba niczego zatrzymywać.
+
+ZWYKŁA FUZJA:
+- Wkładasz od 3 do 10 TAKICH SAMYCH przedmiotów → próba zdobycia 1 losowego przedmiotu o JEDNĄ rzadkość wyższej.
+- Fuzja NIGDY nie ma 100% szansy. Im więcej przedmiotów włożysz, tym większa szansa (gracz sam decyduje, ile ryzykuje).
+- Szanse (wartości startowe w Config; między podanymi liczbami licz liniowo, maks. 95%):
+| Fuzja | 3 przedmioty | 5 przedmiotów | 10 przedmiotów |
+|---|---|---|---|
+| Common → Uncommon | 50% | 65% | 90% |
+| Uncommon → Rare | 40% | 55% | 85% |
+| Rare → Epic | 30% | 45% | 75% |
+| Epic → Legendary | 20% | 35% | 60% |
+| Legendary → Mythic | 10% | 20% | 40% |
+| Mythic → Secret | 2% | 5% | 12% |
+- Gracz ZAWSZE widzi dokładną szansę przed fuzją, np. „Szansa: 62%”, a pasek szansy rośnie na żywo, gdy dokłada przedmioty.
+- PORAŻKA = tracisz WSZYSTKIE włożone przedmioty. Dlatego przed fuzją jest okno potwierdzenia („Ryzykujesz 5× Złota Rybka. Szansa: 45%”), a przy Legendary i wyżej drugie potwierdzenie.
+- Mutacje: jeśli wszystkie włożone przedmioty mają tę samą mutację, wynik ją dziedziczy. Dodatkowo 5% szansy na nową losową mutację.
+- Szansa fuzji nie zależy od Luck (żeby liczba na ekranie była zawsze prawdziwa).
+
+SEKRETNE PRZEPISY:
+- Do fuzji można też włożyć od 2 do 4 RÓŻNYCH przedmiotów. Jeśli to dokładnie pasuje do sekretnego przepisu, powstaje SEKRETNY PRZEDMIOT, którego nie da się wylosować z maszyny (np. Kaczka + Toster + Piorun = „Elektryczna Kaczka”).
+- Przepisów NIE pokazujemy w grze. Gracze odkrywają je sami (to ma być temat filmików: „ODKRYŁEM SEKRETNY PRZEPIS!”).
+- Nieznana kombinacja: zamiast szansy pokaż „Eksperyment – nie wiadomo, co się stanie!”. Zła kombinacja = porażka (przedmioty przepadają, zabawny efekt dymu).
+- Poprawny przepis też nie jest pewny: ma szansę zależną od rzadkości wyniku (jak w tabeli wyżej, kolumna 3 przedmioty). Po odkryciu przepisu gracz widzi go w swojej księdze przepisów razem z dokładną szansą.
+- Podpowiedzi: w Indexie sekretne przedmioty są czarnymi sylwetkami „???” z liczbą składników; codziennie w centrum mapy wisi jedna zagadka-podpowiedź (np. „coś z kuchni + coś, co świeci”).
+- Odkrycie przepisu po raz pierwszy: wielki efekt tylko dla tego gracza (księga się otwiera, strona się zapisuje, fanfary). Ogłoszenie serwerowe tylko według zwykłych zasad (sekcja 8).
+- Przepisy trzymaj w ModuleScript Recipes; nowe przepisy w aktualizacjach co tydzień = nowa zawartość do odkrywania.
+
+ANIMACJA FUZJI (bardzo ważna, zasady ruchu z sekcji 9):
+- Przedmioty wlatują do maszyny jeden po drugim łukiem, maszyna z każdym robi się bardziej napięta (trzęsie się, świeci, rośnie dźwięk).
+- Chwila napięcia: lampki migają na zmianę na zielono i czerwono (wynik jest już wylosowany przez serwer, ale gracz go jeszcze nie zna).
+- Sukces: wybuch światła w kolorze rzadkości, nowy przedmiot wyskakuje łukiem i ląduje z odbiciem + efekty z drabiny efektów.
+- Porażka: maszyna się krztusi, wypuszcza czarny dym i trochę iskier, zabawny smutny dźwięk – ma boleć, ale też trochę śmieszyć.
+
+## 7. WYDARZENIA SERWEROWE
 - Co ok. 12 minut losowe wydarzenie dla całego serwera. Na ekranie stale widać odliczanie „Następne wydarzenie za 4:12” i nazwę, co nadchodzi (żeby czekać i nie wychodzić).
 - Start każdego wydarzenia: dźwięk alarmu, wielki napis, zmiana nieba/światła na czas wydarzenia.
 - Na start 2 wydarzenia:
@@ -76,7 +112,7 @@ Każdy drop ma OSOBNE losowanie mutacji (niezależne od rzadkości). Ten sam prz
   2. ZŁOTA GODZINA (3 min): złote niebo, wszystkie maszyny na serwerze mają 5x większą szansę na mutację Złotą i 2x na mutacje MEGA.
 - Kolejne wydarzenia dodamy w aktualizacjach (np. „Szalona maszyna” – maszyny strzelają 10x szybciej przez minutę). Zrób system tak, żeby dodanie wydarzenia = dopisanie jednego wpisu w ModuleScript Events.
 
-## 7. SATYSFAKCJA Z DROPU – „DRABINA EFEKTÓW”
+## 8. SATYSFAKCJA Z DROPU – „DRABINA EFEKTÓW”
 Każda wyższa rzadkość dokłada coś NOWEGO do efektów niższej (gracz uczy się, że „więcej efektów = lepszy drop”):
 | Rzadkość | Efekty |
 |---|---|
@@ -102,7 +138,7 @@ Zasady:
 - Efekty i dźwięki odtwarzaj po stronie KLIENTA (serwer tylko wysyła: kto, co, jaka rzadkość, jaka mutacja). Efekty cudzych dropów pokazuj słabiej niż własnych (oprócz ogłaszanych).
 - Wydajność na telefonie: limit cząsteczek, efekty sprzątane po 3 s, ustawienie „Mniej efektów” w opcjach.
 
-## 8. FIZYKA I ŚWIAT 3D – KAŻDY RUCH MA BYĆ SATYSFAKCJONUJĄCY
+## 9. FIZYKA I ŚWIAT 3D – KAŻDY RUCH MA BYĆ SATYSFAKCJONUJĄCY
 Zasada: nic nie pojawia się ani nie znika „po prostu”. Każda rzecz w świecie ma wejście, ruch i wyjście z animacją, dźwiękiem i małym efektem. Gracz ma lubić samo patrzenie na swoją działkę, nawet gdy nic nie klika.
 
 WYPADANIE PRZEDMIOTU Z DROPPERA (najważniejsza animacja w grze – widać ją setki razy):
@@ -142,7 +178,7 @@ TECHNICZNIE:
 - Nie używaj prawdziwej fizyki Robloxa dla przedmiotów na taśmie (setki luźnych części = lagi i dziwne zachowania). Prawdziwą fizykę możesz użyć tylko do pojedynczych efektów, np. rozsypujących się monet przy Mythic/Secret, i usuwaj je po kilku sekundach.
 - Serwer decyduje tylko CO wypadło i KIEDY; wygląd ruchu to praca klienta.
 
-## 9. GRAFIKA I WYGLĄD
+## 10. GRAFIKA I WYGLĄD
 Styl: „odświeżony klasyczny Roblox” – taki jak w Steal an Egg, Steal a Brainrot czy Grow a Garden.
 CAŁA gra jest z klocków ze studsami: świat, maszyna, przedmioty z droppera, zwierzaki i postacie. Jeden spójny styl, jak stary Roblox / LEGO, ale w jaskrawych kolorach i jasnym świetle.
 
@@ -179,48 +215,48 @@ MODELE:
 - Mam gotowy sposób na robienie postaci z klocków ze studsami (skrypty, które budują model z Partów prosto w Roblox Studio – tak powstało 20 żab). Jeśli potrzebujesz modeli przedmiotów lub zwierzaków, opisz mi, co ma być (kształt, kolory, rozmiar w studach), a ja je przygotuję; do tego czasu używaj prostych Partów jako tymczasowych.
 - Gotowe żaby z klocków mogą być np. maskotką na środku mapy albo przedmiotami Secret.
 
-## 10. STYL GRAFICZNY – PODSUMOWANIE
+## 11. STYL GRAFICZNY – PODSUMOWANIE
 Wszystko z klocków ze studsami (świat, maszyna, przedmioty, zwierzaki) + szachownica z dwóch odcieni + jaskrawe kolory + jasne słoneczne światło (jak Steal an Egg / Grow a Garden). Przedmioty i zwierzaki wyróżniają się kolorem i efektami. Duże, grube przyciski z czarnym obrysem i cieniem. Czcionka Lilita One / Fredoka. Rzadkości wyraźnie różnią się kolorem, poświatą i dźwiękiem. Secret ma tęczową poświatę, wstrząs ekranu i wyjątkowy dźwięk.
 
-## 11. ULEPSZENIA MASZYNY (kupowane za monety, ceny rosną wykładniczo)
+## 12. ULEPSZENIA MASZYNY (kupowane za monety, ceny rosną wykładniczo)
 - Szybkość dropu (np. co 4 s → co 1 s)
 - Szczęście (+10% Luck za poziom)
 - Wartość przedmiotów (+%)
 - Szybkość taśmy
 - Dodatkowe dekoracje bazy (tylko wygląd, ale fajne do pokazania)
 
-## 12. GABLOTA I EKWIPUNEK (kolekcja)
+## 13. GABLOTA I EKWIPUNEK (kolekcja)
 - Maszyna NIGDY się nie zatrzymuje i gracz nie musi niczego klikać przy dropie. Domyślnie wszystko jedzie taśmą do sprzedaży.
 - Ustawienie „Automatycznie zachowuj”: przedmioty od wybranej rzadkości (np. Epic+) albo z mutacją same trafiają do ekwipunku zamiast do sprzedaży (krótka animacja: przedmiot zjeżdża z taśmy do skrzyni obok). Ekwipunek: 50 miejsc na start.
-- Z ekwipunku można w każdej chwili sprzedać przedmiot albo postawić go w gablocie.
+- Z ekwipunku można w każdej chwili sprzedać przedmiot, postawić go w gablocie albo użyć w fuzji (sekcja 6).
 Gracz może zachować rzadki przedmiot zamiast go sprzedać i postawić na podeście w bazie. Na start 3 podesty; kolejne odblokowuje się za monety i rebirthy.
 Każdy przedmiot w gablocie daje mały stały bonus do monet. Index (kolekcja) pokazuje wszystkie przedmioty i które już zdobyłem — to ma motywować do „zebrania wszystkich”.
 
-## 13. DEVELOPER PRODUCTS (kupowane wielokrotnie)
+## 14. DEVELOPER PRODUCTS (kupowane wielokrotnie)
 - Boost szczęścia x2 na 15 minut
 - Paczka monet (mała / średnia / duża, skalowana do postępu gracza)
 - „Natychmiastowy drop Legendary+” (gwarantowany Legendary albo lepszy)
 Obsłuż je przez MarketplaceService.ProcessReceipt POPRAWNIE: zapisz zakup w DataStore przed zwróceniem PurchaseGranted, nie dawaj nagrody dwa razy.
 
-## 14. SPOŁECZNE
+## 15. SPOŁECZNE
 - +10% monet za każdego znajomego na serwerze (mam już skrypt BonusZnajomi — użyj atrybutu gracza „MnoznikZnajomi”).
-- Ogłoszenia na cały serwer tylko przy Secret albo mutacji MEGA na przedmiocie Rare+ (sekcja 7).
+- Ogłoszenia na cały serwer tylko przy Secret albo mutacji MEGA na przedmiocie Rare+ (sekcja 8).
 - Ranking (leaderstats): Monety, Rebirths, Najrzadszy drop.
 - Globalna tablica „Najrzadsze dropy dzisiaj” na spawnie.
 
-## 15. ZASADY TECHNICZNE (bardzo ważne)
+## 16. ZASADY TECHNICZNE (bardzo ważne)
 1. SERWER decyduje o wszystkim: losowanie (Random.new()), monety, zakupy, ulepszenia. Klient tylko pokazuje efekty i wysyła prośby („chcę kupić ulepszenie X”). Serwer zawsze sprawdza, czy gracz ma pieniądze i czy prośba ma sens. Nigdy nie ufaj wartościom od klienta.
-2. Zapisywanie: DataStoreService z pcall i ponawianiem, UpdateAsync, autozapis co 2 minuty, zapis przy wyjściu gracza i w game:BindToClose. Wersjonuj dane (pole „wersja”), żeby przyszłe aktualizacje nie psuły zapisów. Zapisuj: monety, ulepszenia, rebirthy, ekwipunek (przedmioty z mutacjami), przedmioty w gablocie, Index (zdobyte przedmioty i mutacje), ustawienia auto-zachowywania, licznik pity, najrzadszy drop, kupione produkty.
-3. Wydajność: maks. ok. 30 przedmiotów na taśmie na gracza; stare usuwaj. Przedmioty to małe modele z klocków (najlepiej do ok. 15 Partów każdy, trzymane jako gotowe szablony w ReplicatedStorage i klonowane), animowane po stronie klienta (sekcja 8), a serwer liczy tylko czas dojazdu.
+2. Zapisywanie: DataStoreService z pcall i ponawianiem, UpdateAsync, autozapis co 2 minuty, zapis przy wyjściu gracza i w game:BindToClose. Wersjonuj dane (pole „wersja”), żeby przyszłe aktualizacje nie psuły zapisów. Zapisuj: monety, ulepszenia, rebirthy, ekwipunek (przedmioty z mutacjami), przedmioty w gablocie, Index (zdobyte przedmioty i mutacje), odkryte przepisy, ustawienia auto-zachowywania, licznik pity, najrzadszy drop, kupione produkty.
+3. Wydajność: maks. ok. 30 przedmiotów na taśmie na gracza; stare usuwaj. Przedmioty to małe modele z klocków (najlepiej do ok. 15 Partów każdy, trzymane jako gotowe szablony w ReplicatedStorage i klonowane), animowane po stronie klienta (sekcja 9), a serwer liczy tylko czas dojazdu.
 4. UI: WSZYSTKO w Scale (procentach), nie w Offset, z UIAspectRatioConstraint dla ikon i TextScaled + UITextSizeConstraint dla tekstów. Gra musi wyglądać dobrze na TELEFONIE. Nie kładź przycisków w lewym dolnym rogu (joystick) ani w prawym dolnym (skok).
-5. Kod modularny: ModuleScripty Config, Rarities, Items, DataManager, DropperManager, ConveyorManager, UpgradeManager, Multipliers, ProductManager, EffectsManager, Mutations, InventoryManager, Events, EventManager, RebirthManager, AnnouncementManager, CollectionManager + jeden RemoteEvents folder w ReplicatedStorage.
+5. Kod modularny: ModuleScripty Config, Rarities, Items, DataManager, DropperManager, ConveyorManager, UpgradeManager, Multipliers, ProductManager, EffectsManager, Mutations, InventoryManager, FusionManager, Recipes, Events, EventManager, RebirthManager, AnnouncementManager, CollectionManager + jeden RemoteEvents folder w ReplicatedStorage.
 6. Każdy plik zaczyna się komentarzem: co robi i gdzie leży. Komentarze po polsku.
 
-## 16. WERSJA NA START (MVP)
-Na premierę wystarczą: 1 działka na gracza (serwer do 8 graczy), 1 maszyna, 7 rzadkości, 5 mutacji, 15–20 przedmiotów, ekwipunek z auto-zachowywaniem, 2 wydarzenia serwerowe, 4 ulepszenia + dekoracje, gablota z Indexem, rebirth, developer products i zapisywanie. Game passy dodamy na końcu (sekcja 17). Reszta w aktualizacjach co tydzień.
+## 17. WERSJA NA START (MVP)
+Na premierę wystarczą: 1 działka na gracza (serwer do 8 graczy), 1 maszyna, 7 rzadkości, 5 mutacji, 15–20 przedmiotów, ekwipunek z auto-zachowywaniem, fuzja z ryzykiem, 5–8 sekretnych przepisów, 2 wydarzenia serwerowe, 4 ulepszenia + dekoracje, gablota z Indexem, rebirth, developer products i zapisywanie. Game passy dodamy na końcu (sekcja 18). Reszta w aktualizacjach co tydzień.
 Nie wypuszczaj gry, dopóki drop Legendary+ nie daje prawdziwego „WOW” i gra nie wygląda ładnie na telefonie – to ważniejsze niż dodatkowe funkcje.
 
-## 17. GAME PASSY – DO DODANIA NA KOŃCU (na razie NIE rób)
+## 18. GAME PASSY – DO DODANIA NA KOŃCU (na razie NIE rób)
 Game passy zaprojektujemy razem, gdy gra będzie gotowa. Założenia:
 - Jak w popularnych grach: pierwszy pass ma być bardzo tani, „na zachętę”, np. 2x Luck za ok. 2 Robuxy; kolejne passy coraz droższe i mocniejsze.
 - Teraz tylko przygotuj kod tak, żeby dodanie passów było łatwe: wszystkie mnożniki (Luck, monety, szybkość maszyny) liczone w jednym miejscu (Multipliers), a w ModuleScript Config zostaw pustą sekcję „GamePasses” z komentarzem.
@@ -234,8 +270,8 @@ Każdy krok ma: CEL, CO ZROBIĆ i GOTOWE, GDY (jak sprawdzę, że działa). Nume
 ## KROK 1: Świat, oświetlenie i działki
 CEL: Zbuduj wygląd świata i działki graczy.
 CO ZROBIĆ:
-- Ustawienia Lighting, Atmosphere, Bloom, ColorCorrection i niebo (brief: 9 – Oświetlenie) z dokładnymi wartościami.
-- Mapa w stylu z briefu (9, 10): działki-pasy po bokach oddzielone ścianami w szachownicę ze studsami, kolorowe centrum na środku (na razie proste).
+- Ustawienia Lighting, Atmosphere, Bloom, ColorCorrection i niebo (brief: 10 – Oświetlenie) z dokładnymi wartościami.
+- Mapa w stylu z briefu (10, 11): działki-pasy po bokach oddzielone ścianami w szachownicę ze studsami, kolorowe centrum na środku (na razie proste).
 - Skrypt, który przypisuje wolną działkę graczowi po wejściu i zwalnia ją po wyjściu; gracz pojawia się na swojej działce.
 - ModuleScript Config z podstawowymi ustawieniami (na razie mało, będzie rosnąć).
 GOTOWE, GDY: wchodzę do gry, stoję na swojej działce, świat jest jasny, kolorowy i w stylu klocków ze studsami; drugi gracz (Test → 2 gracze) dostaje inną działkę.
@@ -243,16 +279,16 @@ GOTOWE, GDY: wchodzę do gry, stoję na swojej działce, świat jest jasny, kolo
 ## KROK 2: Maszyna i wypadanie przedmiotów
 CEL: Najważniejsza animacja w grze – ma być przyjemna do oglądania.
 CO ZROBIĆ:
-- Klockowa maszyna (Dropper) na działce z animacją pracy (brief: 8 – Świat żyje, 9 – Maszyna i działka).
-- Co X sekund serwer decyduje o dropie, a klient pokazuje PEŁNĄ animację wypadania: przygotowanie, wystrzał łukiem, lądowanie z odbiciem (brief: 8 – Wypadanie przedmiotu).
+- Klockowa maszyna (Dropper) na działce z animacją pracy (brief: 9 – Świat żyje, 10 – Maszyna i działka).
+- Co X sekund serwer decyduje o dropie, a klient pokazuje PEŁNĄ animację wypadania: przygotowanie, wystrzał łukiem, lądowanie z odbiciem (brief: 9 – Wypadanie przedmiotu).
 - Na razie jeden rodzaj przedmiotu (prosty klockowy model), bez rzadkości.
 GOTOWE, GDY: patrzę na maszynę przez minutę i to jest przyjemne; żadne dwa dropy nie wyglądają identycznie; nic nie laguje.
 
 ## KROK 3: Taśma, sprzedawanie i monety
 CEL: Przedmiot zamienia się w pieniądze w satysfakcjonujący sposób.
 CO ZROBIĆ:
-- Taśma z widocznym ruchem; przedmioty jadą po niej, kołyszą się (brief: 8 – Taśma).
-- „Zjadacz” (piec/skarbonka) wciągający przedmioty z animacją (brief: 8 – Sprzedawanie).
+- Taśma z widocznym ruchem; przedmioty jadą po niej, kołyszą się (brief: 9 – Taśma).
+- „Zjadacz” (piec/skarbonka) wciągający przedmioty z animacją (brief: 9 – Sprzedawanie).
 - leaderstats Monety; serwer dodaje monety po dojechaniu przedmiotu (serwer liczy czas dojazdu).
 - Monety wylatują z przedmiotu i lecą do licznika na górze ekranu.
 GOTOWE, GDY: przedmioty same jadą i się sprzedają, monety rosną, licznik ładnie reaguje; maks. ok. 30 przedmiotów na taśmie.
@@ -279,24 +315,24 @@ GOTOWE, GDY: każda mutacja jest od razu rozpoznawalna wzrokiem na każdym przed
 ## KROK 6: Drabina efektów i ogłoszenia
 CEL: Rzadki drop daje „WOW”. Ten krok dopracowujemy, aż będzie naprawdę satysfakcjonujący.
 CO ZROBIĆ:
-- EffectsManager z jedną tabelą ustawień na rzadkość i na mutację (brief: 5, 7).
+- EffectsManager z jedną tabelą ustawień na rzadkość i na mutację (brief: 5, 8).
 - Wszystkie efekty z drabiny: dźwięki, cząsteczki, światło, kamera, napisy, napięcie przed Legendary+ (tylko gdy naprawdę wypadło), szansa „1 na X”; efekt „MUTACJA!”.
-- Ogłoszenia serwerowe TYLKO przy Secret albo mutacji MEGA na przedmiocie Rare+ (brief: 7), ze słupem światła nad działką.
+- Ogłoszenia serwerowe TYLKO przy Secret albo mutacji MEGA na przedmiocie Rare+ (brief: 8), ze słupem światła nad działką.
 - Pasek pity „Gwarantowany Legendary za: X dropów” i sama gwarancja po stronie serwera.
 GOTOWE, GDY: bez czytania napisów wiem, jak dobry był drop; Legendary+ i mutacje MEGA robią wrażenie; ogłoszenia pojawiają się tylko w opisanych sytuacjach; na telefonie nie laguje.
 
 ## KROK 7: Zapisywanie danych
 CEL: Postęp się nie gubi.
 CO ZROBIĆ:
-- DataManager zgodny z briefem (15 – punkt 2): pcall, ponawianie, UpdateAsync, autozapis, BindToClose, pole „wersja”.
+- DataManager zgodny z briefem (16 – punkt 2): pcall, ponawianie, UpdateAsync, autozapis, BindToClose, pole „wersja”.
 - Zapis wszystkich danych z listy w briefie (te, które już istnieją; resztę dodamy w kolejnych krokach).
 GOTOWE, GDY: wychodzę i wracam (w Studio z włączonym dostępem do API) – monety i licznik pity są takie same; w Output nie ma błędów zapisu.
 
 ## KROK 8: Ulepszenia i budowanie działki
 CEL: Gracz widzi swój postęp.
 CO ZROBIĆ:
-- Przyciski na ziemi z ceną, które zapadają się pod graczem (brief: 8 – Przyciski tycoona).
-- 4 ulepszenia + dekoracje z briefu (11); ceny rosną wykładniczo; serwer sprawdza pieniądze.
+- Przyciski na ziemi z ceną, które zapadają się pod graczem (brief: 9 – Przyciski tycoona).
+- 4 ulepszenia + dekoracje z briefu (12); ceny rosną wykładniczo; serwer sprawdza pieniądze.
 - Kupione rzeczy wyrastają z ziemi lub spadają z nieba; maszyna zmienia wygląd po ulepszeniu.
 - Poziomy ulepszeń zapisywane w danych.
 GOTOWE, GDY: kupuję ulepszenie, widzę i słyszę efekt, maszyna działa szybciej/lepiej; po powrocie do gry ulepszenia zostają.
@@ -305,58 +341,68 @@ GOTOWE, GDY: kupuję ulepszenie, widzę i słyszę efekt, maszyna działa szybci
 CEL: Czytelny i ładny ekran, także na telefonie.
 CO ZROBIĆ:
 - Licznik monet, aktualny Luck, pasek pity, odliczanie do wydarzenia (na razie atrapa), przycisk sklepu/ulepszeń, okno ulepszeń, ustawienia (na razie: „Mniej efektów”).
-- Styl z briefu (9 – UI); wszystko w Scale, animacje przycisków i okien (brief: 15 – punkt 4).
+- Styl z briefu (10 – UI); wszystko w Scale, animacje przycisków i okien (brief: 16 – punkt 4).
 GOTOWE, GDY: w Test → Device na telefonie nic nie wychodzi poza ekran, nic nie zasłania joysticka ani skoku, przyciski są duże.
 
 ## KROK 10: Ekwipunek, gablota i Index
 CEL: Powód, żeby zbierać, a nie tylko sprzedawać – bez przerywania pracy maszyny.
 CO ZROBIĆ:
-- Ekwipunek na 50 przedmiotów z ustawieniem „Automatycznie zachowuj” (od rzadkości / z mutacją) – bez klikania przy dropie, maszyna nigdy nie stoi (brief: 12).
-- Gablota: 3 podesty na start, kolejne za monety; bonus do monet z gabloty przez Multipliers (brief: 12).
+- Ekwipunek na 50 przedmiotów z ustawieniem „Automatycznie zachowuj” (od rzadkości / z mutacją) – bez klikania przy dropie, maszyna nigdy nie stoi (brief: 13).
+- Gablota: 3 podesty na start, kolejne za monety; bonus do monet z gabloty przez Multipliers (brief: 13).
 - Okno Index ze wszystkimi przedmiotami i zdobytymi mutacjami, pieczątka „NEW!”, licznik „Index X/Y”.
 - Zapis ekwipunku, gabloty i Indexu.
 GOTOWE, GDY: zachowuję przedmioty, stawiam rzadki w gablocie i dostaję bonus, Index pokazuje, co mam; wszystko zostaje po powrocie.
 
-## KROK 11: Wydarzenia serwerowe
+## KROK 11: Fuzja i sekretne przepisy
+CEL: Aktywny, emocjonujący sposób na lepsze przedmioty – z prawdziwym ryzykiem.
+CO ZROBIĆ:
+- Maszyna do fuzji na działce i okno wyboru 3–10 takich samych przedmiotów z ekwipunku; pasek szansy rosnący na żywo i dokładny procent (brief: 6).
+- Okno potwierdzenia (drugie przy Legendary+); porażka = utrata wszystkich włożonych przedmiotów; dziedziczenie mutacji i 5% na nową. Wszystko liczy serwer: najpierw zabiera przedmioty, potem losuje, potem zapisuje.
+- Sekretne przepisy (ModuleScript Recipes, 5–8 przepisów na start), napis „Eksperyment” przy nieznanych kombinacjach, księga przepisów, sylwetki „???” w Indexie, codzienna podpowiedź w centrum mapy.
+- Animacja fuzji: sukces i porażka (brief: 6 – Animacja fuzji).
+- W Studio komenda testowa dająca przedmioty do testów fuzji.
+GOTOWE, GDY: widzę dokładną szansę przed fuzją, sukces i porażka działają zgodnie z tabelą, animacja trzyma w napięciu, odkryty przepis zapisuje się w księdze i zostaje po powrocie do gry.
+
+## KROK 12: Wydarzenia serwerowe
 CEL: Na co czekać i po co zostać w grze.
 CO ZROBIĆ:
-- EventManager + ModuleScript Events; losowe wydarzenie co ok. 12 min, odliczanie w UI z nazwą nadchodzącego wydarzenia (brief: 6).
+- EventManager + ModuleScript Events; losowe wydarzenie co ok. 12 min, odliczanie w UI z nazwą nadchodzącego wydarzenia (brief: 7).
 - Deszcz meteorów: spadające meteoryty z przedmiotami na całej mapie, zbieranie przez dotknięcie, serwer sprawdza odległość i kto pierwszy.
 - Złota godzina: zmiana nieba i większe szanse na mutacje dla wszystkich.
 - W Studio komenda testowa do natychmiastowego uruchomienia wydarzenia.
 GOTOWE, GDY: wydarzenia startują same, wszyscy na serwerze je widzą, zmienia się niebo i zasady, a po czasie wszystko wraca do normy.
 
-## KROK 12: Rebirth
+## KROK 13: Rebirth
 CEL: Długi cel dla gracza.
 CO ZROBIĆ:
 - Przycisk/okno rebirtha z ceną; reset monet i ulepszeń (ekwipunek, gablota i Index zostają), stały mnożnik monet (brief: 3).
 - Efektowna animacja rebirtha; zapis liczby rebirthów.
 GOTOWE, GDY: robię rebirth, zaczynam od nowa z większym mnożnikiem, kolekcja zostaje, liczba rebirthów się zapisuje.
 
-## KROK 13: Developer products
+## KROK 14: Developer products
 CEL: Pierwsze zarabianie.
 CO ZROBIĆ:
-- Produkty z briefu (13) z poprawnym ProcessReceipt (zapis przed PurchaseGranted, bez podwójnych nagród).
+- Produkty z briefu (14) z poprawnym ProcessReceipt (zapis przed PurchaseGranted, bez podwójnych nagród).
 - Boost szczęścia z widocznym odliczaniem na ekranie (doliczany w Multipliers).
 - ID produktów w Config (zera + komentarze, wpiszę sam).
 GOTOWE, GDY: testowy zakup w Studio działa, nagroda przychodzi raz, boost się kończy po czasie.
 
-## KROK 14: Społeczne i ranking
+## KROK 15: Społeczne i ranking
 CEL: Gracze widzą się nawzajem i rywalizują.
 CO ZROBIĆ:
-- Bonus za znajomych z mojego skryptu (atrybut „MnoznikZnajomi”, doliczany w Multipliers) – brief: 14.
+- Bonus za znajomych z mojego skryptu (atrybut „MnoznikZnajomi”, doliczany w Multipliers) – brief: 15.
 - leaderstats: Monety, Rebirths, Najrzadszy drop.
 - Tablica „Najlepsze dropy dzisiaj” w centrum mapy (uwzględnia mutacje).
 GOTOWE, GDY: ranking i tablica pokazują poprawne dane; bonus za znajomych zmienia ilość monet.
 
-## KROK 15: Dopracowanie przed premierą
+## KROK 16: Dopracowanie przed premierą
 CEL: Gra gotowa do wypuszczenia.
 CO ZROBIĆ:
 - Działająca opcja „Mniej efektów”.
 - Kody promocyjne (np. RELEASE = 10 000 monet), każdy do użycia raz na gracza.
 - Przegląd wyglądu i wydajności na telefonie; poprawki znalezionych problemów.
-- Lista kontrolna z briefu (16 – MVP): czy wszystko jest i czy drop Legendary+ oraz mutacje MEGA dają „WOW”.
-GOTOWE, GDY: wszystko z MVP działa, gra dobrze wygląda i chodzi na telefonie – można publikować. Game passy robimy dopiero po tym (brief: 17).
+- Lista kontrolna z briefu (17 – MVP): czy wszystko jest i czy drop Legendary+ oraz mutacje MEGA dają „WOW”.
+GOTOWE, GDY: wszystko z MVP działa, gra dobrze wygląda i chodzi na telefonie – można publikować. Game passy robimy dopiero po tym (brief: 18).
 
 ## JAK MI ODPOWIADAĆ (przy każdym kroku)
 - Przy każdym kroku podaj: listę plików, pełny kod każdego pliku (bez „…reszta kodu”), dokładne miejsce w Explorerze i jak przetestować krok w Studio (Play / Test → Device telefon).
