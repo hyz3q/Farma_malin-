@@ -4,6 +4,7 @@ import { PromoTikTok } from "./PromoTikTok";
 import { Motywacja } from "./Motywacja";
 import { TelefonVsCele } from "./TelefonVsCele";
 import { Iskra } from "./Iskra";
+import { Iskra3D } from "./Iskra3D";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -51,6 +52,14 @@ export const RemotionRoot: React.FC = () => {
         id="Iskra"
         component={Iskra}
         durationInFrames={360} // 12 s przy 30 fps – płynny ruch jak w filmowym motion designie
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="Iskra3D"
+        component={Iskra3D}
+        durationInFrames={360} // 12 s, ta sama historia i dźwięk co Iskra, ale prawdziwe 3D (Three.js)
         fps={30}
         width={1080}
         height={1920}
