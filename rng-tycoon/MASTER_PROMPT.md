@@ -6,7 +6,7 @@ Ten prompt ma dwie części:
 - CZĘŚĆ 2 – KROKI: budujemy grę po kolei, krok po kroku.
 
 Zasady:
-1. Teraz przeczytaj CAŁY brief (od sekcji 0, 0B i 0C – zasad dobrych gier Roblox, budowania i mapy projektu, które obowiązują w każdym kroku) i NIE pisz jeszcze kodu.
+1. Teraz przeczytaj CAŁY brief (od sekcji 0, 0B, 0C i 0D – zasad dobrych gier Roblox, budowania, mapy projektu i sprawdzania budowli, które obowiązują w każdym kroku) i NIE pisz jeszcze kodu.
 2. Odpowiedz krótkim podsumowaniem (5–8 zdań), jak rozumiesz grę, i zadaj pytania, jeśli coś jest niejasne.
 3. Potem czekaj, aż napiszę „zaczynaj krok 1”.
 4. Rób tylko JEDEN krok naraz. Po każdym kroku czekaj, aż przetestuję i napiszę „działa” albo opiszę problem.
@@ -172,6 +172,23 @@ REMOTES – KLIENT → SERWER (każdy przez RemoteGuard: sprawdź typy, wartośc
 - RedeemCode(kod) – RemoteFunction zwracająca wynik
 - DebugCommand(...) – działa TYLKO w Studio (RunService:IsStudio()), na serwerze opublikowanej gry ignorowane
 Zakupy za Robuxy idą przez MarketplaceService (bez własnych Remotes), a przyciski tycoona przez dotknięcie po stronie serwera.
+
+## 0D. JAK „WIDZIEĆ” SWOJE BUDOWLE
+Budujesz kodem i zwykle nie widzisz efektu. Używaj tych sposobów, od najprostszego:
+
+1. PLAN PRZED BUDOWANIEM: zanim napiszesz skrypt budujący, pokaż plan z góry jako prosty rysunek z liter (ASCII, 1 znak = 2 study, z legendą) i tabelę głównych brył (nazwa, rozmiar, pozycja, kolor). Poczekaj na moje „ok”. Poprawka na planie jest dużo łatwiejsza niż w gotowej budowli.
+
+2. BUDOWLE JAKO DANE: w skryptach budujących opisuj klocki w tabeli danych (nazwa, rozmiar, pozycja względem środka budowli, kolor, materiał, obrót), a jedna funkcja tworzy z niej klocki. Dzięki temu łatwo poprawiać liczby, a ten sam opis można pokazać w podglądzie (punkt 5).
+
+3. MOJE NARZĘDZIA W STUDIO (mam je gotowe, poproś mnie o ich wynik):
+   - InspektorBudowli – zaznaczam budowlę, uruchamiam w Command Bar i wklejam Ci raport: liczba klocków, rozmiar całości w porównaniu z postacią, klocki niezakotwiczone, poza siatką, bardzo małe, bez nazwy, wiszące w powietrzu / ze szczeliną, duplikaty (migotanie), lista kolorów z procentami. Po każdej budowli poproś o ten raport i popraw wszystkie ostrzeżenia.
+   - KameraPodglad – ustawia kamerę na 5 stałych widoków (przód, bok, góra, 3/4, tył). Gdy chcesz zobaczyć budowlę, poproś o zrzuty ekranu z konkretnych widoków, np. „wyślij widok 1 i 4 maszyny”.
+
+4. ZRZUTY EKRANU: gdy dostaniesz ode mnie zrzut ekranu, opisz najpierw, co widzisz (proporcje, kolory, co odstaje od stylu z sekcji 10 i zasad z 0B), dopiero potem poprawiaj. Porównuj z obrazkami-wzorami, jeśli je wkleiłem.
+
+5. JEŚLI MASZ WIĘCEJ MOŻLIWOŚCI: jeśli możesz uruchamiać kod i oglądać obrazy (np. pracujesz w środowisku z dostępem do plików i przeglądarki), zrób własny podgląd budowli z tych samych danych (punkt 2) – np. prosta strona z three.js albo render w Blenderze – obejrzyj go z kilku stron i popraw, zanim dasz mi skrypt. Jeśli jesteś połączony z Roblox Studio (serwer MCP albo sterowanie komputerem), sam uruchamiaj inspektora i rób zrzuty ekranu.
+
+6. LICZBY ZAMIAST OCZU: po zbudowaniu sprawdź w kodzie proste rzeczy, które da się policzyć: czy wysokość drzwi ≥ 8, czy ścieżka ≥ 8 szerokości, czy maszyna jest 12–16 wysoka, czy nic nie wchodzi w ścieżkę, czy budowla mieści się na działce. Wypisz wynik tych sprawdzeń w Output.
 
 ## 1. POMYSŁ GRY
 Każdy gracz dostaje własną działkę (tycoon) z JEDNĄ maszyną (Dropper).
@@ -571,7 +588,7 @@ GOTOWE, GDY: wszystko z MVP działa, gra dobrze wygląda i chodzi na telefonie �
 
 ## JAK MI ODPOWIADAĆ (przy każdym kroku)
 - Przy każdym kroku sprawdź go z sekcjami 0, 0B i 0C (zasady dobrych gier, budowania i mapa projektu) i krótko napisz, czego z nich pilnowałeś.
-- Przy krokach z budowaniem opisz, co powinienem zobaczyć w Studio, i poproś o zrzut ekranu z kilku stron, żeby poprawić wygląd.
+- Przy krokach z budowaniem: najpierw plan z góry (sekcja 0D, punkt 1), potem skrypt; po zbudowaniu opisz, co powinienem zobaczyć, poproś o raport z InspektorBudowli i zrzuty z wybranych widoków KameraPodglad, i popraw znalezione problemy.
 - Na koniec każdego kroku podaj zaktualizowany PROGRESS.md.
 - Przy każdym kroku podaj: listę plików, pełny kod każdego pliku (bez „…reszta kodu”), dokładne miejsce w Explorerze i jak przetestować krok w Studio (Play / Test → Device telefon).
 - Jeśli coś wymaga zrobienia ręcznie w Studio (np. stworzenie Partu), opisz to krok po kroku.
