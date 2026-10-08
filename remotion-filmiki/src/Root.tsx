@@ -5,6 +5,7 @@ import { Motywacja } from "./Motywacja";
 import { TelefonVsCele } from "./TelefonVsCele";
 import { Iskra } from "./Iskra";
 import { Iskra3D } from "./Iskra3D";
+import { Reel } from "./Reel";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -60,6 +61,14 @@ export const RemotionRoot: React.FC = () => {
         id="Iskra3D"
         component={Iskra3D}
         durationInFrames={360} // 12 s, ta sama historia i dźwięk co Iskra, ale prawdziwe 3D (Three.js)
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="Reel"
+        component={Reel}
+        durationInFrames={720} // 24 s – showreel: 8 technik, 120 BPM
         fps={30}
         width={1080}
         height={1920}
