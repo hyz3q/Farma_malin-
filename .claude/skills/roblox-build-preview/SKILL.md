@@ -56,13 +56,14 @@ Pola klocka:
 - `allowFloating: true` – dla rzeczy, które celowo wiszą w powietrzu (lampy, chmurki), żeby raport nie ostrzegał.
 Pola budowli:
 - `expect` – oczekiwane wymiary całości, np. `"height": [12, 16]`, `"width": [..]`, `"depth": [..]`; raport ostrzeże, jeśli wyjdą poza zakres.
-- `checks` – progi: `maxParts` (500), `grid` (0.5), `minSize` (0.2), `gapWarn` (0.25).
+- `checks` – progi: `maxParts` (500), `grid` (0.5), `minSize` (0.2), `gapWarn` (0.25), `maxNeonPartVolume` (2), `maxNeonParts` (6).
 
 ## Co sprawdza raport
 - liczba klocków vs limit; rozmiar całości i wysokość w „wysokościach gracza”; zgodność z `expect`,
 - klocki poza siatką, bardzo małe, bez nazwy,
 - duplikaty w tym samym miejscu, migotanie (z-fighting) wspólnych ścian o różnych kolorach,
 - małe szczeliny między klockami, klocki wiszące w powietrzu,
+- świecące klocki (Neon): ostrzeżenie przy dużych (objętość > 2) albo zbyt wielu (> 6) – mapy NIE oświetlamy świecącymi rzeczami; świecą tylko rzadkie dropy, efekty i małe lampki-wskaźniki,
 - kolory z udziałem procentowym (zasada 60/30/10) i zbyt wiele kolorów.
 
 ## Ograniczenia (powiedz o nich użytkownikowi, jeśli mają znaczenie)

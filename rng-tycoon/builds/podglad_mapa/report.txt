@@ -1,16 +1,16 @@
 ===== RAPORT: Mapa_Test =====
-Klocków: 1223 (limit 2500)
-Rozmiar całości: 226.5 x 55.0 x 351.0 (szer. X × wys. Y × głęb. Z)
+Klocków: 1649 (limit 3000)
+Rozmiar całości: 306.0 x 55.0 x 530.0 (szer. X × wys. Y × głęb. Z)
 Wysokość = 11.0 wysokości gracza (gracz ≈ 5 studów)
-Kolory: 38 różnych. Udział (wg objętości):
-    #E8954A   26.0%  (137 klocków)
-    #D9803A   25.8%  (121 klocków)
-    #6CC24A   10.8%  (96 klocków)
-    #5DB23F   10.8%  (96 klocków)
-    #F2D98A    2.9%  (31 klocków)
-    #7EDB55    2.6%  (22 klocków)
-    #9B6BF2    2.4%  (35 klocków)
-    #8ED46A    1.7%  (15 klocków)
-  ℹ Żaden kolor nie dominuje (<35%) – zasada 60/30/10 sugeruje jeden kolor główny
+Świecące klocki (Neon): 16
+Kolory: 44 różnych. Udział (wg objętości):
+    #E8954A   36.0%  (165 klocków)
+    #D9803A   35.8%  (149 klocków)
+    #7EDB55    6.0%  (38 klocków)
+    #6CC24A    5.9%  (192 klocków)
+    #5DB23F    5.9%  (192 klocków)
+    #4FB83A    1.8%  (86 klocków)
+    #F2D98A    1.5%  (35 klocków)
+    #E6C873    0.9%  (42 klocków)
   ℹ Ponad 10 kolorów – sprawdź, czy budowla nie jest zbyt pstrokata
 Ostrzeżeń: 0

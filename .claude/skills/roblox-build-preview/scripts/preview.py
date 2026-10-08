@@ -145,7 +145,7 @@ def load(path):
 
 # ---------------------------------------------------------------- sprawdzanie
 def check(data, parts, errors):
-    cfg = {"maxParts": 500, "grid": 0.5, "minSize": 0.2, "gapWarn": 0.25}
+    cfg = {"maxParts": 500, "grid": 0.5, "minSize": 0.2, "gapWarn": 0.25, "maxNeonPartVolume": 2.0, "maxNeonParts": 6}
     cfg.update(data.get("checks", {}))
     L, warn_count = [], 0
 
@@ -238,6 +238,16 @@ def check(data, parts, errors):
     for i, ok in touching.items():
         if not ok and not parts[i]["allowFloating"]:
             w(f"{parts[i]['name']}: niczego nie dotyka (wisi w powietrzu). Jeśli to celowe, dodaj \"allowFloating\": true")
+
+    # świecące klocki (zasada stylu: nie oświetlamy mapy Neonem)
+    neon = [p for p in parts if str(p["material"]).lower() == "neon"]
+    big_neon = [p for p in neon if p["size"][0] * p["size"][1] * p["size"][2] > cfg["maxNeonPartVolume"]]
+    if neon:
+        L.append(f"Świecące klocki (Neon): {len(neon)}")
+    for p in big_neon:
+        w(f"{p['name']}: duży świecący klocek (Neon) – nie oświetlaj mapy świecącymi rzeczami; świecić mogą tylko rzadkie dropy, efekty i małe lampki-wskaźniki")
+    if len(neon) > cfg["maxNeonParts"]:
+        w(f"Za dużo świecących klocków: {len(neon)} > {cfg['maxNeonParts']} – świecenie zostaw dla rzadkich rzeczy")
 
     # kolory
     counts = {}

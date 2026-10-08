@@ -1,16 +1,17 @@
 ===== RAPORT: Dzialka_Test =====
-Klocków: 112 (limit 500)
-Rozmiar całości: 64.0 x 31.0 x 98.5 (szer. X × wys. Y × głęb. Z)
-Wysokość = 6.2 wysokości gracza (gracz ≈ 5 studów)
-Kolory: 30 różnych. Udział (wg objętości):
-    #6CC24A   22.3%  (12 klocków)
-    #5DB23F   22.3%  (12 klocków)
-    #E8954A   14.4%  (6 klocków)
-    #D9803A   14.0%  (4 klocków)
-    #FF9A1F    3.3%  (1 klocków)
-    #4CC94C    3.2%  (1 klocków)
-    #F2D98A    2.9%  (1 klocków)
-    #4FB83A    2.7%  (5 klocków)
+Klocków: 158 (limit 500)
+Rozmiar całości: 96.0 x 32.0 x 137.0 (szer. X × wys. Y × głęb. Z)
+Wysokość = 6.4 wysokości gracza (gracz ≈ 5 studów)
+Świecące klocki (Neon): 2
+Kolory: 36 różnych. Udział (wg objętości):
+    #E8954A   27.0%  (8 klocków)
+    #D9803A   26.6%  (6 klocków)
+    #6CC24A   14.2%  (24 klocków)
+    #5DB23F   14.2%  (24 klocków)
+    #7EDB55    4.5%  (3 klocków)
+    #4FB83A    3.7%  (10 klocków)
+    #F2D98A    1.6%  (1 klocków)
+    #3E9E2E    1.4%  (9 klocków)
   ℹ Żaden kolor nie dominuje (<35%) – zasada 60/30/10 sugeruje jeden kolor główny
   ℹ Ponad 10 kolorów – sprawdź, czy budowla nie jest zbyt pstrokata
 Ostrzeżeń: 0

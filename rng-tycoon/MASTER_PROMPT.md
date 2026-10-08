@@ -74,12 +74,13 @@ Budujesz kodem, więc nie widzisz efektu od razu. Dlatego trzymaj się tych zasa
 SKALA (najczęstszy błąd AI to złe proporcje):
 - Postać gracza ma ok. 5 studów wysokości i 2 szerokości. Wszystko mierz względem niej.
 - Drzwi/przejścia: min. 6 szerokości × 8 wysokości. Ścieżki: 8–12 studów szerokości. Schody: stopień 1 stud wysokości, 2 study głębokości.
-- Działka gracza: ok. 60 × 100 studów (miejsce na maszynę, taśmę, zjadacz, przyciski, gablotę i maszynę do fuzji, z wolnym miejscem do chodzenia). Ściany między działkami: 25–35 studów wysokości.
+- Działka gracza: DUŻA – ok. 96 × 128 studów (miejsce na maszynę, taśmę, zjadacz, przyciski, gablotę i maszynę do fuzji, dużo wolnego miejsca do chodzenia i na przyszłe ulepszenia). Ulica między działkami: ok. 32 szerokości.
+- ŚCIANY to prawdziwe, masywne ściany, a NIE cienkie przegrody: ściany między działkami i dookoła mapy mają 6–10 studów grubości i 25–35 wysokości, wyglądają jak pełne skarpy/mury z trawą na górze (jak w Steal an Egg). Nigdy nie rób ścian granicznych grubości 1–2 studów.
 - Maszyna dropiąca: ok. 12–16 studów wysokości – wyraźnie większa od gracza, widoczna z daleka. Przyciski tycoona: 4 × 4 study, płaskie (0,5–1 stud wysokości) z napisem i ceną nad nimi (BillboardGui).
 - Przedmioty z droppera: 2–4 study (rzadkie mogą być trochę większe).
 
 KSZTAŁTY I STYL BUDOWLI:
-- Budowle „pulchne” i proste: grube ściany (min. 1 stud), duże bryły, zaokrąglenia robione klinami (WedgePart/CornerWedgePart) i cylindrami. Mało drobnych detali – każdy detal ma być widoczny z 30 studów.
+- Budowle „pulchne” i proste: grube ściany (budynki min. 1–2 study, ściany graniczne mapy 6–10 studów), duże bryły, zaokrąglenia robione klinami (WedgePart/CornerWedgePart) i cylindrami. Mało drobnych detali – każdy detal ma być widoczny z 30 studów.
 - Każda budowla ma 3 warstwy: (1) PODSTAWA – duże bryły i kształt, (2) ŚREDNIE – dachy, okna, ramy, rury, (3) DETALE – lampki, napisy, ozdoby. Najpierw zawsze warstwa 1 (blockout), dopiero potem reszta.
 - Ciekawa sylwetka: łam proste kształty (wystający daszek, komin, antena, asymetryczny dodatek), żeby budowla była rozpoznawalna nawet jako czarny cień.
 - Kolory: zasada 60/30/10 – 60% kolor główny, 30% drugi, 10% akcent (np. świecące lampki). Krawędzie i ramy w ciemniejszym lub jaśniejszym odcieniu koloru bryły, żeby kształty się nie zlewały.
@@ -98,7 +99,7 @@ ORGANIZACJA:
 - Każdy skrypt budujący ma na górze tabelę ustawień (kolory, rozmiary), żebym mógł łatwo zmieniać wygląd, i funkcję pomocniczą do tworzenia klocka (rozmiar, pozycja, kolor, materiał, studsy), żeby kod był krótki i spójny.
 
 KOMPOZYCJA MAPY (jak ma się czytać z perspektywy gracza):
-- Jeden wyraźny punkt centralny widoczny z każdego miejsca (kolorowe centrum na środku – najwyższe, najjaśniejsze, z czymś świecącym lub ruchomym).
+- Jeden wyraźny punkt centralny widoczny z każdego miejsca (kolorowe centrum na środku – najwyższe, najbardziej kolorowe, z czymś ruchomym, np. obracającym się).
 - Gracz zawsze widzi, dokąd iść: szerokie ścieżki w innym kolorze niż trawa, strzałki, znaki z ikonkami.
 - Na działce elementy ułożone w kolejności działania: maszyna → taśma → zjadacz, a przyciski ulepszeń obok, w zasięgu kilku kroków. Nic ważnego za plecami gracza po spawnie.
 - Puste miejsca też coś mają: kępki trawy z klocków, kamienie, krzaki, kwiatki – ale bez zaśmiecania ścieżek.
@@ -384,6 +385,7 @@ OŚWIETLENIE (jasne, słoneczne, „zabawkowe”):
 - Wszystko ma być dobrze widoczne: brak ciemnych zakamarków, miękkie i delikatne cienie, jasne ambient i outdoor ambient.
 - Czyste, błękitne niebo z kilkoma chmurkami; bez gęstej mgły (najwyżej bardzo lekka Atmosphere daleko na horyzoncie).
 - ColorCorrection: trochę więcej nasycenia i lekko podbity kontrast. Bloom bardzo delikatny – tylko żeby świecące rzadkie przedmioty ładnie lśniły.
+- NIE oświetlaj mapy świecącymi rzeczami: bez lamp z materiałem Neon, bez PointLight/SpotLight/SurfaceLight do rozjaśniania mapy, bez świecących słupów, latarni i ekranów jako dekoracji. Mapę oświetla tylko Lighting (słońce i niebo). Świecenie jest zarezerwowane dla rzadkich dropów, mutacji i efektów (drabina efektów) oraz bardzo małych lampek-wskaźników na maszynach – dzięki temu rzadkie rzeczy naprawdę się wyróżniają.
 - Podaj dokładne wartości wszystkich ustawień Lighting.
 
 PRZEDMIOTY I POSTACIE (też z klocków):
@@ -393,7 +395,7 @@ PRZEDMIOTY I POSTACIE (też z klocków):
 - Małe efekty „charakteru”: np. „Zzz” nad śpiącym zwierzakiem, serduszka, iskierki.
 
 MASZYNA I DZIAŁKA:
-- Maszyna to „gwiazda” działki: z klocków jak świat, ale z kolorowymi świecącymi elementami (lampki, rury, ekran z rzadkością). Wyraźnie widoczna, z animacją pracy (tłoki, migające lampki, kołysanie), z każdym ulepszeniem wygląda lepiej (nowe części, światła, kolory). Gracz ma WIDZIEĆ postęp.
+- Maszyna to „gwiazda” działki: z klocków jak świat, z mocnymi kolorami i detalami (rury, tłoki, ekran z rzadkością; świecić mogą tylko małe lampki-wskaźniki). Wyraźnie widoczna, z animacją pracy (tłoki, migające lampki, kołysanie), z każdym ulepszeniem wygląda lepiej (nowe części, światła, kolory). Gracz ma WIDZIEĆ postęp.
 - Działka rośnie wizualnie z postępem: nowe ścieżki, ogrodzenie, dekoracje, podest gabloty.
 
 UI:
