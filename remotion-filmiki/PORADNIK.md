@@ -19,6 +19,8 @@ tworzyć, poprawiać i renderować za Ciebie – także w sesji w chmurze.
     poświata, 1 symbol na ujęcie, ujęcia różnej długości. Dźwięk: `dzwieki/generuj_dzwieki_iskra.py`.
   - `Iskra3D` – ta sama historia i dźwięk co `Iskra`, ale prawdziwe 3D (Three.js, `@remotion/three`):
     kamera okrąża obiekty, żywe kolory. Render w chmurze: dodaj `--gl=swangle` (na komputerze zwykle `--gl=angle`).
+  - `Reel` – showreel 24 s (1080×1920, 30 fps, 120 BPM): 8 technik – kinetyczna typografia, morfing kształtów,
+    płyn (goo), 1200 cząsteczek, 3D, dane, klamra intro/outro. Dźwięk: `dzwieki/generuj_dzwieki_reel.py`.
 - Gotowe pliki MP4 (też `gotowe/telefon-vs-cele.mp4`): `gotowe/promo-tiktok.mp4`, `gotowe/motywacja.mp4`, porównanie ze wzorem `gotowe/porownanie_z_wzorem.png`.
 
 ## Linki
