@@ -126,7 +126,7 @@ Jeśli musisz wybierać, lepiej mniej funkcji, ale dopracowany drop i ładny wyg
 4. Rzadki drop lub mutacja → efekt świetlny, dźwięk, napis na ekranie; ogłoszenie dla całego serwera tylko przy Secret albo mutacji MEGA na przedmiocie Rare+ (sekcja 8).
 5. Najlepsze przedmioty same trafiają do ekwipunku (ustawienie auto-zachowywania), a gracz może postawić je w gablocie (sekcja 13). Maszyna nigdy się nie zatrzymuje.
 6. W dowolnym momencie gracz może zaryzykować przedmioty z ekwipunku w fuzji albo spróbować sekretnego przepisu (sekcja 6).
-7. Co ok. 12 minut wydarzenie serwerowe zmienia zasady na chwilę (sekcja 7).
+7. Co ok. 12 minut wydarzenie serwerowe zmienia zasady na chwilę, a co 3–4 minuty po mapie lata złoty stworek, za którego złapanie jest żeton mutacji (sekcja 7).
 8. Rebirth: reset monet i ulepszeń → stały mnożnik monet. (W aktualizacjach: kolejne rebirthy odblokowują nową, lepszą maszynę z nowymi przedmiotami.)
 
 ## 4. RZADKOŚCI I LOSOWANIE
@@ -194,12 +194,19 @@ ANIMACJA FUZJI (bardzo ważna, zasady ruchu z sekcji 9):
 - Sukces: wybuch światła w kolorze rzadkości, nowy przedmiot wyskakuje łukiem i ląduje z odbiciem + efekty z drabiny efektów.
 - Porażka: maszyna się krztusi, wypuszcza czarny dym i trochę iskier, zabawny smutny dźwięk – ma boleć, ale też trochę śmieszyć.
 
-## 7. WYDARZENIA SERWEROWE
+## 7. WYDARZENIA SERWEROWE I ZŁOTE STWORKI
 - Co ok. 12 minut losowe wydarzenie dla całego serwera. Na ekranie stale widać odliczanie „Następne wydarzenie za 4:12” i nazwę, co nadchodzi (żeby czekać i nie wychodzić).
 - Start każdego wydarzenia: dźwięk alarmu, wielki napis, zmiana nieba/światła na czas wydarzenia.
 - Na start 2 wydarzenia:
   1. DESZCZ METEORÓW (2 min): niebo ciemnieje, na całą mapę spadają meteoryty z przedmiotami w środku. Gracze biegają i je zbierają (podejście/dotknięcie). Serwer sprawdza odległość gracza od meteorytu, pierwszy gracz zabiera. Większa szansa na rzadkie przedmioty i mutacje niż z maszyny.
   2. ZŁOTA GODZINA (3 min): złote niebo, wszystkie maszyny na serwerze mają 5x większą szansę na mutację Złotą i 2x na mutacje MEGA.
+- ZŁOTE STWORKI (niezależnie od wydarzeń, co ok. 3–4 minuty):
+  - Na mapie pojawia się złoty klockowy stworek (np. złota mucha albo żabka) i lata/skacze po mapie przez ok. 60 s. Wszyscy dostają małe powiadomienie „A Golden Fly appeared!” i strzałkę na krawędzi ekranu, która pokazuje kierunek.
+  - Stworek ucieka, gdy gracz jest blisko (zmienia kierunek, przyspiesza na chwilę), ale da się go dogonić – ma to być zabawny pościg, a nie frustracja.
+  - Kto pierwszy go dotknie, dostaje ŻETON MUTACJI: następny drop z jego maszyny ma gwarantowaną mutację (losowaną z tabeli mutacji bez „brak”). Żetony się zapisują i można mieć ich kilka.
+  - Rzadziej (1 na 10 pojawień) pojawia się TĘCZOWY stworek – daje żeton mutacji MEGA (Tęczowa albo Kosmiczna).
+  - Uczciwie i bez oszustw: pozycję stworka liczy SERWER (ruch po ścieżce z punktów albo krzywych), klient tylko płynnie go pokazuje; przy złapaniu serwer sprawdza odległość gracza od stworka i pilnuje, żeby nagrodę dostał tylko pierwszy.
+  - Złapanie ma być satysfakcjonujące: stworek wybucha iskierkami, żeton wlatuje do licznika na ekranie, dźwięk „cha-ching”; u innych graczy krótki napis „<nick> caught the Golden Fly!”.
 - Kolejne wydarzenia dodamy w aktualizacjach (np. „Szalona maszyna” – maszyny strzelają 10x szybciej przez minutę). Zrób system tak, żeby dodanie wydarzenia = dopisanie jednego wpisu w ModuleScript Events.
 
 ## 8. SATYSFAKCJA Z DROPU – „DRABINA EFEKTÓW”
@@ -336,14 +343,14 @@ Obsłuż je przez MarketplaceService.ProcessReceipt POPRAWNIE: zapisz zakup w Da
 
 ## 16. ZASADY TECHNICZNE (bardzo ważne)
 1. SERWER decyduje o wszystkim: losowanie (Random.new()), monety, zakupy, ulepszenia. Klient tylko pokazuje efekty i wysyła prośby („chcę kupić ulepszenie X”). Serwer zawsze sprawdza, czy gracz ma pieniądze i czy prośba ma sens. Nigdy nie ufaj wartościom od klienta.
-2. Zapisywanie: DataStoreService z pcall i ponawianiem, UpdateAsync, autozapis co 2 minuty, zapis przy wyjściu gracza i w game:BindToClose. Wersjonuj dane (pole „wersja”), żeby przyszłe aktualizacje nie psuły zapisów. Zapisuj: monety, ulepszenia, rebirthy, ekwipunek (przedmioty z mutacjami), przedmioty w gablocie, Index (zdobyte przedmioty i mutacje), odkryte przepisy, ustawienia auto-zachowywania, licznik pity, najrzadszy drop, kupione produkty.
+2. Zapisywanie: DataStoreService z pcall i ponawianiem, UpdateAsync, autozapis co 2 minuty, zapis przy wyjściu gracza i w game:BindToClose. Wersjonuj dane (pole „wersja”), żeby przyszłe aktualizacje nie psuły zapisów. Zapisuj: monety, ulepszenia, rebirthy, ekwipunek (przedmioty z mutacjami), przedmioty w gablocie, Index (zdobyte przedmioty i mutacje), odkryte przepisy, żetony mutacji, ustawienia auto-zachowywania, licznik pity, najrzadszy drop, kupione produkty.
 3. Wydajność: maks. ok. 30 przedmiotów na taśmie na gracza; stare usuwaj. Przedmioty to małe modele z klocków (najlepiej do ok. 15 Partów każdy, trzymane jako gotowe szablony w ReplicatedStorage i klonowane), animowane po stronie klienta (sekcja 9), a serwer liczy tylko czas dojazdu.
 4. UI: WSZYSTKO w Scale (procentach), nie w Offset, z UIAspectRatioConstraint dla ikon i TextScaled + UITextSizeConstraint dla tekstów. Gra musi wyglądać dobrze na TELEFONIE. Nie kładź przycisków w lewym dolnym rogu (joystick) ani w prawym dolnym (skok).
-5. Kod modularny: ModuleScripty Config, Rarities, Items, DataManager, DropperManager, ConveyorManager, UpgradeManager, Multipliers, ProductManager, EffectsManager, Mutations, InventoryManager, FusionManager, Recipes, Events, EventManager, RebirthManager, AnnouncementManager, CollectionManager + jeden RemoteEvents folder w ReplicatedStorage.
+5. Kod modularny: ModuleScripty Config, Rarities, Items, DataManager, DropperManager, ConveyorManager, UpgradeManager, Multipliers, ProductManager, EffectsManager, Mutations, InventoryManager, FusionManager, Recipes, Events, EventManager, CritterManager, RebirthManager, AnnouncementManager, CollectionManager + jeden RemoteEvents folder w ReplicatedStorage.
 6. Każdy plik zaczyna się komentarzem: co robi i gdzie leży. Komentarze po polsku.
 
 ## 17. WERSJA NA START (MVP)
-Na premierę wystarczą: 1 działka na gracza (serwer do 8 graczy), 1 maszyna, 7 rzadkości, 5 mutacji, 15–20 przedmiotów, ekwipunek z auto-zachowywaniem, fuzja z ryzykiem, 5–8 sekretnych przepisów, 2 wydarzenia serwerowe, 4 ulepszenia + dekoracje, gablota z Indexem, rebirth, developer products i zapisywanie. Game passy dodamy na końcu (sekcja 18). Reszta w aktualizacjach co tydzień.
+Na premierę wystarczą: 1 działka na gracza (serwer do 8 graczy), 1 maszyna, 7 rzadkości, 5 mutacji, 15–20 przedmiotów, ekwipunek z auto-zachowywaniem, fuzja z ryzykiem, 5–8 sekretnych przepisów, 2 wydarzenia serwerowe, złote stworki z żetonami mutacji, 4 ulepszenia + dekoracje, gablota z Indexem, rebirth, developer products i zapisywanie. Game passy dodamy na końcu (sekcja 18). Reszta w aktualizacjach co tydzień.
 Nie wypuszczaj gry, dopóki drop Legendary+ nie daje prawdziwego „WOW” i gra nie wygląda ładnie na telefonie – to ważniejsze niż dodatkowe funkcje.
 
 ## 18. GAME PASSY – DO DODANIA NA KOŃCU (na razie NIE rób)
@@ -453,14 +460,15 @@ CO ZROBIĆ:
 - W Studio komenda testowa dająca przedmioty do testów fuzji.
 GOTOWE, GDY: widzę dokładną szansę przed fuzją, sukces i porażka działają zgodnie z tabelą, animacja trzyma w napięciu, odkryty przepis zapisuje się w księdze i zostaje po powrocie do gry.
 
-## KROK 12: Wydarzenia serwerowe
+## KROK 12: Wydarzenia serwerowe i złote stworki
 CEL: Na co czekać i po co zostać w grze.
 CO ZROBIĆ:
 - EventManager + ModuleScript Events; losowe wydarzenie co ok. 12 min, odliczanie w UI z nazwą nadchodzącego wydarzenia (brief: 7).
 - Deszcz meteorów: spadające meteoryty z przedmiotami na całej mapie, zbieranie przez dotknięcie, serwer sprawdza odległość i kto pierwszy.
 - Złota godzina: zmiana nieba i większe szanse na mutacje dla wszystkich.
-- W Studio komenda testowa do natychmiastowego uruchomienia wydarzenia.
-GOTOWE, GDY: wydarzenia startują same, wszyscy na serwerze je widzą, zmienia się niebo i zasady, a po czasie wszystko wraca do normy.
+- Złote i tęczowe stworki (CritterManager): pojawianie się, ucieczka przed graczem, strzałka kierunku, łapanie sprawdzane przez serwer, żetony mutacji użyte przy następnym dropie i zapisywane w danych.
+- W Studio komenda testowa do natychmiastowego uruchomienia wydarzenia i przywołania stworka.
+GOTOWE, GDY: wydarzenia startują same, wszyscy na serwerze je widzą, zmienia się niebo i zasady, a po czasie wszystko wraca do normy; pościg za stworkiem jest zabawny, nagrodę dostaje tylko pierwszy, a żeton daje mutację przy następnym dropie.
 
 ## KROK 13: Rebirth
 CEL: Długi cel dla gracza.
