@@ -15,6 +15,8 @@ tworzyć, poprawiać i renderować za Ciebie – także w sesji w chmurze.
   - `TelefonVsCele` – 60 s, 1080×1920, 12 fps, ten sam styl: 12 scen po 5 s („SCROLL.” → „PHONE DOWN / GOALS UP”),
     własna muzyka (najpierw mol, od sceny START dur i coraz mocniej) + efekty. Teksty scen: tablica `SCENES`
     w `src/TelefonVsCele.tsx`, dźwięki: `dzwieki/generuj_dzwieki_telefon.py`. Wspólny styl: `src/vintage.tsx`.
+  - `Iskra` – 12 s, 1080×1920, 30 fps, styl „filmowy motion design” (inspiracja, nie kopia): ciemne gradienty,
+    poświata, 1 symbol na ujęcie, ujęcia różnej długości. Dźwięk: `dzwieki/generuj_dzwieki_iskra.py`.
 - Gotowe pliki MP4 (też `gotowe/telefon-vs-cele.mp4`): `gotowe/promo-tiktok.mp4`, `gotowe/motywacja.mp4`, porównanie ze wzorem `gotowe/porownanie_z_wzorem.png`.
 
 ## Linki

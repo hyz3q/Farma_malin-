@@ -3,6 +3,7 @@ import { Composition } from "remotion";
 import { PromoTikTok } from "./PromoTikTok";
 import { Motywacja } from "./Motywacja";
 import { TelefonVsCele } from "./TelefonVsCele";
+import { Iskra } from "./Iskra";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -45,6 +46,14 @@ export const RemotionRoot: React.FC = () => {
           handle: "@rngtycoon",
           theme: "Phone vs Goals",
         }}
+      />
+      <Composition
+        id="Iskra"
+        component={Iskra}
+        durationInFrames={360} // 12 s przy 30 fps – płynny ruch jak w filmowym motion designie
+        fps={30}
+        width={1080}
+        height={1920}
       />
     </>
   );
