@@ -6,7 +6,7 @@ Ten prompt ma dwie części:
 - CZĘŚĆ 2 – KROKI: budujemy grę po kolei, krok po kroku.
 
 Zasady:
-1. Teraz przeczytaj CAŁY brief i NIE pisz jeszcze kodu.
+1. Teraz przeczytaj CAŁY brief (od sekcji 0 – zasad dobrych gier Roblox, które obowiązują w każdym kroku) i NIE pisz jeszcze kodu.
 2. Odpowiedz krótkim podsumowaniem (5–8 zdań), jak rozumiesz grę, i zadaj pytania, jeśli coś jest niejasne.
 3. Potem czekaj, aż napiszę „zaczynaj krok 1”.
 4. Rób tylko JEDEN krok naraz. Po każdym kroku czekaj, aż przetestuję i napiszę „działa” albo opiszę problem.
@@ -15,6 +15,56 @@ Zasady:
 ════════════════════════════════════════
 # CZĘŚĆ 1 – BRIEF (przeczytaj w całości, nie pisz kodu)
 ════════════════════════════════════════
+
+## 0. JAK ROBIĆ DOBRE GRY NA ROBLOX – ZASADY, KTÓRYCH ZAWSZE SIĘ TRZYMASZ
+Te zasady dotyczą KAŻDEGO kroku. Jeśli coś w briefie jest niejasne, wybieraj rozwiązanie zgodne z tymi zasadami. Nie dodawaj jednak nowych funkcji spoza briefu bez pytania – zasady mówią JAK robić, a nie CO dodać.
+
+A. PIERWSZE WRAŻENIE (najwięcej graczy odchodzi w pierwszej minucie)
+- W ciągu 10 sekund gracz wie, co robić; w ciągu 30 sekund dostaje pierwszą nagrodę (pierwszy drop, pierwsze monety).
+- Zero ścian tekstu i długich samouczków. Prowadź gracza strzałkami, świecącą ścieżką (Beam) i krótkimi napisami w stylu „Stań na przycisku!”.
+- Nic nie blokuje startu: bez menu „Graj”, bez długiego ładowania. Krótki ekran ładowania (ReplicatedFirst) tylko jeśli naprawdę potrzebny.
+- Pierwsze ulepszenia mają być tanie i szybkie – gracz ma poczuć postęp w pierwszych 2–3 minutach.
+
+B. ZAWSZE JASNY NASTĘPNY CEL
+- Na ekranie zawsze widać, do czego gracz teraz dąży (pasek do następnego ulepszenia, pasek pity, odliczanie do wydarzenia, „Index 12/40”).
+- Duże liczby skracaj: 1.2K, 3.4M, 5.6B, 7.8T.
+- Gdy gracza stać na ulepszenie, przycisk to pokazuje (świeci, podskakuje, ikonka „!”).
+
+C. TEMPO I EKONOMIA
+- Ceny rosną wykładniczo, ale bez „ścian”, przy których gracz nic nie może robić przez długi czas.
+- Wszystkie liczby (ceny, szanse, nagrody, czasy) trzymaj w Config, żebym mógł je stroić bez szukania po kodzie.
+- Przy każdym kroku z ekonomią podaj przybliżony czas: ile minut gry do pierwszego ulepszenia, do pierwszego Epic, do rebirtha. Cel: częste małe nagrody i rzadkie wielkie.
+
+D. FEEDBACK I „JUICE”
+- Każda akcja gracza ma natychmiastową reakcję: dźwięk, ruch, efekt (sekcje 8 i 9). Brak reakcji = gracz myśli, że gra jest zepsuta.
+
+E. TELEFON NA PIERWSZYM MIEJSCU (ponad połowa graczy gra na telefonie)
+- Duże przyciski (łatwo trafić kciukiem), UI w Scale, nic w rogach z joystickiem i skokiem.
+- Wydajność: mało Partów, brak pętli bez czekania, efekty sprzątane (Debris / Destroy), rozłączanie niepotrzebnych połączeń (:Disconnect()), żeby gra nie zwalniała z czasem. Rozważ StreamingEnabled przy dużej mapie.
+- Testuj zawsze w Test → Device na telefonie i z 2+ graczami.
+
+F. POWODY, ŻEBY WRACAĆ
+- Gra ma dawać powód, żeby wrócić jutro (wydarzenia, kolekcja, sekretne przepisy, pity). Roblox mocno promuje gry, do których gracze wracają i w których spędzają dużo czasu.
+- Co tydzień aktualizacja z czymś nowym (przedmioty, przepisy, wydarzenie) – kod ma pozwalać dodawać takie rzeczy przez dopisanie wpisu w ModuleScript, bez przerabiania systemów.
+
+G. UCZCIWOŚĆ I ZASADY ROBLOXA
+- Przestrzegaj zasad społeczności Roblox (gra dla dzieci: bez przemocy z krwią, bez treści dla dorosłych, bez linków poza Roblox).
+- Przy losowych rzeczach, za które gracz płaci Robuxami, pokazuj szanse (to wymóg Robloxa). Szanse fuzji i dropów zawsze prawdziwe.
+- Bez oszukiwania gracza: żadnych fałszywych zapowiedzi, fałszywych liczników „tylko dziś!”, przycisków-pułapek do zakupu. Zakupy mają być fajnym dodatkiem, a gra ma być dobra bez płacenia.
+
+H. JAKOŚĆ KODU
+- Serwer ma ostatnie słowo (sekcja 16). Każdy RemoteEvent: sprawdź typy i wartości od klienta i ogranicz, jak często gracz może go wywołać (ochrona przed spamem/exploitami).
+- Używaj nowoczesnego API: task.wait / task.spawn / task.delay (nie wait/spawn/delay), GetService, :Connect na zdarzenia zamiast pętli sprawdzających.
+- Każde wywołanie usług, które może się nie udać (DataStore, MarketplaceService, HttpService), w pcall z obsługą błędu.
+- Kod czytelny i podzielony na ModuleScripty; nazwy zmiennych po angielsku, komentarze po polsku; bez nieużywanego kodu.
+- Gotowy krok = zero czerwonych błędów i ostrzeżeń w Output.
+
+I. POMIAR I POPRAWKI
+- Dodaj AnalyticsService: lejek pierwszych kroków gracza (onboarding funnel: wejście → pierwszy drop → pierwsze ulepszenie → pierwszy Epic → pierwsza fuzja) i zdarzenia ekonomii (zarobione/wydane monety). Dzięki temu w panelu Creator Hub zobaczę, gdzie gracze odchodzą.
+- Po każdym większym kroku zagraj sam 10–15 minut i nazwij momenty, które są nudne albo niejasne – zaproponuj poprawki.
+
+J. JĘZYK W GRZE
+- Wszystkie napisy w grze po ANGIELSKU (gracze z całego świata), krótkie i proste. Przykłady napisów w tym briefie są po polsku tylko dla mnie – w grze przetłumacz je na angielski (np. „Gwarantowany Legendary za: 37 dropów” → „Legendary guaranteed in: 37 drops”); ikonki zamiast długich tekstów. Teksty trzymaj w jednym module, żeby łatwo dodać tłumaczenia (LocalizationService) później.
 
 ## 1. POMYSŁ GRY
 Każdy gracz dostaje własną działkę (tycoon) z JEDNĄ maszyną (Dropper).
@@ -405,6 +455,7 @@ CO ZROBIĆ:
 GOTOWE, GDY: wszystko z MVP działa, gra dobrze wygląda i chodzi na telefonie – można publikować. Game passy robimy dopiero po tym (brief: 18).
 
 ## JAK MI ODPOWIADAĆ (przy każdym kroku)
+- Przy każdym kroku sprawdź go z sekcją 0 (zasady dobrych gier) i krótko napisz, czego z niej pilnowałeś.
 - Przy każdym kroku podaj: listę plików, pełny kod każdego pliku (bez „…reszta kodu”), dokładne miejsce w Explorerze i jak przetestować krok w Studio (Play / Test → Device telefon).
 - Jeśli coś wymaga zrobienia ręcznie w Studio (np. stworzenie Partu), opisz to krok po kroku.
 - Po każdym kroku napisz krótko, co mogło pójść źle i jak to rozpoznać w oknie Output.
