@@ -1,0 +1,22 @@
+{
+  "name": "remotion-filmiki",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Filmiki promocyjne (TikTok / Shorts / Reels) do gry Tycoon, but every drop is RNG – zrobione w Remotion",
+  "scripts": {
+    "dev": "remotion studio",
+    "render": "remotion render PromoTikTok out/promo-tiktok.mp4",
+    "still": "remotion still PromoTikTok out/miniatura.png --frame=330"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.534",
+    "@remotion/fonts": "4.0.534",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "remotion": "4.0.534"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.8",
+    "typescript": "5.8.3"
+  }
+}
