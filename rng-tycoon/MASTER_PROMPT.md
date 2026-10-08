@@ -174,7 +174,15 @@ REMOTES – KLIENT → SERWER (każdy przez RemoteGuard: sprawdź typy, wartośc
 Zakupy za Robuxy idą przez MarketplaceService (bez własnych Remotes), a przyciski tycoona przez dotknięcie po stronie serwera.
 
 ## 0D. JAK „WIDZIEĆ” SWOJE BUDOWLE
-Budujesz kodem i zwykle nie widzisz efektu. Używaj tych sposobów, od najprostszego:
+Budujesz kodem i zwykle nie widzisz efektu. Używaj tych sposobów:
+
+0. SKILL „roblox-build-preview” – NAJWAŻNIEJSZE, UŻYWAJ ZAWSZE, JEŚLI GO MASZ:
+   W repozytorium projektu jest skill `.claude/skills/roblox-build-preview` (narzędzie do sprawdzania budowli PRZED wklejeniem do Studio). Jeśli pracujesz w Claude Code w tym repozytorium (albo masz dostęp do tego folderu i możesz uruchamiać Pythona):
+   - KAŻDĄ budowlę (mapa, działka, maszyna, przedmiot z droppera, dekoracja) najpierw zapisz jako plik JSON w formacie z SKILL.md,
+   - uruchom `scripts/preview.py`, przeczytaj raport i OBEJRZYJ obrazki podglądu (z manekinem gracza dla skali),
+   - poprawiaj JSON, aż raport nie ma ostrzeżeń i budowla na obrazkach wygląda zgodnie z briefem,
+   - dopiero wtedy daj mi wygenerowany `build.lua` i pokaż mi obrazek podglądu.
+   NIGDY nie dawaj mi skryptu budującego, którego nie sprawdziłeś tym narzędziem, jeśli masz do niego dostęp. Jeśli nie masz dostępu (np. inny czat AI bez plików), powiedz mi o tym i użyj punktów 1–6 poniżej.
 
 1. PLAN PRZED BUDOWANIEM: zanim napiszesz skrypt budujący, pokaż plan z góry jako prosty rysunek z liter (ASCII, 1 znak = 2 study, z legendą) i tabelę głównych brył (nazwa, rozmiar, pozycja, kolor). Poczekaj na moje „ok”. Poprawka na planie jest dużo łatwiejsza niż w gotowej budowli.
 
@@ -588,7 +596,7 @@ GOTOWE, GDY: wszystko z MVP działa, gra dobrze wygląda i chodzi na telefonie �
 
 ## JAK MI ODPOWIADAĆ (przy każdym kroku)
 - Przy każdym kroku sprawdź go z sekcjami 0, 0B i 0C (zasady dobrych gier, budowania i mapa projektu) i krótko napisz, czego z nich pilnowałeś.
-- Przy krokach z budowaniem: najpierw plan z góry (sekcja 0D, punkt 1), potem skrypt; po zbudowaniu opisz, co powinienem zobaczyć, poproś o raport z InspektorBudowli i zrzuty z wybranych widoków KameraPodglad, i popraw znalezione problemy.
+- Przy krokach z budowaniem: najpierw plan z góry (sekcja 0D, punkt 1), potem sprawdzenie skillem roblox-build-preview (sekcja 0D, punkt 0), potem skrypt; po zbudowaniu opisz, co powinienem zobaczyć, poproś o raport z InspektorBudowli i zrzuty z wybranych widoków KameraPodglad, i popraw znalezione problemy.
 - Na koniec każdego kroku podaj zaktualizowany PROGRESS.md.
 - Przy każdym kroku podaj: listę plików, pełny kod każdego pliku (bez „…reszta kodu”), dokładne miejsce w Explorerze i jak przetestować krok w Studio (Play / Test → Device telefon).
 - Jeśli coś wymaga zrobienia ręcznie w Studio (np. stworzenie Partu), opisz to krok po kroku.

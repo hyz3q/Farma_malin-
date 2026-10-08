@@ -1,0 +1,21 @@
+{
+  "name": "Dropper",
+  "studs": true,
+  "expect": { "height": [12, 16] },
+  "parts": [
+    { "name": "Base", "size": [10, 1, 10], "pos": [0, 0.5, 0], "color": "#5E656D" },
+    { "name": "BaseTrim", "size": [11, 0.5, 11], "pos": [0, 1.25, 0], "color": "#3E444B" },
+    { "name": "Body", "size": [8, 7, 8], "pos": [0, 5, 0], "color": "#FF9A1F" },
+    { "name": "BodyStripe", "size": [8.5, 1, 8.5], "pos": [0, 6.5, 0], "color": "#2B2D33" },
+    { "name": "Head", "size": [6, 3, 6], "pos": [0, 10, 0], "color": "#FFC93C" },
+    { "name": "Hopper", "shape": "Wedge", "size": [6, 2, 3], "pos": [0, 12.5, 1.5], "color": "#FFC93C" },
+    { "name": "Chimney", "shape": "Cylinder", "size": [3, 1.5, 1.5], "pos": [2, 13, 1.5], "rot": [0, 0, 90], "color": "#5E656D" },
+    { "name": "Nozzle", "size": [3, 3, 2], "pos": [0, 4, -5], "color": "#2B2D33" },
+    { "name": "NozzleRim", "size": [4, 0.5, 3], "pos": [0, 5.75, -5], "color": "#FFC93C" },
+    { "name": "Screen", "size": [4, 2, 0.5], "pos": [0, 8.5, -4.25], "color": "#3FE0F2", "material": "Neon" },
+    { "name": "LampL", "shape": "Ball", "size": [1, 1, 1], "pos": [-2.5, 12, -2], "color": "#7CFC00", "material": "Neon" },
+    { "name": "LampR", "shape": "Ball", "size": [1, 1, 1], "pos": [2.5, 12, -2], "color": "#F0524B", "material": "Neon" },
+    { "name": "PipeL", "shape": "Cylinder", "size": [6, 1, 1], "pos": [-4.5, 5, 2], "rot": [0, 0, 90], "color": "#8E969F" },
+    { "name": "PipeR", "shape": "Cylinder", "size": [6, 1, 1], "pos": [4.5, 5, 2], "rot": [0, 0, 90], "color": "#8E969F" }
+  ]
+}
