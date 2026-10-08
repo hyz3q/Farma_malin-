@@ -50,9 +50,13 @@ tworzyć, poprawiać i renderować za Ciebie – także w sesji w chmurze.
   porówna tempo, kolory i układ klatka po klatce (tak powstała „Motywacja”).
 
 ## Muzyka i dźwięk
-Filmiki są bez dźwięku. Muzykę najłatwiej dodać w TikToku/CapCut (wybierasz modny dźwięk przy publikacji).
-Własny plik MP3 można też dodać w Remotion: wrzuć go do `public/` i poproś Claude o `<Audio>`.
-Nie używaj cudzej muzyki bez prawa do niej.
+„Motywacja” ma własne dźwięki – muzykę i efekty wygenerował kod `dzwieki/generuj_dzwieki.py` (zero cudzej muzyki,
+więc nie ma problemu z prawami autorskimi). Pliki leżą w `public/dzwieki/`:
+- `muzyka.wav` – 120 BPM, bębny i melodia w czasie uderzenia napisu, cichy akord w czasie spokoju,
+- `klik.wav`, `narastanie.wav`, `uderzenie.wav`, `pyki.wav`, `zassanie.wav`, `dzwonek.wav` – efekty zgrane z obrazem.
+Czasy efektów są w tablicy `SFX` w `src/Motywacja.tsx` (głośność: `volume`). Żeby zmienić brzmienie, popraw
+skrypt i uruchom `python dzwieki/generuj_dzwieki.py` (potrzebny `pip install numpy`).
+Do TikToka możesz też wyciszyć tę muzykę i dodać modny dźwięk w aplikacji. Nie używaj cudzej muzyki bez prawa do niej.
 
 ## Zmienianie tekstów bez kodu
 W `src/Root.tsx` są `defaultProps` – np. `title`, `subtitle`, `handle`, `cta`, `gameName`. Zmień tekst w cudzysłowie

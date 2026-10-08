@@ -2,7 +2,8 @@
 // Tempo jak we wzorze: 12 fps (lekko „poklatkowe”), 15 s = 3 pętle po 5 s:
 //   spokój (2 s, maszyna + kursor klika) → UDERZENIE (tytuł wjeżdża, rzeczy wybuchają, wszystko „drży”) 2,75 s
 //   → szybkie zassanie do środka (0,25 s) → znowu spokój.
-import { AbsoluteFill, interpolate, random, useCurrentFrame, useVideoConfig } from "remotion";
+import { Audio } from "@remotion/media";
+import { AbsoluteFill, interpolate, random, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { FONT } from "./theme";
 
 export type MotywacjaProps = {
@@ -237,6 +238,35 @@ const renderBurst = (items: BurstItem[], burst: number, frame: number) =>
     );
   });
 
+// ------------------------------------------------ dźwięki (własne, z dzwieki/generuj_dzwieki.py)
+// czasy w sekundach pętli 5 s – takie same jak fazy obrazu
+const SFX: { file: string; at: number; volume: number }[] = [
+  { file: "klik.wav", at: 0.35, volume: 0.7 }, // kursor klika w ekran
+  { file: "narastanie.wav", at: 0.4, volume: 0.5 }, // świst przed uderzeniem
+  { file: "uderzenie.wav", at: 1.0, volume: 0.75 }, // BUM – tytuł wjeżdża
+  { file: "pyki.wav", at: 1.05, volume: 0.6 }, // przedmioty wyskakują
+  { file: "zassanie.wav", at: 3.3, volume: 0.7 }, // wszystko zassane do środka
+  { file: "dzwonek.wav", at: 4.4, volume: 0.5 }, // iskierka
+];
+
+const Dzwieki: React.FC = () => {
+  const { fps, durationInFrames } = useVideoConfig();
+  const loops = Math.ceil(durationInFrames / fps / 5);
+  return (
+    <>
+      <Audio src={staticFile("dzwieki/muzyka.wav")} volume={0.7} />
+      {Array.from({ length: loops }).flatMap((_, k) =>
+        SFX.map((s) => {
+          const from = Math.round((s.at + k * 5) * fps);
+          return from < durationInFrames ? (
+            <Audio key={`${s.file}${k}`} from={from} src={staticFile(`dzwieki/${s.file}`)} volume={s.volume} />
+          ) : null;
+        }),
+      )}
+    </>
+  );
+};
+
 export const Motywacja: React.FC<MotywacjaProps> = ({ handle, issue, theme, title, subtitle }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -331,6 +361,7 @@ export const Motywacja: React.FC<MotywacjaProps> = ({ handle, issue, theme, titl
       ) : null}
 
       <Grain id="grain" opacity={0.12} />
+      <Dzwieki />
     </AbsoluteFill>
   );
 };
