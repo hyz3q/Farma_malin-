@@ -6,11 +6,13 @@ Ten prompt ma dwie części:
 - CZĘŚĆ 2 – KROKI: budujemy grę po kolei, krok po kroku.
 
 Zasady:
-1. Teraz przeczytaj CAŁY brief (od sekcji 0 i 0B – zasad dobrych gier Roblox i budowania, które obowiązują w każdym kroku) i NIE pisz jeszcze kodu.
+1. Teraz przeczytaj CAŁY brief (od sekcji 0, 0B i 0C – zasad dobrych gier Roblox, budowania i mapy projektu, które obowiązują w każdym kroku) i NIE pisz jeszcze kodu.
 2. Odpowiedz krótkim podsumowaniem (5–8 zdań), jak rozumiesz grę, i zadaj pytania, jeśli coś jest niejasne.
 3. Potem czekaj, aż napiszę „zaczynaj krok 1”.
 4. Rób tylko JEDEN krok naraz. Po każdym kroku czekaj, aż przetestuję i napiszę „działa” albo opiszę problem.
 5. Nie wybiegaj do przodu: nie rób rzeczy z dalszych kroków, ale pisz kod tak, żeby dało się je łatwo dodać.
+6. Prowadź DZIENNIK POSTĘPU (plik PROGRESS.md, wzór na końcu promptu). Po każdym zakończonym kroku podaj jego pełną, aktualną wersję: jeśli masz dostęp do plików projektu – zapisz go sam, jeśli nie – wypisz cały plik w odpowiedzi, a ja go zapiszę.
+7. Jeśli na początku rozmowy wkleję razem z briefem plik PROGRESS.md, to znaczy, że kontynuujemy: przeczytaj go, napisz w 3–5 zdaniach, na czym skończyliśmy i co jest następne, i czekaj na moje „kontynuuj”.
 
 ════════════════════════════════════════
 # CZĘŚĆ 1 – BRIEF (przeczytaj w całości, nie pisz kodu)
@@ -106,6 +108,71 @@ WYDAJNOŚĆ BUDOWLI:
 - Jedna działka gracza: celuj w maks. ok. 300–500 Partów razem z maszynami; cała mapa z 8 działkami: maks. kilka tysięcy.
 - Duże płaskie powierzchnie (podłoga, ściany) jako duże klocki, nie setki małych. Szachownica = duże kafle albo tekstura, a nie tysiące klocków 1×1.
 
+## 0C. MAPA PROJEKTU – STRUKTURA I KOMUNIKACJA
+Trzymaj się tej struktury od pierwszego kroku. Jeśli coś trzeba zmienić albo dodać, powiedz mi o tym i dopisz zmianę do PROGRESS.md. Nazwy w kodzie po angielsku.
+
+DRZEWKO EXPLORERA:
+ReplicatedFirst
+  LoadingScreen (LocalScript, tylko jeśli potrzebny)
+ReplicatedStorage
+  Shared (Folder z ModuleScriptami używanymi przez serwer i klienta)
+    Config – wszystkie liczby do strojenia (ceny, czasy, szanse fuzji, ID produktów, pusta sekcja GamePasses)
+    Rarities – tabela rzadkości i funkcja losowania
+    Mutations – tabela mutacji i funkcja losowania
+    Items – lista przedmiotów (id, nazwa, rzadkość, wartość, nazwa szablonu)
+    Recipes – sekretne przepisy (TYLKO dane wyniku i sylwetki; same składniki trzymaj na serwerze, patrz ServerStorage)
+    Events – lista wydarzeń serwerowych
+    Strings – wszystkie napisy w grze (po angielsku)
+    NumberFormat – skracanie liczb (1.2K, 3.4M)
+  Templates (Folder)
+    Items – klockowe modele przedmiotów
+    Critters – złoty i tęczowy stworek
+    Effects – gotowe efekty (cząsteczki, światła)
+  Remotes (Folder z RemoteEvents/RemoteFunctions – lista niżej)
+ServerScriptService
+  Main (Script) – uruchamia wszystkie serwisy w ustalonej kolejności
+  Services (Folder z ModuleScriptami)
+    DataManager, PlotManager, DropperManager, ConveyorManager, Multipliers, UpgradeManager, InventoryManager, CollectionManager (gablota + Index), FusionManager, EventManager, CritterManager, RebirthManager, ProductManager, AnnouncementManager, LeaderboardManager, CodesManager, AnalyticsTracker, RemoteGuard (sprawdzanie i limit częstotliwości RemoteEvents)
+  BonusZnajomi (Script – mój gotowy skrypt bonusu za znajomych)
+ServerStorage
+  Templates (Folder): Plot, Dropper, Conveyor, Seller, FusionMachine, Showcase
+  SecretRecipes (ModuleScript – składniki przepisów; tylko serwer, żeby nikt ich nie wyciągnął z gry)
+StarterPlayer
+  StarterPlayerScripts
+    ClientMain (LocalScript) – uruchamia kontrolery
+    Controllers (Folder z ModuleScriptami): DropVisuals (wypadanie, taśma, sprzedaż), EffectsController (drabina efektów), CameraShake, SoundController, UIController, FusionVisuals, CritterVisuals, EventVisuals (niebo i światło w czasie wydarzeń)
+StarterGui
+  MainUI (ScreenGui): HUD (monety, Luck, pity, żetony, odliczanie do wydarzenia), Upgrades, Inventory, Index, RecipeBook, Fusion, Rebirth, Shop, Settings, Notifications
+SoundService
+  Sounds (Folder pogrupowany: Drops, Rarities, Mutations, UI, Fusion, Events, Ambient)
+Workspace
+  Map (stałe elementy mapy), Plots (działki graczy), Effects (tymczasowe efekty), Critters (stworki)
+
+PROSTE WARTOŚCI GRACZA: monety, Luck, licznik pity, liczba żetonów, rebirthy trzymaj jako atrybuty gracza (Player:SetAttribute) i leaderstats – klient widzi je automatycznie i UI reaguje na GetAttributeChangedSignal. Większe dane (ekwipunek, Index, przepisy) wysyłaj przez Remotes.
+
+REMOTES – SERWER → KLIENT:
+- DropSpawned (do wszystkich): id dropu, UserId właściciela, id przedmiotu, rzadkość, mutacja, czas startu – klienci pokazują animację.
+- DropResolved (do wszystkich): id dropu, czy sprzedany czy zachowany, ile monet.
+- Announcement (do wszystkich): ogłoszenie serwerowe (Secret albo mutacja MEGA na Rare+).
+- InventoryUpdated (do gracza): zmiany w ekwipunku.
+- CollectionUpdated (do gracza): zmiany w gablocie, Indexie i księdze przepisów.
+- FusionResult (do wszystkich – animacja na działce; szczegóły dla gracza): sukces/porażka, wynik.
+- EventChanged (do wszystkich): jakie wydarzenie trwa / nadchodzi i kiedy.
+- CritterSpawned / CritterCaught (do wszystkich): stworek (id, typ, dane ścieżki, czas startu) / kto go złapał.
+- Notify (do gracza): krótki komunikat (klucz z Strings + dane).
+
+REMOTES – KLIENT → SERWER (każdy przez RemoteGuard: sprawdź typy, wartości i limit częstotliwości):
+- BuyUpgrade(upgradeId)
+- SetAutoKeep(ustawienia)
+- InventoryAction(akcja: sell / showcase / unshowcase, uid przedmiotu)
+- RequestFusion(lista uid przedmiotów) – serwer sam liczy szansę i wynik
+- RequestRebirth()
+- CatchCritter(critterId) – serwer sprawdza odległość i kto był pierwszy
+- SetSetting(nazwa, wartość) – np. „Mniej efektów”
+- RedeemCode(kod) – RemoteFunction zwracająca wynik
+- DebugCommand(...) – działa TYLKO w Studio (RunService:IsStudio()), na serwerze opublikowanej gry ignorowane
+Zakupy za Robuxy idą przez MarketplaceService (bez własnych Remotes), a przyciski tycoona przez dotknięcie po stronie serwera.
+
 ## 1. POMYSŁ GRY
 Każdy gracz dostaje własną działkę (tycoon) z JEDNĄ maszyną (Dropper).
 Maszyna co kilka sekund zrzuca na taśmę LOSOWY przedmiot. Każdy przedmiot ma rzadkość.
@@ -186,7 +253,7 @@ SEKRETNE PRZEPISY:
 - Poprawny przepis też nie jest pewny: ma szansę zależną od rzadkości wyniku (jak w tabeli wyżej, kolumna 3 przedmioty). Po odkryciu przepisu gracz widzi go w swojej księdze przepisów razem z dokładną szansą.
 - Podpowiedzi: w Indexie sekretne przedmioty są czarnymi sylwetkami „???” z liczbą składników; codziennie w centrum mapy wisi jedna zagadka-podpowiedź (np. „coś z kuchni + coś, co świeci”).
 - Odkrycie przepisu po raz pierwszy: wielki efekt tylko dla tego gracza (księga się otwiera, strona się zapisuje, fanfary). Ogłoszenie serwerowe tylko według zwykłych zasad (sekcja 8).
-- Przepisy trzymaj w ModuleScript Recipes; nowe przepisy w aktualizacjach co tydzień = nowa zawartość do odkrywania.
+- Przepisy trzymaj w ModuleScript Recipes (wyniki) i SecretRecipes w ServerStorage (składniki – tylko serwer); nowe przepisy w aktualizacjach co tydzień = nowa zawartość do odkrywania.
 
 ANIMACJA FUZJI (bardzo ważna, zasady ruchu z sekcji 9):
 - Przedmioty wlatują do maszyny jeden po drugim łukiem, maszyna z każdym robi się bardziej napięta (trzęsie się, świeci, rośnie dźwięk).
@@ -227,7 +294,7 @@ Zasady:
 - Liczby monet „wyskakują” z przedmiotu przy sprzedaży (+150) i lecą do licznika na górze ekranu; licznik krótko się powiększa.
 - Dźwięk każdej rzadkości jest inny i rozpoznawalny bez patrzenia.
 - System „pity”: jeśli gracz przez 800 dropów nie dostał Legendary lub lepszego, następny drop to gwarantowany Legendary (pokaż pasek „Gwarantowany Legendary za: 137 dropów”). Licznik zapisuj w danych gracza. Gracz zawsze ma na co czekać.
-- Wszystkie efekty trzymaj w jednym module (EffectsManager) z jedną tabelą ustawień na rzadkość, żebym mógł je łatwo stroić.
+- Wszystkie efekty trzymaj w jednym module po stronie klienta (EffectsController, sekcja 0C) z jedną tabelą ustawień na rzadkość, żebym mógł je łatwo stroić.
 - OGŁOSZENIE NA CAŁY SERWER jest rzadkie i wyjątkowe. Pojawia się TYLKO, gdy:
   a) ktoś trafi przedmiot Secret, albo
   b) ktoś trafi mutację MEGA (Tęczowa, Kosmiczna) na przedmiocie Rare lub lepszym.
@@ -346,7 +413,7 @@ Obsłuż je przez MarketplaceService.ProcessReceipt POPRAWNIE: zapisz zakup w Da
 2. Zapisywanie: DataStoreService z pcall i ponawianiem, UpdateAsync, autozapis co 2 minuty, zapis przy wyjściu gracza i w game:BindToClose. Wersjonuj dane (pole „wersja”), żeby przyszłe aktualizacje nie psuły zapisów. Zapisuj: monety, ulepszenia, rebirthy, ekwipunek (przedmioty z mutacjami), przedmioty w gablocie, Index (zdobyte przedmioty i mutacje), odkryte przepisy, żetony mutacji, ustawienia auto-zachowywania, licznik pity, najrzadszy drop, kupione produkty.
 3. Wydajność: maks. ok. 30 przedmiotów na taśmie na gracza; stare usuwaj. Przedmioty to małe modele z klocków (najlepiej do ok. 15 Partów każdy, trzymane jako gotowe szablony w ReplicatedStorage i klonowane), animowane po stronie klienta (sekcja 9), a serwer liczy tylko czas dojazdu.
 4. UI: WSZYSTKO w Scale (procentach), nie w Offset, z UIAspectRatioConstraint dla ikon i TextScaled + UITextSizeConstraint dla tekstów. Gra musi wyglądać dobrze na TELEFONIE. Nie kładź przycisków w lewym dolnym rogu (joystick) ani w prawym dolnym (skok).
-5. Kod modularny: ModuleScripty Config, Rarities, Items, DataManager, DropperManager, ConveyorManager, UpgradeManager, Multipliers, ProductManager, EffectsManager, Mutations, InventoryManager, FusionManager, Recipes, Events, EventManager, CritterManager, RebirthManager, AnnouncementManager, CollectionManager + jeden RemoteEvents folder w ReplicatedStorage.
+5. Kod modularny według struktury z sekcji 0C (Mapa projektu). Nie twórz plików poza tą strukturą bez powiedzenia mi o tym.
 6. Każdy plik zaczyna się komentarzem: co robi i gdzie leży. Komentarze po polsku.
 
 ## 17. WERSJA NA START (MVP)
@@ -412,7 +479,7 @@ GOTOWE, GDY: każda mutacja jest od razu rozpoznawalna wzrokiem na każdym przed
 ## KROK 6: Drabina efektów i ogłoszenia
 CEL: Rzadki drop daje „WOW”. Ten krok dopracowujemy, aż będzie naprawdę satysfakcjonujący.
 CO ZROBIĆ:
-- EffectsManager z jedną tabelą ustawień na rzadkość i na mutację (brief: 5, 8).
+- EffectsController (klient) z jedną tabelą ustawień na rzadkość i na mutację (brief: 5, 8).
 - Wszystkie efekty z drabiny: dźwięki, cząsteczki, światło, kamera, napisy, napięcie przed Legendary+ (tylko gdy naprawdę wypadło), szansa „1 na X”; efekt „MUTACJA!”.
 - Ogłoszenia serwerowe TYLKO przy Secret albo mutacji MEGA na przedmiocie Rare+ (brief: 8), ze słupem światła nad działką.
 - Pasek pity „Gwarantowany Legendary za: X dropów” i sama gwarancja po stronie serwera.
@@ -455,7 +522,7 @@ CEL: Aktywny, emocjonujący sposób na lepsze przedmioty – z prawdziwym ryzyki
 CO ZROBIĆ:
 - Maszyna do fuzji na działce i okno wyboru 3–10 takich samych przedmiotów z ekwipunku; pasek szansy rosnący na żywo i dokładny procent (brief: 6).
 - Okno potwierdzenia (drugie przy Legendary+); porażka = utrata wszystkich włożonych przedmiotów; dziedziczenie mutacji i 5% na nową. Wszystko liczy serwer: najpierw zabiera przedmioty, potem losuje, potem zapisuje.
-- Sekretne przepisy (ModuleScript Recipes, 5–8 przepisów na start), napis „Eksperyment” przy nieznanych kombinacjach, księga przepisów, sylwetki „???” w Indexie, codzienna podpowiedź w centrum mapy.
+- Sekretne przepisy (5–8 na start; wyniki i sylwetki w Recipes, składniki tylko na serwerze w SecretRecipes – sekcja 0C), napis „Eksperyment” przy nieznanych kombinacjach, księga przepisów, sylwetki „???” w Indexie, codzienna podpowiedź w centrum mapy.
 - Animacja fuzji: sukces i porażka (brief: 6 – Animacja fuzji).
 - W Studio komenda testowa dająca przedmioty do testów fuzji.
 GOTOWE, GDY: widzę dokładną szansę przed fuzją, sukces i porażka działają zgodnie z tabelą, animacja trzyma w napięciu, odkryty przepis zapisuje się w księdze i zostaje po powrocie do gry.
@@ -503,8 +570,9 @@ CO ZROBIĆ:
 GOTOWE, GDY: wszystko z MVP działa, gra dobrze wygląda i chodzi na telefonie – można publikować. Game passy robimy dopiero po tym (brief: 18).
 
 ## JAK MI ODPOWIADAĆ (przy każdym kroku)
-- Przy każdym kroku sprawdź go z sekcjami 0 i 0B (zasady dobrych gier i budowania) i krótko napisz, czego z nich pilnowałeś.
+- Przy każdym kroku sprawdź go z sekcjami 0, 0B i 0C (zasady dobrych gier, budowania i mapa projektu) i krótko napisz, czego z nich pilnowałeś.
 - Przy krokach z budowaniem opisz, co powinienem zobaczyć w Studio, i poproś o zrzut ekranu z kilku stron, żeby poprawić wygląd.
+- Na koniec każdego kroku podaj zaktualizowany PROGRESS.md.
 - Przy każdym kroku podaj: listę plików, pełny kod każdego pliku (bez „…reszta kodu”), dokładne miejsce w Explorerze i jak przetestować krok w Studio (Play / Test → Device telefon).
 - Jeśli coś wymaga zrobienia ręcznie w Studio (np. stworzenie Partu), opisz to krok po kroku.
 - Po każdym kroku napisz krótko, co mogło pójść źle i jak to rozpoznać w oknie Output.
@@ -512,5 +580,24 @@ GOTOWE, GDY: wszystko z MVP działa, gra dobrze wygląda i chodzi na telefonie �
 - Przy krokach z efektami i grafiką zaproponuj, co jeszcze mogłoby zwiększyć satysfakcję lub poprawić wygląd, ale zrób to jako osobną listę propozycji.
 
 Zacznij od kroku 1.
+
+## WZÓR DZIENNIKA POSTĘPU (PROGRESS.md)
+Utrzymuj go dokładnie w tym układzie i aktualizuj po KAŻDYM kroku:
+
+# PROGRESS – Tycoon, but every drop is RNG
+## Stan
+Ostatni skończony krok: X. Następny krok: Y. Data ostatniej zmiany.
+## Zrobione kroki
+- Krok N – nazwa: co powstało (1–3 zdania), co przetestowałem.
+## Pliki w projekcie
+| Ścieżka w Explorerze | Typ | Co robi |
+## Decyzje i ustalenia
+- Ważne wybory, które zapadły w rozmowie (np. zmienione liczby, nazwy, zasady), żeby ich nie zgubić.
+## Odstępstwa od mapy projektu (sekcja 0C)
+- Co i dlaczego jest inaczej niż w strukturze.
+## Znane problemy i rzeczy do zrobienia później
+- Lista.
+## Do uzupełnienia przeze mnie
+- ID dźwięków, obrazków, produktów itp., które muszę wpisać sam.
 
 Na początek: przeczytaj brief, napisz podsumowanie i pytania, a potem czekaj na „zaczynaj krok 1”.
