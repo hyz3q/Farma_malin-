@@ -6,7 +6,7 @@ Ten prompt ma dwie części:
 - CZĘŚĆ 2 – KROKI: budujemy grę po kolei, krok po kroku.
 
 Zasady:
-1. Teraz przeczytaj CAŁY brief (od sekcji 0 – zasad dobrych gier Roblox, które obowiązują w każdym kroku) i NIE pisz jeszcze kodu.
+1. Teraz przeczytaj CAŁY brief (od sekcji 0 i 0B – zasad dobrych gier Roblox i budowania, które obowiązują w każdym kroku) i NIE pisz jeszcze kodu.
 2. Odpowiedz krótkim podsumowaniem (5–8 zdań), jak rozumiesz grę, i zadaj pytania, jeśli coś jest niejasne.
 3. Potem czekaj, aż napiszę „zaczynaj krok 1”.
 4. Rób tylko JEDEN krok naraz. Po każdym kroku czekaj, aż przetestuję i napiszę „działa” albo opiszę problem.
@@ -65,6 +65,46 @@ I. POMIAR I POPRAWKI
 
 J. JĘZYK W GRZE
 - Wszystkie napisy w grze po ANGIELSKU (gracze z całego świata), krótkie i proste. Przykłady napisów w tym briefie są po polsku tylko dla mnie – w grze przetłumacz je na angielski (np. „Gwarantowany Legendary za: 37 dropów” → „Legendary guaranteed in: 37 drops”); ikonki zamiast długich tekstów. Teksty trzymaj w jednym module, żeby łatwo dodać tłumaczenia (LocalizationService) później.
+
+## 0B. JAK BUDOWAĆ W ROBLOX – BUDOWLE, MAPA I MODELE
+Budujesz kodem, więc nie widzisz efektu od razu. Dlatego trzymaj się tych zasad i przy każdym budowaniu opisz mi, co powinienem zobaczyć, żebym mógł sprawdzić i wysłać zrzut ekranu.
+
+SKALA (najczęstszy błąd AI to złe proporcje):
+- Postać gracza ma ok. 5 studów wysokości i 2 szerokości. Wszystko mierz względem niej.
+- Drzwi/przejścia: min. 6 szerokości × 8 wysokości. Ścieżki: 8–12 studów szerokości. Schody: stopień 1 stud wysokości, 2 study głębokości.
+- Działka gracza: ok. 60 × 100 studów (miejsce na maszynę, taśmę, zjadacz, przyciski, gablotę i maszynę do fuzji, z wolnym miejscem do chodzenia). Ściany między działkami: 25–35 studów wysokości.
+- Maszyna dropiąca: ok. 12–16 studów wysokości – wyraźnie większa od gracza, widoczna z daleka. Przyciski tycoona: 4 × 4 study, płaskie (0,5–1 stud wysokości) z napisem i ceną nad nimi (BillboardGui).
+- Przedmioty z droppera: 2–4 study (rzadkie mogą być trochę większe).
+
+KSZTAŁTY I STYL BUDOWLI:
+- Budowle „pulchne” i proste: grube ściany (min. 1 stud), duże bryły, zaokrąglenia robione klinami (WedgePart/CornerWedgePart) i cylindrami. Mało drobnych detali – każdy detal ma być widoczny z 30 studów.
+- Każda budowla ma 3 warstwy: (1) PODSTAWA – duże bryły i kształt, (2) ŚREDNIE – dachy, okna, ramy, rury, (3) DETALE – lampki, napisy, ozdoby. Najpierw zawsze warstwa 1 (blockout), dopiero potem reszta.
+- Ciekawa sylwetka: łam proste kształty (wystający daszek, komin, antena, asymetryczny dodatek), żeby budowla była rozpoznawalna nawet jako czarny cień.
+- Kolory: zasada 60/30/10 – 60% kolor główny, 30% drugi, 10% akcent (np. świecące lampki). Krawędzie i ramy w ciemniejszym lub jaśniejszym odcieniu koloru bryły, żeby kształty się nie zlewały.
+- Studsy i szachownica jak w sekcji 10 (Grafika).
+
+PRECYZJA (żeby budowle wyglądały porządnie):
+- Wszystko wyrównane do siatki: pozycje i rozmiary w pełnych studach albo połówkach (0,5). Żadnych „krzywych” liczb typu 3,137.
+- Bez szczelin między klockami i bez dwóch ścian w tym samym miejscu (z-fighting – migotanie). Jeśli klocki się stykają, niech jeden lekko wchodzi w drugi albo stykają się idealnie.
+- Wszystko, co jest częścią mapy: Anchored = true. Drobne ozdoby (trawa, kwiatki, lampki): CanCollide = false i CastShadow = false (mniej lagów, gracz się o nie nie potyka).
+- Ostrożnie z Unionami (potrafią się psuć i lagować) – używaj ich tylko, jeśli naprawdę trzeba.
+
+ORGANIZACJA:
+- Każda budowla to Model z sensowną nazwą (np. „Dropper”, „Seller”, „FusionMachine”) i ustawionym PrimaryPart; części w środku też nazwane (nie „Part, Part, Part”).
+- Workspace podzielony na foldery: Map (stałe elementy), Plots (działki), Effects (tymczasowe efekty). Szablony do klonowania (działka, maszyna, przedmioty) w ServerStorage / ReplicatedStorage.
+- Statyczną mapę buduj JEDNORAZOWYM skryptem do wklejenia w Command Bar w Studio (tworzy budowle w trybie edycji, potem zapisuję grę). Rzeczy, które powstają w czasie gry (działki graczy, przedmioty, efekty), klonuj z szablonów.
+- Każdy skrypt budujący ma na górze tabelę ustawień (kolory, rozmiary), żebym mógł łatwo zmieniać wygląd, i funkcję pomocniczą do tworzenia klocka (rozmiar, pozycja, kolor, materiał, studsy), żeby kod był krótki i spójny.
+
+KOMPOZYCJA MAPY (jak ma się czytać z perspektywy gracza):
+- Jeden wyraźny punkt centralny widoczny z każdego miejsca (kolorowe centrum na środku – najwyższe, najjaśniejsze, z czymś świecącym lub ruchomym).
+- Gracz zawsze widzi, dokąd iść: szerokie ścieżki w innym kolorze niż trawa, strzałki, znaki z ikonkami.
+- Na działce elementy ułożone w kolejności działania: maszyna → taśma → zjadacz, a przyciski ulepszeń obok, w zasięgu kilku kroków. Nic ważnego za plecami gracza po spawnie.
+- Puste miejsca też coś mają: kępki trawy z klocków, kamienie, krzaki, kwiatki – ale bez zaśmiecania ścieżek.
+- Brzegi mapy zamknięte naturalnie (wysokie ściany, wzgórza z klocków), bez niewidzialnych ścian, o które gracz się „odbija” bez powodu.
+
+WYDAJNOŚĆ BUDOWLI:
+- Jedna działka gracza: celuj w maks. ok. 300–500 Partów razem z maszynami; cała mapa z 8 działkami: maks. kilka tysięcy.
+- Duże płaskie powierzchnie (podłoga, ściany) jako duże klocki, nie setki małych. Szachownica = duże kafle albo tekstura, a nie tysiące klocków 1×1.
 
 ## 1. POMYSŁ GRY
 Każdy gracz dostaje własną działkę (tycoon) z JEDNĄ maszyną (Dropper).
@@ -455,7 +495,8 @@ CO ZROBIĆ:
 GOTOWE, GDY: wszystko z MVP działa, gra dobrze wygląda i chodzi na telefonie – można publikować. Game passy robimy dopiero po tym (brief: 18).
 
 ## JAK MI ODPOWIADAĆ (przy każdym kroku)
-- Przy każdym kroku sprawdź go z sekcją 0 (zasady dobrych gier) i krótko napisz, czego z niej pilnowałeś.
+- Przy każdym kroku sprawdź go z sekcjami 0 i 0B (zasady dobrych gier i budowania) i krótko napisz, czego z nich pilnowałeś.
+- Przy krokach z budowaniem opisz, co powinienem zobaczyć w Studio, i poproś o zrzut ekranu z kilku stron, żeby poprawić wygląd.
 - Przy każdym kroku podaj: listę plików, pełny kod każdego pliku (bez „…reszta kodu”), dokładne miejsce w Explorerze i jak przetestować krok w Studio (Play / Test → Device telefon).
 - Jeśli coś wymaga zrobienia ręcznie w Studio (np. stworzenie Partu), opisz to krok po kroku.
 - Po każdym kroku napisz krótko, co mogło pójść źle i jak to rozpoznać w oknie Output.
