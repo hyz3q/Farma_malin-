@@ -1,0 +1,16 @@
+===== RAPORT: Dzialka_Test =====
+Klocków: 112 (limit 500)
+Rozmiar całości: 64.0 x 31.0 x 98.5 (szer. X × wys. Y × głęb. Z)
+Wysokość = 6.2 wysokości gracza (gracz ≈ 5 studów)
+Kolory: 30 różnych. Udział (wg objętości):
+    #6CC24A   22.3%  (12 klocków)
+    #5DB23F   22.3%  (12 klocków)
+    #E8954A   14.4%  (6 klocków)
+    #D9803A   14.0%  (4 klocków)
+    #FF9A1F    3.3%  (1 klocków)
+    #4CC94C    3.2%  (1 klocków)
+    #F2D98A    2.9%  (1 klocków)
+    #4FB83A    2.7%  (5 klocków)
+  ℹ Żaden kolor nie dominuje (<35%) – zasada 60/30/10 sugeruje jeden kolor główny
+  ℹ Ponad 10 kolorów – sprawdź, czy budowla nie jest zbyt pstrokata
+Ostrzeżeń: 0
