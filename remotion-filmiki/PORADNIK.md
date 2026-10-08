@@ -12,7 +12,10 @@ tworzyć, poprawiać i renderować za Ciebie – także w sesji w chmurze.
   - `PromoTikTok` – 15 s, 1080×1920 (TikTok / Shorts / Reels), reklama gry: maszyna, dropy, LEGENDARY, SECRET, „PLAY NOW”.
   - `Motywacja` – 15 s, 1080×1080, 12 fps, styl vintage-plakatu jak wzór (@mondayschallenge #27): pętla 5 s
     spokój → uderzenie tytułu → zassanie.
-- Gotowe pliki MP4: `gotowe/promo-tiktok.mp4`, `gotowe/motywacja.mp4`, porównanie ze wzorem `gotowe/porownanie_z_wzorem.png`.
+  - `TelefonVsCele` – 60 s, 1080×1920, 12 fps, ten sam styl: 12 scen po 5 s („SCROLL.” → „PHONE DOWN / GOALS UP”),
+    własna muzyka (najpierw mol, od sceny START dur i coraz mocniej) + efekty. Teksty scen: tablica `SCENES`
+    w `src/TelefonVsCele.tsx`, dźwięki: `dzwieki/generuj_dzwieki_telefon.py`. Wspólny styl: `src/vintage.tsx`.
+- Gotowe pliki MP4 (też `gotowe/telefon-vs-cele.mp4`): `gotowe/promo-tiktok.mp4`, `gotowe/motywacja.mp4`, porównanie ze wzorem `gotowe/porownanie_z_wzorem.png`.
 
 ## Linki
 - Strona Remotion: https://www.remotion.dev

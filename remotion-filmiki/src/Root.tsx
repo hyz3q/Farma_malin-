@@ -2,6 +2,7 @@
 import { Composition } from "remotion";
 import { PromoTikTok } from "./PromoTikTok";
 import { Motywacja } from "./Motywacja";
+import { TelefonVsCele } from "./TelefonVsCele";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -31,6 +32,18 @@ export const RemotionRoot: React.FC = () => {
           theme: "Motivation",
           title: "KEEP GOING!",
           subtitle: "ONE DROP AT A TIME",
+        }}
+      />
+      <Composition
+        id="TelefonVsCele"
+        component={TelefonVsCele}
+        durationInFrames={720} // 60 s przy 12 fps = 12 scen po 5 s
+        fps={12}
+        width={1080}
+        height={1920} // pionowo: TikTok, Shorts, Reels
+        defaultProps={{
+          handle: "@rngtycoon",
+          theme: "Phone vs Goals",
         }}
       />
     </>
